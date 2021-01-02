@@ -1,0 +1,40 @@
+{
+  "name": "multivector",
+  "version": "0.0.1",
+  "description": "Swizzle-friendly multivector for GA",
+  "author": "Wan",
+  "license": "MIT",
+  "keywords": [
+    "math",
+    "vector",
+    "GA",
+    "algebra",
+    "swizzle"
+  ],
+  "main": "./src/index.js",
+  "scripts": {
+    "clean": "rimraf ./dist",
+    "build:dev": "rollup -c --environment NODE_ENV:development",
+    "build:prod": "rollup -c --environment NODE_ENV:production"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.10",
+    "@babel/eslint-parser": "^7.12.1",
+    "@babel/eslint-plugin": "^7.12.1",
+    "@babel/plugin-transform-runtime": "^7.12.10",
+    "@babel/preset-env": "^7.12.11",
+    "@babel/register": "^7.12.10",
+    "@babel/runtime": "^7.12.5",
+    "@rollup/plugin-babel": "^5.2.2",
+    "@rollup/plugin-commonjs": "^17.0.0",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^11.0.1",
+    "core-js": "^3.8.1",
+    "eslint": "^7.17.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1",
+    "jest": "^26.6.3",
+    "rollup": "^2.35.1",
+    "rollup-plugin-terser": "^7.0.2"
+  }
+}
