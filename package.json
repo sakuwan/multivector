@@ -15,7 +15,8 @@
   "scripts": {
     "clean": "rimraf ./dist",
     "build:dev": "rollup -c --environment NODE_ENV:development",
-    "build:prod": "rollup -c --environment NODE_ENV:production"
+    "build:prod": "rollup -c --environment NODE_ENV:production",
+    "test:unit": "jest ./test"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",

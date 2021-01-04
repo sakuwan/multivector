@@ -1,29 +1,61 @@
-import { uniqueComponents, mapComponents, componentSwizzles } from './util';
+import {
+  uniqueComponents,
+  mapComponents,
+  componentSwizzles,
+  initializeFloatArray,
+} from './util';
 
-const proxifyFloatArray = (mask) => {
-  const proxyGenerators = [];
+export const proxifyFloatArray = (mask) => {
+  const proxyGenerators = {};
 
   const comps = uniqueComponents(mask);
   const cmap = mapComponents(comps);
   const swizzles = componentSwizzles(comps);
 
-  const proxyGet = (vec, swiz, map) => (
+  const proxyGet = (vec, swiz) => (
     (swiz.length === 1)
-      ? vec[map[swiz[0]]]
-      : proxyGenerators[swiz.length - 2](swiz.map((x) => vec[map[x]]))
+      ? vec[cmap[swiz[0]]]
+      : proxyGenerators[swiz.length]([...swiz].map((x) => vec[cmap[x]]))
   );
 
-  const proxySet = (vec, swiz, map, value) => {
-    const count = value.length - 1;
+  const proxySet = (vec, swiz, value) => {
+    const count = value.length;
     const multi = Array.isArray(value);
-    swiz.forEach((x, i) => {
-      if (multi && i < count) {
-        vec[map[x]] = value[i]; // eslint-disable-line no-param-reassign
-      } else if (!multi) {
-        vec[map[x]] = value; // eslint-disable-line no-param-reassign
-      }
-    });
 
+    /* eslint-disable no-param-reassign */
+    const setValues = (v, i) => {
+      vec[cmap[v]] = multi ? value[i % count] : value;
+    };
+    /* eslint-enable no-param-reassign */
+
+    [...swiz].forEach(setValues);
     return true;
   };
+
+  const proxyHandler = {
+    get(target, key, receiver) {
+      return swizzles.includes(key)
+        ? proxyGet(target, key)
+        : Reflect.get(target, key, receiver);
+    },
+    set(target, key, value, receiver) {
+      return swizzles.includes(key)
+        ? proxySet(target, key, value)
+        : Reflect.set(target, key, value, receiver);
+    },
+  };
+
+  const makeProxy = (key) => (
+    (...v) => new Proxy(initializeFloatArray([].concat(...v), key), proxyHandler)
+  );
+
+  const reducer = (a, _, i) => (
+    (i > 0)
+      ? Object.assign(a, { [i + 1]: makeProxy(i + 1) })
+      : a
+  );
+
+  return comps.reduce(reducer, proxyGenerators);
 };
+
+export const { 2: mvec2, 3: mvec3, 4: mvec4 } = proxifyFloatArray([...'xyzw']);
