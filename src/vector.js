@@ -3,6 +3,8 @@ import {
   mapComponents,
   componentSwizzles,
   initializeFloatArray,
+
+  VectorBuffer,
 } from './util';
 
 export const proxifyFloatArray = (mask) => {
@@ -35,27 +37,36 @@ export const proxifyFloatArray = (mask) => {
   const proxyHandler = {
     get(target, key, receiver) {
       return swizzles.includes(key)
-        ? proxyGet(target, key)
+        ? proxyGet(target.buffer, key)
         : Reflect.get(target, key, receiver);
     },
     set(target, key, value, receiver) {
       return swizzles.includes(key)
-        ? proxySet(target, key, value)
+        ? proxySet(target.buffer, key, value)
         : Reflect.set(target, key, value, receiver);
+    },
+    apply(target) {
+      return target.buffer;
     },
   };
 
+  const initializeBuffer = (v, key) => {
+    const mvb = Object.create(VectorBuffer);
+    mvb.buffer = initializeFloatArray(v, key);
+    return mvb;
+  };
+
   const makeProxy = (key) => (
-    (...v) => new Proxy(initializeFloatArray([].concat(...v), key), proxyHandler)
+    (...v) => new Proxy(initializeBuffer([].concat(...v), key), proxyHandler)
   );
 
-  const reducer = (a, _, i) => (
+  const mapGenerators = (a, _, i) => (
     (i > 0)
       ? Object.assign(a, { [i + 1]: makeProxy(i + 1) })
       : a
   );
 
-  return comps.reduce(reducer, proxyGenerators);
+  return comps.reduce(mapGenerators, proxyGenerators);
 };
 
 export const { 2: mvec2, 3: mvec3, 4: mvec4 } = proxifyFloatArray([...'xyzw']);

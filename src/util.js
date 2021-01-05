@@ -18,4 +18,26 @@ export const initializeFloatArray = (values, len) => {
     : Float32Array.from({ length: len }, (_, i) => values[i % count]);
 };
 
-// TODO: Actual TypedArray function wrappers
+export const VectorBuffer = {
+  buffer: null,
+
+  [Symbol.toPrimitive](type) {
+    if (type === 'string') {
+      const [x, y, z, w] = this.buffer;
+      return `(${x}, ${y}, ${z}, ${w})`;
+    }
+
+    // type = number, default
+    return this.buffer.reduce((a, c) => a + c);
+  },
+
+  [Symbol.iterator]() {
+    let i = 0;
+    return {
+      next: () => ({
+        value: this.buffer[i++], // eslint-disable-line no-plusplus
+        done: i > this.buffer.length,
+      }),
+    };
+  },
+};
