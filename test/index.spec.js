@@ -1,3 +1,7 @@
+/**
+ * @jest-environment node
+ */
+
 /* eslint-disable */
 
 import assert from 'assert';
@@ -15,7 +19,7 @@ const eq = (...args) => {
   assert.strictEqual(actual, expected);
 };
 
-describe('multivector', function () {
+describe('unit', function () {
   it('Properly initializes from provided values', function () {
     const v1 = mvec4([1, 2, 3, 4]);
     eq(v1.buffer, new Float32Array([1, 2, 3, 4]));
@@ -29,6 +33,12 @@ describe('multivector', function () {
     let v1_1 = mvec4(...v1);
     v1_1.xyz = [6, 5, 4];
     eq(v1_1.buffer, new Float32Array([6, 5, 4, 4]));
+
+    let x = v1_1.reduce((a, c) => a + c);
+    eq(x, 19);
+
+    let length = +mvec4(1, -3, 3, 1);
+    console.log(v1);
   });
 
   // TODO: Actual benchmarks to see the significance of the Proxy hit; likely large

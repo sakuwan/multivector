@@ -2,9 +2,10 @@ import {
   uniqueComponents,
   mapComponents,
   componentSwizzles,
-  initializeFloatArray,
 
-  VectorBuffer,
+  TypedArrayMethods,
+
+  initializeBuffer,
 } from './util';
 
 export const proxifyFloatArray = (mask) => {
@@ -36,28 +37,25 @@ export const proxifyFloatArray = (mask) => {
 
   const proxyHandler = {
     get(target, key, receiver) {
-      return swizzles.includes(key)
-        ? proxyGet(target.buffer, key)
-        : Reflect.get(target, key, receiver);
+      if (swizzles.includes(key)) return proxyGet(target.buffer, key);
+
+      if (key in TypedArrayMethods) {
+        const arrFunction = Reflect.get(target.buffer, key, receiver);
+        return (...args) => arrFunction.apply(target.buffer, args);
+      }
+
+      return Reflect.get(target, key, receiver);
     },
+
     set(target, key, value, receiver) {
       return swizzles.includes(key)
         ? proxySet(target.buffer, key, value)
         : Reflect.set(target, key, value, receiver);
     },
-    apply(target) {
-      return target.buffer;
-    },
   };
 
-  const initializeBuffer = (v, key) => {
-    const mvb = Object.create(VectorBuffer);
-    mvb.buffer = initializeFloatArray(v, key);
-    return mvb;
-  };
-
-  const makeProxy = (key) => (
-    (...v) => new Proxy(initializeBuffer([].concat(...v), key), proxyHandler)
+  const makeProxy = (size) => (
+    (...v) => new Proxy(initializeBuffer([].concat(...v), size), proxyHandler)
   );
 
   const mapGenerators = (a, _, i) => (

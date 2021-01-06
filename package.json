@@ -16,8 +16,9 @@
     "clean": "rimraf ./dist",
     "build:dev": "rollup -c --environment NODE_ENV:development",
     "build:prod": "rollup -c --environment NODE_ENV:production",
-    "test:unit": "jest ./test"
-  },
+    "test:unit": "jest ./test -t unit",
+    "test:benchmark": "node --expose-gc ./node_modules/jest/bin/jest --runInBand --logHeapUsage ./test -t benchmark"
+  },  
   "devDependencies": {
     "@babel/core": "^7.12.10",
     "@babel/eslint-parser": "^7.12.1",
@@ -30,6 +31,7 @@
     "@rollup/plugin-commonjs": "^17.0.0",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^11.0.1",
+    "benchmark": "^2.1.4",
     "core-js": "^3.8.1",
     "eslint": "^7.17.0",
     "eslint-config-airbnb-base": "^14.2.1",
