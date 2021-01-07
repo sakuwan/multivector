@@ -1,70 +1,98 @@
-import {
-  uniqueComponents,
-  mapComponents,
-  componentSwizzles,
+/*
+ * Method map for forwarding proxied getters to their respective %TypedArray%
+ * methods. Verbose, but faster than naive forwarding and negligibly slower
+ * then directly accessing the buffer. Arguably a blacklist is smaller than
+ * this whitelist, but the clarity is better.
+*/
+const TYPED_ARRAY_METHODS = Object.assign(Object.create(null), {
+  // Functional methods
+  filter: true,
+  forEach: true,
+  map: true,
+  reduce: true,
+  reduceRight: true,
 
-  TypedArrayMethods,
+  // Non-mutating slicing methods
+  slice: true,
+  subarray: true,
 
-  initializeBuffer,
-} from './util';
+  // Testing, truthy, indexing methods
+  every: true,
+  find: true,
+  findIndex: true,
+  includes: true,
+  indexOf: true,
+  lastIndexOf: true,
+  some: true,
 
-export const proxifyFloatArray = (mask) => {
-  const proxyGenerators = {};
+  // Mutating buffer methods
+  copyWithin: true,
+  fill: true,
+  reverse: true,
+  set: true,
+  sort: true,
 
-  const comps = uniqueComponents(mask);
-  const cmap = mapComponents(comps);
-  const swizzles = componentSwizzles(comps);
+  // Iterating, key/value and string methods
+  entries: true,
+  join: true,
+  keys: true,
+  values: true,
+  [Symbol.iterator]: true,
+});
 
-  const proxyGet = (vec, swiz) => (
-    (swiz.length === 1)
-      ? vec[cmap[swiz[0]]]
-      : proxyGenerators[swiz.length]([...swiz].map((x) => vec[cmap[x]]))
-  );
+/*
+ * Vector wrapper around a float array buffer, implements helper Symbols
+ * and is the object to be proxied, forwarding %TypedArray% methods to the
+ * contained buffer, and should only be instantiated via 'initializeBuffer'
+*/
+const VectorBuffer = {
+  buffer: null,
 
-  const proxySet = (vec, swiz, value) => {
-    const count = value.length;
-    const multi = Array.isArray(value);
+  [Symbol.toPrimitive](type) {
+    if (type === 'string') {
+      const [x, y, z, w] = this.buffer;
+      return `(${x}, ${y}, ${z}, ${w})`;
+    }
 
-    /* eslint-disable no-param-reassign */
-    const setValues = (v, i) => {
-      vec[cmap[v]] = multi ? value[i % count] : value;
-    };
-    /* eslint-enable no-param-reassign */
+    const sqsum = (a, c) => a + c * c;
+    const length = Math.sqrt(this.buffer.reduce(sqsum, 0));
 
-    [...swiz].forEach(setValues);
-    return true;
-  };
-
-  const proxyHandler = {
-    get(target, key, receiver) {
-      if (swizzles.includes(key)) return proxyGet(target.buffer, key);
-
-      if (key in TypedArrayMethods) {
-        const arrFunction = Reflect.get(target.buffer, key, receiver);
-        return (...args) => arrFunction.apply(target.buffer, args);
-      }
-
-      return Reflect.get(target, key, receiver);
-    },
-
-    set(target, key, value, receiver) {
-      return swizzles.includes(key)
-        ? proxySet(target.buffer, key, value)
-        : Reflect.set(target, key, value, receiver);
-    },
-  };
-
-  const makeProxy = (size) => (
-    (...v) => new Proxy(initializeBuffer([].concat(...v), size), proxyHandler)
-  );
-
-  const mapGenerators = (a, _, i) => (
-    (i > 0)
-      ? Object.assign(a, { [i + 1]: makeProxy(i + 1) })
-      : a
-  );
-
-  return comps.reduce(mapGenerators, proxyGenerators);
+    return (type === 'number') ? length : (length > 0);
+  },
 };
 
-export const { 2: mvec2, 3: mvec3, 4: mvec4 } = proxifyFloatArray([...'xyzw']);
+/*
+ * Method for forwarding %TypedArray% methods called on VectorBuffer classes
+*/
+export const forwardArrayMethod = ({ buffer }, key) => (
+  (key in TYPED_ARRAY_METHODS)
+    ? (...args) => buffer[key].call(buffer, ...args)
+    : null
+);
+
+/*
+ * Create a new float array, initialized with the provided values and size,
+ * will cycle the values if the provided values are less than the size, e.g.
+ * ([1, 2], 3) -> [1, 2, 1]
+*/
+const createFloatArray = (values, size) => {
+  const { length } = values;
+
+  return (length === size)
+    ? new Float32Array(values)
+    : Float32Array.from({ size }, (_, i) => values[i % length]);
+};
+
+/*
+ * Creates a new VectorBuffer instance, setting the primary members and
+ * returning the instance, e.g.
+ * (values, length) -> new VectorBuffer
+*/
+export const createVectorBuffer = (values, length) => {
+  const bufferInstance = Object.create(VectorBuffer);
+
+  bufferInstance.length = length;
+  bufferInstance.buffer = createFloatArray(values, length);
+
+  return bufferInstance;
+};

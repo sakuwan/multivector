@@ -7,7 +7,16 @@
 import assert from 'assert';
 import { Benchmark } from 'benchmark';
 
-import { mvec4 } from '../src/vector';
+import { mvec4 } from '../src/swizzle';
+
+const eq = (...args) => {
+  assert.strictEqual(args.length, 2);
+
+  const actual = JSON.stringify(args[0]);
+  const expected = JSON.stringify(args[1]);
+
+  assert.strictEqual(actual, expected);
+};
 
 describe('benchmark', () => {
   let tableCollection = [];
@@ -53,6 +62,50 @@ describe('benchmark', () => {
     })
     .add('Buffer access', () => {
       v1.buffer.reduce(reducer);
+    })
+    .on('cycle', function(event) {
+      tableCollection.push(String(event.target));
+    })
+    .on('complete', function() {
+      tableCollection.push(`\nFastest is ${this.filter('fastest').map('name')}`);
+      console.log(tableCollection.join('\n'));
+    })
+    .run({ async: false });
+  });
+
+  it('Swizzles', () =>{
+    const v1 = mvec4([1, 2, 3, 4]);
+    const buf = new Float32Array([1, 2, 3, 4]);
+
+    eq(v1.xyzw.buffer, new Float32Array([1, 2, 3, 4]));
+    eq(v1.xxyy.buffer, new Float32Array([1, 1, 2, 2]));
+
+    {
+      const [x, y, z, w] = buf;
+      const xyzw = new Float32Array([x, y, z, w]);
+      eq(xyzw, new Float32Array([1, 2, 3, 4]));
+    }
+
+    {
+      const [x, y, ...rest] = buf;
+      const xxyy = new Float32Array([x, x, y, y]);
+      eq(xxyy, new Float32Array([1, 1, 2, 2]));
+    }
+
+    new Benchmark.Suite('Swizzles')
+    .add('Unique: xyzw', () => {
+      const xyzw = v1.xyzw;
+    })
+    .add('Repeated: xxyy', () => {
+      const xxyy = v1.xxyy;
+    })
+    .add('Manual: xyzw', () => {
+      const [x, y, z, w] = buf;
+      const xyzw = new Float32Array([x, y, z, w]);
+    })
+    .add('Manual: xxyy', () => {
+      const [x, y, ...rest] = buf;
+      const xxyy = new Float32Array([x, x, y, y]);
     })
     .on('cycle', function(event) {
       tableCollection.push(String(event.target));

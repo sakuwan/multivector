@@ -1,6 +1,5 @@
 export {
-  // TODO: Push the actual library!
+  createVectorGenerators,
 
-  proxifyFloatArray,
   mvec2, mvec3, mvec4,
-} from './vector';
+} from './swizzle';
