@@ -7,7 +7,7 @@
 import assert from 'assert';
 import { Benchmark } from 'benchmark';
 
-import { mvec4 } from '../src/swizzle';
+import { mvec4 } from '../src/vector';
 
 const eq = (...args) => {
   assert.strictEqual(args.length, 2);
@@ -106,6 +106,30 @@ describe('benchmark', () => {
     .add('Manual: xxyy', () => {
       const [x, y, ...rest] = buf;
       const xxyy = new Float32Array([x, x, y, y]);
+    })
+    .on('cycle', function(event) {
+      tableCollection.push(String(event.target));
+    })
+    .on('complete', function() {
+      tableCollection.push(`\nFastest is ${this.filter('fastest').map('name')}`);
+      console.log(tableCollection.join('\n'));
+    })
+    .run({ async: false });
+  });
+
+  it('Props', () =>{
+    const v1 = mvec4([1, 2, 3, 4]);
+    const fl1 = new Float32Array([1, 2, 3, 4]);
+
+    eq(v1.size, 4);
+    eq(fl1.length, 4);
+
+    new Benchmark.Suite('Props')
+    .add('mv length', () => {
+      const { size } = v1;
+    })
+    .add('f32array length', () => {
+      const { length } = fl1;
     })
     .on('cycle', function(event) {
       tableCollection.push(String(event.target));

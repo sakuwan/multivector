@@ -8,7 +8,7 @@ import assert from 'assert';
 
 import {
   mvec2, mvec3, mvec4
-} from '../src/swizzle';
+} from '../src/vector';
 
 const eq = (...args) => {
   assert.strictEqual(args.length, 2);
@@ -48,6 +48,9 @@ describe('unit', function () {
 
     let length = +mvec4(1, -3, 3, 1);
     console.log(v1_1);
+
+    const test = v1_1.size;
+    console.log(test);
   });
 
   // TODO: Actual benchmarks to see the significance of the Proxy hit; likely large

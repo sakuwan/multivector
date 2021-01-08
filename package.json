@@ -17,7 +17,7 @@
     "build:dev": "rollup -c --environment NODE_ENV:development",
     "build:prod": "rollup -c --environment NODE_ENV:production",
     "test:unit": "jest ./test -t unit",
-    "test:benchmark": "node --expose-gc ./node_modules/jest/bin/jest --runInBand --logHeapUsage ./test -t benchmark"
+    "test:benchmark": "jest ./test -t benchmark"
   },  
   "devDependencies": {
     "@babel/core": "^7.12.10",
