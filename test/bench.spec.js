@@ -8,6 +8,7 @@ import assert from 'assert';
 import { Benchmark } from 'benchmark';
 
 import { mvec4 } from '../src/vector';
+import { normalize3 } from '../src/math';
 
 const eq = (...args) => {
   assert.strictEqual(args.length, 2);
@@ -140,4 +141,34 @@ describe('benchmark', () => {
     })
     .run({ async: false });
   });
+
+  /*
+  it.only('Normalizes', () =>{
+    new Benchmark.Suite('Normalizes')
+    .add('normalize', () => {
+      const v1 = mvec4([1, 2, 3, 4]);
+      v1.normalize();
+    })
+    .add('normalize2', () => {
+      const v1 = mvec4([1, 2, 3, 4]);
+      v1.normalize2();
+    })
+    .add('normalize3', () => {
+      const v1 = mvec4([1, 2, 3, 4]);
+      v1.normalize3();
+    })
+    .add('normalize3 on fl32', () => {
+      const v1 = new Float32Array([1, 2, 3, 4]);
+      normalize3(v1);
+    })
+    .on('cycle', function(event) {
+      tableCollection.push(String(event.target));
+    })
+    .on('complete', function() {
+      tableCollection.push(`\nFastest is ${this.filter('fastest').map('name')}`);
+      console.log(tableCollection.join('\n'));
+    })
+    .run({ async: false });
+  });
+  */
 });

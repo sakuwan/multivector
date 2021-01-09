@@ -7,7 +7,8 @@
 import assert from 'assert';
 
 import {
-  mvec2, mvec3, mvec4
+  mvec2, mvec3, mvec4,
+  VectorBuffer, Point,
 } from '../src/vector';
 
 const eq = (...args) => {

@@ -1,4 +1,6 @@
 import { unique } from './util';
+import { magnitude } from './math';
+
 import createSwizzleProxyHandler from './swizzle';
 
 /*
@@ -15,10 +17,8 @@ const VectorBuffer = {
       return `(${x}, ${y}, ${z}, ${w})`;
     }
 
-    const sqsum = (a, c) => a + c * c;
-    const length = Math.sqrt(this.buffer.reduce(sqsum, 0));
-
-    return (type === 'number') ? length : (length > 0);
+    const mag = magnitude(this.buffer);
+    return (type === 'number') ? mag : (mag > 0);
   },
 };
 
