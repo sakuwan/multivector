@@ -8,7 +8,6 @@ import assert from 'assert';
 
 import {
   mvec2, mvec3, mvec4,
-  VectorBuffer, Point,
 } from '../src/vector';
 
 const eq = (...args) => {
@@ -52,6 +51,10 @@ describe('unit', function () {
 
     const test = v1_1.size;
     console.log(test);
+
+    const v4 = mvec4([1, 2, 3, 1]);
+    v4.normalize(1);
+    console.log(v4);
   });
 
   // TODO: Actual benchmarks to see the significance of the Proxy hit; likely large

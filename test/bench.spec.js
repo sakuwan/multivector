@@ -141,25 +141,27 @@ describe('benchmark', () => {
     })
     .run({ async: false });
   });
+    
+  it.only('add', () =>{
+    const fl32 = new Float32Array(4);
+    const v1 = mvec4([0, 0, 0, 0]);
+    const v2 = mvec4([0, 0, 0, 0]);
+    const v3 = mvec4([0, 0, 0, 0]);
 
-  /*
-  it.only('Normalizes', () =>{
-    new Benchmark.Suite('Normalizes')
-    .add('normalize', () => {
-      const v1 = mvec4([1, 2, 3, 4]);
-      v1.normalize();
+    new Benchmark.Suite('add')
+    .add('add', () => {
+      v1.add(1);
     })
-    .add('normalize2', () => {
-      const v1 = mvec4([1, 2, 3, 4]);
-      v1.normalize2();
+    .add('add2', () => {
+      v2.add2(1);
     })
-    .add('normalize3', () => {
-      const v1 = mvec4([1, 2, 3, 4]);
-      v1.normalize3();
+    .add('add3', () => {
+      v3.add3(1);
     })
-    .add('normalize3 on fl32', () => {
-      const v1 = new Float32Array([1, 2, 3, 4]);
-      normalize3(v1);
+    .add('add native', () => {
+      for (let i = 0; i < fl32.length; i += 1) {
+        fl32[i] += 1;
+      }
     })
     .on('cycle', function(event) {
       tableCollection.push(String(event.target));
@@ -170,5 +172,5 @@ describe('benchmark', () => {
     })
     .run({ async: false });
   });
-  */
+  
 });

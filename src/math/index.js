@@ -2,7 +2,7 @@ export {
   magnitude,
   magnitudeSquared,
   normalize,
-  normalize2,
-  normalize3,
+  normalized,
   reverse,
+  scalarAdd,
 } from './ops';

@@ -21,19 +21,16 @@ export const normalize = (buffer) => {
   buffer.forEach(norm);
 };
 
-export const normalize2 = (buffer) => {
+export const normalized = (buffer) => {
   const norm = (v, i, a) => set(i, ((1.0 / v) * (2 - (1.0 / v) * v)) * v, a);
 
   buffer.forEach(norm);
 };
 
-export const normalize3 = (buffer) => {
-  const norm = (v, i, a) => {
-    const rcp = (1.0 / v);
-    set(i, (rcp * (2 - rcp * v)) * v, a);
-  };
-
-  buffer.forEach(norm);
+export const scalarAdd = (buffer, scalar) => {
+  for (let i = 0; i < buffer.length; i += 1) {
+    buffer[i] += scalar;
+  }
 };
 
 export const reverse = (grades, buffer) => {

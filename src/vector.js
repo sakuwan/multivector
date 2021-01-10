@@ -6,7 +6,7 @@ import createSwizzleProxyHandler from './swizzle';
 /*
  * Vector wrapper around a float array buffer, implements helper Symbols
  * and is the object to be proxied, forwarding %TypedArray% methods to the
- * contained buffer, and should only be instantiated via 'initializeBuffer'
+ * contained buffer, and should only be instantiated via 'createVectorBuffer'
 */
 const VectorBuffer = {
   buffer: null,
@@ -19,6 +19,50 @@ const VectorBuffer = {
 
     const mag = magnitude(this.buffer);
     return (type === 'number') ? mag : (mag > 0);
+  },
+
+  mag() {
+    return magnitude(this.buffer);
+  },
+
+  normalize() {
+    this.div(magnitude(this.buffer));
+  },
+
+  add(scalar) {
+    const { buffer } = this;
+    for (let i = 0; i < buffer.length; i += 1) {
+      buffer[i] += scalar;
+    }
+
+    return this;
+  },
+
+  sub(scalar) {
+    const { buffer } = this;
+    for (let i = 0; i < buffer.length; i += 1) {
+      buffer[i] -= scalar;
+    }
+
+    return this;
+  },
+
+  mul(scalar) {
+    const { buffer } = this;
+    for (let i = 0; i < buffer.length; i += 1) {
+      buffer[i] *= scalar;
+    }
+
+    return this;
+  },
+
+  div(scalar) {
+    const { buffer } = this;
+    for (let i = 0; i < buffer.length; i += 1) {
+      buffer[i] /= scalar;
+    }
+
+    return this;
   },
 };
 
