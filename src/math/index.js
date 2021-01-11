@@ -1,8 +1,13 @@
 export {
   magnitude,
   magnitudeSquared,
+  distance,
   normalize,
-  normalized,
-  reverse,
-  scalarAdd,
 } from './ops';
+
+export {
+  addScalar,
+  subScalar,
+  mulScalar,
+  divScalar,
+} from './unary';

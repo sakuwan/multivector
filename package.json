@@ -16,8 +16,8 @@
     "clean": "rimraf ./dist",
     "build:dev": "rollup -c --environment NODE_ENV:development",
     "build:prod": "rollup -c --environment NODE_ENV:production",
-    "test:unit": "jest ./test -t unit",
-    "test:benchmark": "jest ./test -t benchmark"
+    "test:unit": "jest --projects test/unit",
+    "test:benchmark": "jest --projects test/bench"
   },  
   "devDependencies": {
     "@babel/core": "^7.12.10",

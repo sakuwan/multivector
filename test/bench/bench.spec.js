@@ -7,8 +7,8 @@
 import assert from 'assert';
 import { Benchmark } from 'benchmark';
 
-import { mvec4 } from '../src/vector';
-import { normalize3 } from '../src/math';
+import { cvec4 } from '../../src/vector';
+import { set } from '../../src/util';
 
 const eq = (...args) => {
   assert.strictEqual(args.length, 2);
@@ -29,7 +29,7 @@ describe('benchmark', () => {
   it('Construction', () => {
     new Benchmark.Suite('Construction')
     .add('multivector', () => {
-      const tmpVector = mvec4([1, 2, 3, 4]);
+      const tmpVector = cvec4([1, 2, 3, 4]);
     })
     .add('Float32Array direct', () => {
       const tmpVector = new Float32Array([1, 2, 3, 4]);
@@ -51,7 +51,7 @@ describe('benchmark', () => {
   });
 
   it('Forwarding vs buffer access', () => {
-    const v1 = mvec4([1, 2, 3, 4]);
+    const v1 = cvec4([1, 2, 3, 4]);
     const reducer = (a, c) => a + c;
 
     assert.strictEqual(v1.reduce(reducer), 10);
@@ -75,7 +75,7 @@ describe('benchmark', () => {
   });
 
   it('Swizzles', () =>{
-    const v1 = mvec4([1, 2, 3, 4]);
+    const v1 = cvec4([1, 2, 3, 4]);
     const buf = new Float32Array([1, 2, 3, 4]);
 
     eq(v1.xyzw.buffer, new Float32Array([1, 2, 3, 4]));
@@ -119,7 +119,7 @@ describe('benchmark', () => {
   });
 
   it('Props', () =>{
-    const v1 = mvec4([1, 2, 3, 4]);
+    const v1 = cvec4([1, 2, 3, 4]);
     const fl1 = new Float32Array([1, 2, 3, 4]);
 
     eq(v1.size, 4);
@@ -141,12 +141,12 @@ describe('benchmark', () => {
     })
     .run({ async: false });
   });
-    
-  it.only('add', () =>{
+
+  it('add', () =>{
     const fl32 = new Float32Array(4);
-    const v1 = mvec4([0, 0, 0, 0]);
-    const v2 = mvec4([0, 0, 0, 0]);
-    const v3 = mvec4([0, 0, 0, 0]);
+    const v1 = cvec4([0, 0, 0, 0]);
+    const v2 = cvec4([0, 0, 0, 0]);
+    const v3 = cvec4([0, 0, 0, 0]);
 
     new Benchmark.Suite('add')
     .add('add', () => {
@@ -172,5 +172,25 @@ describe('benchmark', () => {
     })
     .run({ async: false });
   });
-  
+
+  it.only('set Test', () =>{
+    const testObj = {};
+
+    new Benchmark.Suite('add')
+    .add('set', () => {
+      set('abc', 1234, testObj);
+    })
+    .add('prop', () => {
+      testObj.abc = 1234;
+    })
+    .on('cycle', function(event) {
+      tableCollection.push(String(event.target));
+    })
+    .on('complete', function() {
+      tableCollection.push(`\nFastest is ${this.filter('fastest').map('name')}`);
+      console.log(tableCollection.join('\n'));
+    })
+    .run({ async: false });
+  });
+
 });

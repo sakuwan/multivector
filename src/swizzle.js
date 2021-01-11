@@ -42,7 +42,7 @@ const TYPED_ARRAY_METHODS = Object.assign(Object.create(null), {
 });
 
 /*
- * Method for forwarding %TypedArray% methods called on VectorBuffer classes
+ * Method for forwarding %TypedArray% methods called on ComponentVector classes
 */
 const forwardArrayMethod = ({ buffer }, key) => (
   (key in TYPED_ARRAY_METHODS)
@@ -97,6 +97,7 @@ const setSwizzled = ({ buffer }, swizzle, value) => {
   };
 
   swizzle.forEach(setValues);
+
   return true;
 };
 

@@ -1,5 +1,5 @@
 export {
   createVectorGenerators,
 
-  mvec2, mvec3, mvec4,
+  cvec2, cvec3, cvec4,
 } from './vector';

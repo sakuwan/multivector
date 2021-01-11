@@ -1,39 +1,26 @@
-import { set } from '../util';
+/* eslint-disable no-param-reassign */
 
-const sqsum = (a, c) => a + c * c;
+const { sqrt } = Math;
 
-const rcpNR1 = (buffer) => {
-  const iterateNR1 = (v) => {
-    const rcp = 1.0 / v;
-    return rcp * (2 - rcp * v);
-  };
+const squaredSum = (a, c) => a + c * c;
+export const magnitudeSquared = (buffer) => buffer.reduce(squaredSum, 0);
+export const magnitude = (buffer) => sqrt(buffer.reduce(squaredSum, 0));
 
+export const rcpNR1 = (buffer) => {
+  const iterateNR1 = (v) => (1.0 / v) * (2 - (1.0 / v) * v);
   return buffer.map(iterateNR1);
 };
 
-export const magnitudeSquared = (buffer) => buffer.reduce(sqsum, 0);
-export const magnitude = (buffer) => Math.sqrt(magnitudeSquared(buffer));
+export const distance = (buffer1, buffer2) => {
+  const sub = (x, i) => x - buffer2[i];
+  return magnitude(buffer1.map(sub));
+};
 
 export const normalize = (buffer) => {
-  const rcp = rcpNR1(buffer);
-  const norm = (v, i, a) => set(i, rcp[i] * v, a);
+  const mag = magnitude(buffer);
 
-  buffer.forEach(norm);
-};
-
-export const normalized = (buffer) => {
-  const norm = (v, i, a) => set(i, ((1.0 / v) * (2 - (1.0 / v) * v)) * v, a);
-
-  buffer.forEach(norm);
-};
-
-export const scalarAdd = (buffer, scalar) => {
-  for (let i = 0; i < buffer.length; i += 1) {
-    buffer[i] += scalar;
+  const { length } = buffer;
+  for (let i = 0; i < length; i += 1) {
+    buffer[i] /= mag;
   }
-};
-
-export const reverse = (grades, buffer) => {
-  const flip = (v, i, a) => set(i, (grades[i] === 2 || grades[i] === 3) ? -v : v, a);
-  buffer.forEach(flip);
 };
