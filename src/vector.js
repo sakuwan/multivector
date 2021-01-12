@@ -22,6 +22,14 @@ const ComponentVector = {
   buffer: null,
 
   /* Standard vector operations, Euclidean */
+  length() {
+    return magnitude(this.buffer);
+  },
+
+  lengthSquared() {
+    return magnitudeSquared(this.buffer);
+  },
+
   magnitude() {
     return magnitude(this.buffer);
   },
@@ -30,8 +38,8 @@ const ComponentVector = {
     return magnitudeSquared(this.buffer);
   },
 
-  distance() {
-    return distance(this.buffer);
+  distance({ buffer }) {
+    return distance(this.buffer, buffer);
   },
 
   normalize() {

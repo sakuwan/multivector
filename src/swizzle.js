@@ -16,7 +16,6 @@ const TYPED_ARRAY_METHODS = Object.assign(Object.create(null), {
 
   // Non-mutating slicing methods
   slice: 'slice',
-  subarray: 'subarray',
 
   // Testing, truthy, indexing methods
   every: 'every',
@@ -32,6 +31,9 @@ const TYPED_ARRAY_METHODS = Object.assign(Object.create(null), {
   fill: 'fill',
   set: 'set',
   sort: 'sort',
+
+  // Special mutating copying methods, same underlying ArrayBuffer
+  subarray: 'subarray',
 
   // Iterating, key/value, string methods
   entries: 'entries',

@@ -1,5 +1,8 @@
 /* eslint-disable no-param-reassign */
 
+/*
+ * General scalar operations over any array-like
+*/
 export const addScalar = (scalar, buffer) => {
   const { length } = buffer;
   for (let i = 0; i < length; i += 1) {

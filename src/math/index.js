@@ -3,6 +3,7 @@ export {
   magnitudeSquared,
   distance,
   normalize,
+  rcpNR1,
 } from './ops';
 
 export {
