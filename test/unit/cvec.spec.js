@@ -220,16 +220,16 @@ describe('ComponentVector', () => {
   it('Performs general case n-Vector methods', () => {
     const v1 = cvec4(1, 2, 3, 4);
 
-    v1.add(5);
+    v1.addS(5);
     expect(v1.buffer).toEqual(new Float32Array([6, 7, 8, 9]));
 
-    v1.sub(5);
+    v1.subS(5);
     expect(v1.buffer).toEqual(new Float32Array([1, 2, 3, 4]));
 
-    v1.mul(2);
+    v1.mulS(2);
     expect(v1.buffer).toEqual(new Float32Array([2, 4, 6, 8]));
 
-    v1.div(2);
+    v1.divS(2);
     expect(v1.buffer).toEqual(new Float32Array([1, 2, 3, 4]));
 
     const mag2 = v1.magnitudeSquared();

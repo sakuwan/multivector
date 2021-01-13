@@ -2,6 +2,7 @@ import { unique } from './util';
 import {
   magnitude,
   magnitudeSquared,
+  clamp,
   distance,
   normalize,
 
@@ -9,6 +10,11 @@ import {
   subScalar,
   mulScalar,
   divScalar,
+
+  addVector,
+  subVector,
+  mulVector,
+  divVector,
 } from './math';
 
 import createSwizzleProxyHandler from './swizzle';
@@ -46,24 +52,51 @@ const ComponentVector = {
     return normalize(this.buffer);
   },
 
-  /* Unary scalar operations */
-  add(scalar) {
-    addScalar(scalar, this.buffer);
+  /* Utility vector operations */
+  clamp(min, max) {
+    clamp(this.buffer, min, max);
     return this;
   },
 
-  sub(scalar) {
-    subScalar(scalar, this.buffer);
+  /* Basic scalar operations */
+  addS(scalar) {
+    addScalar(this.buffer, scalar);
     return this;
   },
 
-  mul(scalar) {
-    mulScalar(scalar, this.buffer);
+  subS(scalar) {
+    subScalar(this.buffer, scalar);
     return this;
   },
 
-  div(scalar) {
-    divScalar(scalar, this.buffer);
+  mulS(scalar) {
+    mulScalar(this.buffer, scalar);
+    return this;
+  },
+
+  divS(scalar) {
+    divScalar(this.buffer, scalar);
+    return this;
+  },
+
+  /* Basic vector operations */
+  add({ buffer }) {
+    addVector(this.buffer, buffer);
+    return this;
+  },
+
+  sub({ buffer }) {
+    subVector(this.buffer, buffer);
+    return this;
+  },
+
+  mul({ buffer }) {
+    mulVector(this.buffer, buffer);
+    return this;
+  },
+
+  div({ buffer }) {
+    divVector(this.buffer, buffer);
     return this;
   },
 

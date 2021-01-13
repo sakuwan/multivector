@@ -1,6 +1,7 @@
 export {
   magnitude,
   magnitudeSquared,
+  clamp,
   distance,
   normalize,
   rcpNR1,
@@ -11,4 +12,9 @@ export {
   subScalar,
   mulScalar,
   divScalar,
-} from './unary';
+
+  addVector,
+  subVector,
+  mulVector,
+  divVector,
+} from './basic';
