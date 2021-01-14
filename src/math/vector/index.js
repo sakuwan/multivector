@@ -1,10 +1,26 @@
 export {
+  rcpNR1,
+
+  manhattan,
   magnitude,
   magnitudeSquared,
-  clamp,
   distance,
   normalize,
-  rcpNR1,
+
+  dot,
+
+  equals,
+  approxEq,
+
+  lerp,
+  min,
+  max,
+  clamp,
+  ceil,
+  floor,
+  round,
+
+  negate,
 } from './ops';
 
 export {

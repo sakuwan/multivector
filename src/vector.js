@@ -1,10 +1,25 @@
 import { unique } from './util';
 import {
+  manhattan,
   magnitude,
   magnitudeSquared,
-  clamp,
   distance,
   normalize,
+
+  dot,
+
+  equals,
+  approxEq,
+
+  lerp,
+  min,
+  max,
+  clamp,
+  ceil,
+  floor,
+  round,
+
+  negate,
 
   addScalar,
   subScalar,
@@ -15,7 +30,7 @@ import {
   subVector,
   mulVector,
   divVector,
-} from './math';
+} from './math/vector';
 
 import createSwizzleProxyHandler from './swizzle';
 
@@ -27,7 +42,11 @@ import createSwizzleProxyHandler from './swizzle';
 const ComponentVector = {
   buffer: null,
 
-  /* Standard vector operations, Euclidean */
+  /* Standard vector operations, L1 & L2 */
+  manhattan() {
+    return manhattan(this.buffer);
+  },
+
   length() {
     return magnitude(this.buffer);
   },
@@ -49,12 +68,63 @@ const ComponentVector = {
   },
 
   normalize() {
-    return normalize(this.buffer);
+    normalize(this.buffer);
+    return this;
+  },
+
+  /* Dot product */
+  dot({ buffer }) {
+    return dot(this.buffer, buffer);
+  },
+
+  /* Comparison methods */
+  equals({ buffer }) {
+    return equals(this.buffer, buffer);
+  },
+
+  approxEq({ buffer }, precision) {
+    return approxEq(this.buffer, buffer, precision);
   },
 
   /* Utility vector operations */
-  clamp(min, max) {
-    clamp(this.buffer, min, max);
+  lerp({ buffer }, delta) {
+    lerp(this.buffer, buffer, delta);
+    return this;
+  },
+
+  min({ buffer }) {
+    min(this.buffer, buffer);
+    return this;
+  },
+
+  max({ buffer }) {
+    max(this.buffer, buffer);
+    return this;
+  },
+
+  clamp(vmin, vmax) {
+    clamp(this.buffer, vmin, vmax);
+    return this;
+  },
+
+  ceil() {
+    ceil(this.buffer);
+    return this;
+  },
+
+  floor() {
+    floor(this.buffer);
+    return this;
+  },
+
+  round() {
+    round(this.buffer);
+    return this;
+  },
+
+  /* Unary vector operations */
+  negate() {
+    negate(this.buffer);
     return this;
   },
 
@@ -107,7 +177,7 @@ const ComponentVector = {
       return `(${x}, ${y}, ${z}, ${w})`;
     }
 
-    const mag = this.magnitude(this.buffer);
+    const mag = magnitude(this.buffer);
     return (type === 'number') ? mag : (mag > 0);
   },
 };

@@ -220,17 +220,8 @@ describe('ComponentVector', () => {
   it('Performs general case n-Vector methods', () => {
     const v1 = cvec4(1, 2, 3, 4);
 
-    v1.addS(5);
-    expect(v1.buffer).toEqual(new Float32Array([6, 7, 8, 9]));
-
-    v1.subS(5);
-    expect(v1.buffer).toEqual(new Float32Array([1, 2, 3, 4]));
-
-    v1.mulS(2);
-    expect(v1.buffer).toEqual(new Float32Array([2, 4, 6, 8]));
-
-    v1.divS(2);
-    expect(v1.buffer).toEqual(new Float32Array([1, 2, 3, 4]));
+    const l1len = v1.manhattan();
+    expect(l1len).toBe(10);
 
     const mag2 = v1.magnitudeSquared();
     expect(mag2).toBe(30);
@@ -255,5 +246,101 @@ describe('ComponentVector', () => {
 
     v1.normalize();
     expect(v1.buffer).toEqual(new Float32Array([1 / len, 2 / len, 3 / len, 4 / len]));
+
+    v1.ceil();
+    expect(v1.buffer).toEqual(new Float32Array([1, 1, 1, 1]));
+
+    v1.subS(0.1);
+    v1.floor();
+    expect(v1.buffer).toEqual(new Float32Array([0, 0, 0, 0]));
+
+    v1.set([0.49, 0.5, -1.49, -1.50]);
+    v1.round();
+    expect(v1.buffer).toEqual(new Float32Array([0, 1, -1, -1]));
+
+    v1.negate();
+    expect(v1.buffer).toEqual(new Float32Array([-0, -1, 1, 1]));
+
+    v1.set([-5, -5, 5, 5]);
+    v1.clamp(-1, 1);
+    expect(v1.buffer).toEqual(new Float32Array([-1, -1, 1, 1]));
+
+    v1.set([1, 0, 0, 0]);
+    v2.set([0, 1, 0, 0]);
+
+    v1.normalize();
+    v2.normalize();
+
+    const cosTheta = v1.dot(v2);
+    expect(cosTheta).toBe(0);
+
+    v2.set([1, 0, 0, 0]);
+    v2.normalize();
+
+    const cosTheta2 = v1.dot(v2);
+    expect(cosTheta2).toBe(1);
+
+    v1.set([1, 1, 1, 1]);
+    const dotlen = v1.dot(v1);
+    expect(dotlen).toBe(v1.magnitudeSquared());
+
+    v2.set([2, 2, 2, 2]);
+    v1.lerp(v2, 0.5);
+    expect(v1.buffer).toEqual(new Float32Array([1.5, 1.5, 1.5, 1.5]));
+
+    v1.lerp(v2, -1);
+    expect(v1.buffer).toEqual(new Float32Array([1, 1, 1, 1]));
+
+    v1.max(v2);
+    expect(v1.buffer).toEqual(new Float32Array([2, 2, 2, 2]));
+
+    v2.set([1, 2, 3, 4]);
+    v1.min(v2);
+    expect(v1.buffer).toEqual(new Float32Array([1, 2, 2, 2]));
+
+    const notEqual = v1.equals(v2);
+    expect(notEqual).toBe(false);
+
+    v1.set([...v2]);
+    const shouldBeEqual = v1.equals(v2);
+    expect(shouldBeEqual).toBe(true);
+
+    v1.subS(0.001);
+    const shouldBeApprox = v1.approxEq(v2);
+    expect(shouldBeApprox).toBe(true);
+
+    const notApproxEq = v1.approxEq(v2, 3);
+    expect(notApproxEq).toBe(false);
+  });
+
+  it('Performs scalar and n-Vector arithmatic methods', () => {
+    const v1 = cvec4(1, 2, 3, 4);
+
+    v1.addS(5);
+    expect(v1.buffer).toEqual(new Float32Array([6, 7, 8, 9]));
+
+    v1.subS(5);
+    expect(v1.buffer).toEqual(new Float32Array([1, 2, 3, 4]));
+
+    v1.mulS(2);
+    expect(v1.buffer).toEqual(new Float32Array([2, 4, 6, 8]));
+
+    v1.divS(2);
+    expect(v1.buffer).toEqual(new Float32Array([1, 2, 3, 4]));
+
+    const v2 = cvec4(0);
+
+    v2.add(v1);
+    expect(v2.buffer).toEqual(new Float32Array([1, 2, 3, 4]));
+
+    v2.sub(v1);
+    expect(v2.buffer).toEqual(new Float32Array([0, 0, 0, 0]));
+
+    v2.set([1, 2, 3, 4]);
+    v2.mul(v1);
+    expect(v2.buffer).toEqual(new Float32Array([1, 4, 9, 16]));
+
+    v2.div(v1);
+    expect(v2.buffer).toEqual(new Float32Array([1, 2, 3, 4]));
   });
 });
