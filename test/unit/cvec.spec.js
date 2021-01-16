@@ -248,74 +248,99 @@ describe('ComponentVector', () => {
   });
 
   it('Performs n-Vector methods: Core', () => {
-    const v1 = cvec4(1, 2, 3, 4);
-    const v2 = cvec4(5, 2, 3, 4);
+    const v1 = cvec4(0);
+    const v2 = cvec4(0);
 
     {
-      const mag = v1.manhattan();
-      expect(mag).toBe(10);
+      v1.set([1, 2, 3, 4]);
+      v2.set([-1, -2, -3, -4]);
+
+      const mag1 = v1.manhattan();
+      const mag2 = v2.manhattan();
+      expect(mag1).toBe(10);
+      expect(mag2).toBe(10);
     }
 
     {
+      v1.set([1, 2, 3, 4]);
+
       const magSq = v1.magnitudeSq();
       expect(magSq).toBe(30);
     }
 
     {
+      v1.set([1, 2, 3, 4]);
+
       const mag = v1.magnitude();
       expect(mag).toBe(Math.sqrt(v1.magnitudeSq()));
       expect(mag).toBeCloseTo(5.47722557, 5);
     }
 
     {
+      v1.set([1, 2, 3, 4]);
+
       const lenSq = v1.lengthSq();
       expect(lenSq).toBe(v1.magnitudeSq());
     }
 
     {
+      v1.set([1, 2, 3, 4]);
+
       const len = v1.length();
       expect(len).toBe(v1.magnitude());
     }
 
     {
+      v1.set([1, 2, 3, 4]);
+      v2.set([5, 2, 3, 4]);
+
       const dist = v1.distance(v2);
       expect(dist).toBe(4);
     }
 
     {
-      v2.x = 1;
+      v1.set([1, 2, 3, 4]);
+      v2.set([1, 2, 3, 4]);
+
       const dist = v1.distance(v2);
       expect(dist).toBe(0);
     }
 
     {
+      v1.set([1, 2, 3, 4]);
+
       const mag = v1.magnitude();
+
       v1.normalize();
+
       expect(v1.buffer).toEqual(new Float32Array([1 / mag, 2 / mag, 3 / mag, 4 / mag]));
     }
 
-    v1.set([1, 0, 0, 0]);
-    v2.set([0, 1, 0, 0]);
-
-    v1.normalize();
-    v2.normalize();
-
     {
+      v1.set([1, 0, 0, 0]);
+      v2.set([0, 1, 0, 0]);
+
+      v1.normalize();
+      v2.normalize();
+
       const cosTheta = v1.dot(v2);
       expect(cosTheta).toBe(0);
     }
 
-    v2.set([1, 0, 0, 0]);
-    v2.normalize();
-
     {
+      v1.set([1, 0, 0, 0]);
+      v2.set([1, 0, 0, 0]);
+
+      v1.normalize();
+      v2.normalize();
+
       const cosTheta = v1.dot(v2);
       expect(cosTheta).toBe(1);
     }
 
-    v1.set([1, 1, 1, 1]);
-
     {
+      v1.set([1, 1, 1, 1]);
+
       const magSq = v1.dot(v1);
       expect(magSq).toBe(v1.magnitudeSq());
     }
