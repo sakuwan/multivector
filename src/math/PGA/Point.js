@@ -2,7 +2,7 @@ import PGATypes from './types';
 
 class PointElement {
   /*
-   * Set our multivector buffer (Float32Array of length 4) and element type
+   * Set our multivector buffer (Float32Array of length 4) and element type (Point)
   */
   constructor(buffer) {
     this.buffer = buffer;
