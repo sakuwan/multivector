@@ -12,7 +12,7 @@ class PointElement {
   /* === Core === */
 
   /*
-  * Familiar Euclidean length function, same as R^3
+   * Familiar Euclidean length function, same as R^3
   */
   length() {
     let result = 0;
@@ -24,20 +24,18 @@ class PointElement {
   }
 
   /*
-  * e032, e013, e021, e123 has a metric of 0, 0, 0, -1, so discard all but e123
-  * As the result will be sqrt(|w^2|), discard the negation
+   * [e032, e013, e021, e123] has a metric of [0, 0, 0, -1], so discard all but e123
+   * As the result will be sqrt(|w^2|), discard the negation
   */
   metricLength() {
-    return ((this.buffer[3] ** 2) ** 0.5);
+    return (this.buffer[3] ** 2) ** 0.5;
   }
 
   /*
    * Point normalization satisfies X^2 = +-1
   */
   normalize() {
-    const e123 = this.buffer[3]; // w or e123
-    const rcp = (1.0 / e123) * (2 - (1.0 / e123) * e123);
-
+    const rcp = (1.0 / this.buffer[3]);
     for (let i = 0; i < 4; i += 1) {
       this.buffer[i] *= rcp;
     }
@@ -49,9 +47,7 @@ class PointElement {
    * Inversion satisfies X * Xinv = X.normalize(), or a homogeneous weight of +-1
   */
   invert() {
-    const e123 = this.buffer[3]; // w or e123
-    const rcp = ((1.0 / e123) * (2 - (1.0 / e123) * e123)) ** 2;
-
+    const rcp = (1.0 / this.buffer[3]) ** 2;
     for (let i = 0; i < 4; i += 1) {
       this.buffer[i] *= rcp;
     }

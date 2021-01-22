@@ -5,6 +5,15 @@ const absSum = (a, c) => a + Math.abs(c);
 const squaredSum = (a, c) => a + c * c;
 
 /*
+ * Mutating map to significantly reduce the amount of repetitive loops
+*/
+const transform = (fn, arr) => {
+  for (let i = 0; i < arr.length; i += 1) {
+    arr[i] = fn(arr[i], i); // eslint-disable-line no-param-reassign
+  }
+};
+
+/*
  * Vector wrapper around a %TypedArray% buffer, implements helper Symbols
  * and is the object to be proxied, forwarding %TypedArray% methods to the
  * contained buffer, and should only be instantiated via 'createComponentVector'
@@ -56,8 +65,8 @@ class ComponentVector {
    * Compute the distance between itself and another vector, length(p0 - p1)
   */
   distance({ buffer }) {
-    const sub = (x, i) => x - buffer[i];
-    return this.buffer.map(sub).reduce(squaredSum, 0) ** 0.5;
+    const diffOf = (x, i) => x - buffer[i];
+    return this.buffer.map(diffOf).reduce(squaredSum, 0) ** 0.5;
   }
 
   /*
@@ -66,10 +75,8 @@ class ComponentVector {
   normalize() {
     const { buffer } = this;
 
-    const mag = (1.0 / buffer.reduce(squaredSum, 0) ** 0.5);
-    for (let i = 0; i < buffer.length; i += 1) {
-      buffer[i] *= mag;
-    }
+    const invMag = (1.0 / buffer.reduce(squaredSum, 0) ** 0.5);
+    transform((x) => x * invMag, buffer);
 
     return this;
   }
@@ -78,8 +85,8 @@ class ComponentVector {
    * Compute the dot product with another vector
   */
   dot({ buffer }) {
-    const dist = (a, c, i) => a + (c * buffer[i]);
-    return this.buffer.reduce(dist, 0);
+    const calcDot = (a, c, i) => a + (c * buffer[i]);
+    return this.buffer.reduce(calcDot, 0);
   }
 
   /* === Comparison === */
@@ -88,16 +95,16 @@ class ComponentVector {
    * Compare to another vector with strict equality
   */
   equals({ buffer }) {
-    const equal = (v, i) => v === buffer[i];
-    return this.buffer.every(equal);
+    const isEqual = (v, i) => v === buffer[i];
+    return this.buffer.every(isEqual);
   }
 
   /*
    * Compare to another vector with approximate precision
   */
   approxEq({ buffer }, precision = 2) {
-    const equal = (v, i) => Math.abs(buffer[i] - v) < (10 ** -precision) / 2;
-    return this.buffer.every(equal);
+    const isApproxEq = (v, i) => Math.abs(buffer[i] - v) < (10 ** -precision) / 2;
+    return this.buffer.every(isApproxEq);
   }
 
   /* === Vector-related Utility === */
@@ -106,10 +113,8 @@ class ComponentVector {
   * Copy the values from another vector
   */
   copy({ buffer }) {
-    const self = this.buffer;
-    for (let i = 0; i < self.length; i += 1) {
-      self[i] = buffer[i];
-    }
+    const copyValue = (_, i) => buffer[i];
+    transform(copyValue, this.buffer);
 
     return this;
   }
@@ -118,10 +123,8 @@ class ComponentVector {
    * Linearly interpolate towards another vector with delta weight
   */
   lerp({ buffer }, delta) {
-    const self = this.buffer;
-    for (let i = 0; i < self.length; i += 1) {
-      self[i] += (buffer[i] - self[i]) * delta;
-    }
+    const interpolate = (x, i) => x + (buffer[i] - x) * delta;
+    transform(interpolate, this.buffer);
 
     return this;
   }
@@ -130,10 +133,8 @@ class ComponentVector {
    * Set components to the min between itself and another vector
   */
   min({ buffer }) {
-    const self = this.buffer;
-    for (let i = 0; i < self.length; i += 1) {
-      self[i] = Math.min(self[i], buffer[i]);
-    }
+    const minOf = (x, i) => Math.min(x, buffer[i]);
+    transform(minOf, this.buffer);
 
     return this;
   }
@@ -142,10 +143,8 @@ class ComponentVector {
    * Set components to the max between itself and another vector
   */
   max({ buffer }) {
-    const self = this.buffer;
-    for (let i = 0; i < self.length; i += 1) {
-      self[i] = Math.max(self[i], buffer[i]);
-    }
+    const maxOf = (x, i) => Math.max(x, buffer[i]);
+    transform(maxOf, this.buffer);
 
     return this;
   }
@@ -154,10 +153,8 @@ class ComponentVector {
    * Clamp components to the provided range
   */
   clamp(min, max) {
-    const { buffer } = this;
-    for (let i = 0; i < buffer.length; i += 1) {
-      buffer[i] = Math.max(min, Math.min(max, buffer[i]));
-    }
+    const clampBetween = (x) => Math.max(min, Math.min(max, x));
+    transform(clampBetween, this.buffer);
 
     return this;
   }
@@ -166,10 +163,8 @@ class ComponentVector {
    * Round components up to the next integer
   */
   ceil() {
-    const { buffer } = this;
-    for (let i = 0; i < buffer.length; i += 1) {
-      buffer[i] = Math.ceil(buffer[i]);
-    }
+    const ceilValue = (x) => Math.ceil(x);
+    transform(ceilValue, this.buffer);
 
     return this;
   }
@@ -178,10 +173,8 @@ class ComponentVector {
    * Round components down to a less or equal integer
   */
   floor() {
-    const { buffer } = this;
-    for (let i = 0; i < buffer.length; i += 1) {
-      buffer[i] = Math.floor(buffer[i]);
-    }
+    const floorValue = (x) => Math.floor(x);
+    transform(floorValue, this.buffer);
 
     return this;
   }
@@ -190,10 +183,8 @@ class ComponentVector {
    * Round components depending on the fractional portion of each
   */
   round() {
-    const { buffer } = this;
-    for (let i = 0; i < buffer.length; i += 1) {
-      buffer[i] = Math.round(buffer[i]);
-    }
+    const roundValue = (x) => Math.round(x);
+    transform(roundValue, this.buffer);
 
     return this;
   }
@@ -204,10 +195,8 @@ class ComponentVector {
    * Negation
   */
   negate() {
-    const { buffer } = this;
-    for (let i = 0; i < buffer.length; i += 1) {
-      buffer[i] = -buffer[i];
-    }
+    const negateValue = (x) => -x;
+    transform(negateValue, this.buffer);
 
     return this;
   }
@@ -218,37 +207,29 @@ class ComponentVector {
    * Scalar arithmetic operations
   */
   addS(scalar) {
-    const { buffer } = this;
-    for (let i = 0; i < buffer.length; i += 1) {
-      buffer[i] += scalar; // Addition
-    }
+    const addValue = (x) => x + scalar;
+    transform(addValue, this.buffer);
 
     return this;
   }
 
   subS(scalar) {
-    const { buffer } = this;
-    for (let i = 0; i < buffer.length; i += 1) {
-      buffer[i] -= scalar; // Subtraction
-    }
+    const subValue = (x) => x - scalar;
+    transform(subValue, this.buffer);
 
     return this;
   }
 
   mulS(scalar) {
-    const { buffer } = this;
-    for (let i = 0; i < buffer.length; i += 1) {
-      buffer[i] *= scalar; // Multiplication
-    }
+    const mulValue = (x) => x * scalar;
+    transform(mulValue, this.buffer);
 
     return this;
   }
 
   divS(scalar) {
-    const { buffer } = this;
-    for (let i = 0; i < buffer.length; i += 1) {
-      buffer[i] *= (1.0 / scalar); // Inversion tends to be faster for constants
-    }
+    const divValue = (x) => x * (1.0 / scalar);
+    transform(divValue, this.buffer);
 
     return this;
   }
@@ -257,37 +238,29 @@ class ComponentVector {
    * Vector arithmetic operations
   */
   add({ buffer }) {
-    const self = this.buffer;
-    for (let i = 0; i < self.length; i += 1) {
-      self[i] += buffer[i]; // Addition
-    }
+    const addVector = (x, i) => x + buffer[i];
+    transform(addVector, this.buffer);
 
     return this;
   }
 
   sub({ buffer }) {
-    const self = this.buffer;
-    for (let i = 0; i < self.length; i += 1) {
-      self[i] -= buffer[i]; // Subtraction
-    }
+    const subVector = (x, i) => x - buffer[i];
+    transform(subVector, this.buffer);
 
     return this;
   }
 
   mul({ buffer }) {
-    const self = this.buffer;
-    for (let i = 0; i < self.length; i += 1) {
-      self[i] *= buffer[i]; // Multiplication
-    }
+    const mulVector = (x, i) => x * buffer[i];
+    transform(mulVector, this.buffer);
 
     return this;
   }
 
   div({ buffer }) {
-    const self = this.buffer;
-    for (let i = 0; i < self.length; i += 1) {
-      self[i] *= (1.0 / buffer[i]); // Inversion tends to be faster for constants
-    }
+    const divVector = (x, i) => x * (1.0 / buffer[i]);
+    transform(divVector, this.buffer);
 
     return this;
   }

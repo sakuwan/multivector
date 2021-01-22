@@ -11,6 +11,47 @@ class PlaneElement {
 
   /* === Core === */
 
+  /*
+   * Familiar Euclidean length function, same as R^3
+  */
+  length() {
+    let result = 0;
+    for (let i = 0; i < 4; i += 1) {
+      result += this.buffer[i] ** 2;
+    }
+
+    return result ** 0.5;
+  }
+
+  /*
+   * [e1, e2, e3, e0] has a metric of [1, 1, 1, 0], so discard e0
+  */
+  metricLength() {
+    let result = 0;
+    for (let i = 0; i < 3; i += 1) {
+      result += this.buffer[i] ** 2;
+    }
+
+    return result ** 0.5;
+  }
+
+  /*
+   * Plane normalization satisfies X∙X = 1
+  */
+  normalize() {
+    let length = 0;
+    for (let i = 0; i < 3; i += 1) {
+      length += this.buffer[i] ** 2;
+    }
+
+    const invSqrt = (1.0 / length) ** 0.5;
+    for (let i = 0; i < 3; i += 1) {
+      this.buffer[i] *= invSqrt;
+    }
+
+    return this;
+  }
+
   /* === Multivector component access === */
 
   /*

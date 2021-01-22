@@ -130,11 +130,14 @@ describe('benchmark', () => {
     .run({ async: false });
   });
 
-  it('Arithmetic operations', () =>{
+  it.only('Arithmetic operations', () =>{
     const v1 = cvec4(0);
 
     const v2 = cvec4(0);
     const v3 = cvec4(1);
+
+    const v4 = cvec4(0);
+
     const fl32 = new Float32Array(4);
 
     new Benchmark.Suite('Arithmetic')
@@ -143,6 +146,9 @@ describe('benchmark', () => {
     })
     .add('Arithmetic: ComponentVector add vector', () => {
       v2.add(v3);
+    })
+    .add('Arithmetic: ComponentVector add transform', () => {
+      v4.addT(1);
     })
     .add('Arithmetic: Float32Array add loop', () => {
       for (let i = 0; i < fl32.length; i += 1) {

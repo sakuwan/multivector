@@ -1,8 +1,35 @@
 import Point from '../../src/math/PGA/Point';
+import Plane from '../../src/math/PGA/Plane';
 import PGATypes from '../../src/math/PGA/types';
 
-describe('PGA elements', () => {
-  it('Initializes a proper Point element', () => {
+describe('PGA element - Plane', () => {
+  it('Initializes a proper element', () => {
+
+  });
+
+  it('Performs core element operations: Normalization', () => {
+    // Satisfy X∙X = 1
+    const toBeNormalized = Plane(1, 1, 1, 2);
+
+    toBeNormalized.normalize();
+    expect(toBeNormalized.buffer).toEqual(new Float32Array([0.5, 0.5, 0.5, 1]));
+
+    // Already normalized
+    const alreadyNormalized = Plane(1, 1, 1, 1);
+
+    alreadyNormalized.normalize();
+    expect(alreadyNormalized.buffer).toEqual(new Float32Array([1, 1, 1, 1]));
+
+    // Scale values upwards instead of down
+    const belowOne = Plane(1, 1, 1, 0.5);
+
+    belowOne.normalize();
+    expect(belowOne.buffer).toEqual(new Float32Array([2, 2, 2, 1]));
+  });
+});
+
+describe('PGA element - Point', () => {
+  it('Initializes a proper element', () => {
     // Export is a light factory wrapper around new
     expect(typeof Point).toBe('function');
 
@@ -56,7 +83,7 @@ describe('PGA elements', () => {
     expect(pointElement.mv()).toEqual(new Float32Array([4, 3, 2, 1]));
   });
 
-  it('Performs core point element operations: Lengths', () => {
+  it('Performs core element operations: Lengths', () => {
     // Metric will simply be e123
     const farPoint = Point(10, 10, 10, 5);
 
@@ -67,7 +94,7 @@ describe('PGA elements', () => {
     expect(euclideanLength).toBeCloseTo(18.0277);
   });
 
-  it('Performs core point element operations: Normalization', () => {
+  it('Performs core element operations: Normalization', () => {
     // Satisfy X^2 = +-1, the homogeneous coordinate should be of weight 1
     const toBeNormalized = Point(1, 1, 1, 2);
 
@@ -87,7 +114,7 @@ describe('PGA elements', () => {
     expect(belowOne.buffer).toEqual(new Float32Array([2, 2, 2, 1]));
   });
 
-  it('Performs core point element operations: Inversion', () => {
+  it('Performs core element operations: Inversion', () => {
     // Satisfy X * Xinv = X^2 = +-1
     const toBeInverted = Point(1, 1, 1, 2);
 
@@ -116,7 +143,7 @@ describe('PGA elements', () => {
     expect(negativeInvert.w()).toBeCloseTo(-0.1);
   });
 
-  it('Performs core point element operations: Reversion', () => {
+  it('Performs core element operations: Reversion', () => {
     // Reversion of grade 3 k-vectors is simply a sign flip
     const toBeReversed = Point(1, -2, 3, -1);
 
@@ -124,7 +151,7 @@ describe('PGA elements', () => {
     expect(toBeReversed.buffer).toEqual(new Float32Array([-1, 2, -3, 1]));
   });
 
-  it('Performs core point element operations: Conjugation', () => {
+  it('Performs core element operations: Conjugation', () => {
     // There is no conjugate for this multivector, so expect a no-op
     const noConjugate = Point(1, 2, 3, 4);
 
