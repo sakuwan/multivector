@@ -1,6 +1,4 @@
-import Point from '../../src/math/PGA/Point';
-import Plane from '../../src/math/PGA/Plane';
-import PGATypes from '../../src/math/PGA/types';
+import { Plane, Point, PGATypes } from '../../src/math/PGA';
 
 describe('PGA element - Plane', () => {
   it('Initializes a proper element', () => {
@@ -12,19 +10,35 @@ describe('PGA element - Plane', () => {
     const toBeNormalized = Plane(1, 1, 1, 2);
 
     toBeNormalized.normalize();
-    expect(toBeNormalized.buffer).toEqual(new Float32Array([0.5, 0.5, 0.5, 1]));
+    {
+      const [e1, e2, e3, e0] = toBeNormalized.buffer;
+      expect(e1).toBeCloseTo(0.5773);
+      expect(e2).toBeCloseTo(0.5773);
+      expect(e3).toBeCloseTo(0.5773);
 
-    // Already normalized
-    const alreadyNormalized = Plane(1, 1, 1, 1);
+      // e0 is untouched by normalization
+      expect(e0).toBeCloseTo(2);
 
-    alreadyNormalized.normalize();
-    expect(alreadyNormalized.buffer).toEqual(new Float32Array([1, 1, 1, 1]));
+      const innerProduct = [e1, e2, e3].reduce((a, c) => a + c * c, 0);
+      expect(innerProduct).toBeCloseTo(1, 5);
+    }
 
     // Scale values upwards instead of down
-    const belowOne = Plane(1, 1, 1, 0.5);
+    const mixedSigns = Plane(-1, 2, -3, 4);
 
-    belowOne.normalize();
-    expect(belowOne.buffer).toEqual(new Float32Array([2, 2, 2, 1]));
+    mixedSigns.normalize();
+    {
+      const [e1, e2, e3, e0] = mixedSigns.buffer;
+      expect(e1).toBeCloseTo(-0.2672);
+      expect(e2).toBeCloseTo(0.5345);
+      expect(e3).toBeCloseTo(-0.8017);
+
+      // e0 is untouched by normalization
+      expect(e0).toBeCloseTo(4);
+
+      const innerProduct = [e1, e2, e3].reduce((a, c) => a + c * c, 0);
+      expect(innerProduct).toBeCloseTo(1, 5);
+    }
   });
 });
 
