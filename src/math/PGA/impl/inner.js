@@ -1,4 +1,5 @@
 /*
+ * PGA (3, 0, 1) inner products
  * Commutativity matters, the following assumes a ∙ b
 */
 
@@ -104,6 +105,25 @@ export const innerPlanePoint = (a, b) => {
   return new Float32Array([e01, e02, e03, 0, e23, e31, e12, 0]);
 };
 
+/* === Ideal inner products === */
+
+/*
+ * Ideal ∙ Plane  -> Plane (0, 0, 0, e0)
+ * Ideal ∙ Ideal  -> Vanishes completely
+ * Ideal ∙ Origin -> Vanishes completely (assuming pseudo is 0)
+ * Ideal ∙ Line   -> Vanishes completely (assuming pseudo is 0)
+ * Ideal ∙ Point  -> Vanishes completely (assuming pseudo is 0)
+*/
+
+/*
+ * Ideal line ∙ Plane -> Plane (0, 0, 0, e0)
+ * All components vanish except for e0 (assuming pseudo is 0), simplifying to:
+ * (a.e1 * b.e01) + (a.e2 * b.e02) + (a.e3 * b.e03)
+*/
+export const innerIdealPlane = (a, b) => (
+  a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
+);
+
 /* === Origin inner products === */
 
 /*
@@ -166,25 +186,6 @@ export const innerOriginPoint = (a, b) => {
 
   return new Float32Array([e1, e2, e3, e0]);
 };
-
-/* === Ideal inner products === */
-
-/*
- * Ideal ∙ Plane  -> Plane (0, 0, 0, e0)
- * Ideal ∙ Ideal  -> Vanishes completely
- * Ideal ∙ Origin -> Vanishes completely (assuming pseudo is 0)
- * Ideal ∙ Line   -> Vanishes completely (assuming pseudo is 0)
- * Ideal ∙ Point  -> Vanishes completely (assuming pseudo is 0)
-*/
-
-/*
- * Ideal line ∙ Plane -> Plane (0, 0, 0, e0)
- * All components vanish except for e0 (assuming pseudo is 0), simplifying to:
- * (a.e1 * b.e01) + (a.e2 * b.e02) + (a.e3 * b.e03)
-*/
-export const innerIdealPlane = (a, b) => (
-  a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
-);
 
 /* === Line inner products === */
 
