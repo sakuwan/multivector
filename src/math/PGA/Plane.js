@@ -1,55 +1,224 @@
 import PGATypes from './types';
+import transform from './impl/helper';
+
+import {
+  planeNorm, planeNormSq,
+  euclideanNorm, euclideanNormSq,
+} from './impl/metric';
+
+import {
+  innerPlanePlane,
+  innerPlaneIdeal,
+  innerPlaneOrigin,
+  innerPlaneLine,
+  innerPlanePoint,
+} from './impl/inner';
+
+import {
+  outerPlanePlane,
+  outerPlaneIdeal,
+  outerPlaneOrigin,
+  outerPlaneLine,
+  outerPlanePoint,
+} from './impl/outer';
 
 class PlaneElement {
   /*
-   * Set our multivector buffer (Float32Array of length 4) and element type (Plane)
+   * Set our multivector buffer (Float32Array) and element type (Point)
   */
   constructor(buffer) {
     this.buffer = buffer;
-    this.elementType = PGATypes.Plane;
+    this.elementType = PGATypes.Point;
   }
 
-  /* === Core === */
+  /* === Unary operations === */
 
   /*
-   * Familiar Euclidean length function, same as R^3
+   * Euclidean length/L2 norm
+  */
+  euclideanLength() {
+    return euclideanNorm(this.buffer);
+  }
+
+  /*
+   * Squared length, faster for distance comparisons
+  */
+  euclideanLengthSq() {
+    return euclideanNormSq(this.buffer);
+  }
+
+  /*
+   * PGA metric norm
   */
   length() {
-    let result = 0;
-    for (let i = 0; i < 4; i += 1) {
-      result += this.buffer[i] ** 2;
-    }
-
-    return result ** 0.5;
+    return planeNorm(this.buffer);
   }
 
   /*
-   * [e1, e2, e3, e0] has a metric of [1, 1, 1, 0], so discard e0
+   * Same as above, no sqrt for faster comparisons
   */
-  metricLength() {
-    let result = 0;
-    for (let i = 0; i < 3; i += 1) {
-      result += this.buffer[i] ** 2;
-    }
-
-    return result ** 0.5;
+  lengthSq() {
+    return planeNormSq(this.buffer);
   }
 
   /*
-   * Plane normalization satisfies X∙X = 1
+   * Plane normalization satisfies p∙p = 1, or p^2 = 1
   */
   normalize() {
-    let length = 0;
-    for (let i = 0; i < 3; i += 1) {
-      length += this.buffer[i] ** 2;
-    }
+    const invSqrt = (1.0 / planeNorm(this.buffer));
 
-    const invSqrt = (1.0 / length) ** 0.5;
-    for (let i = 0; i < 3; i += 1) {
-      this.buffer[i] *= invSqrt;
-    }
+    const normalizeElement = (x) => x * invSqrt;
+    transform(normalizeElement, this.buffer, 0, 3);
 
     return this;
+  }
+
+  /*
+   * Plane inversion satisfies p∙pinv = 1
+  */
+  invert() {
+    const invSqrt = (1.0 / planeNorm(this.buffer)) ** 2;
+
+    const normalizeElement = (x) => x * invSqrt;
+    transform(normalizeElement, this.buffer);
+
+    return this;
+  }
+
+  /* === Element inner products === */
+
+  /*
+   * See impl/inner.js for implementation details
+  */
+
+  /*
+   * Plane ∙ Plane -> Scalar
+  */
+  dotPlane({ buffer }) {
+    return innerPlanePlane(this.buffer, buffer);
+  }
+
+  /*
+   * Plane ∙ Ideal -> Plane
+  */
+  dotIdeal({ buffer }) {
+    return innerPlaneIdeal(this.buffer, buffer);
+  }
+
+  /*
+   * Plane ∙ Origin -> Plane
+  */
+  dotOrigin({ buffer }) {
+    return innerPlaneOrigin(this.buffer, buffer);
+  }
+
+  /*
+   * Plane ∙ Line -> Plane
+  */
+  dotLine({ buffer }) {
+    return innerPlaneLine(this.buffer, buffer);
+  }
+
+  /*
+   * Plane ∙ Point -> Line
+  */
+  dotPoint({ buffer }) {
+    return innerPlanePoint(this.buffer, buffer);
+  }
+
+  /*
+   * Inner product typed delegation for ease of use
+  */
+  dot(other) {
+    const type = other.type();
+
+    switch (type) {
+      case PGATypes.Plane:
+        return innerPlanePlane(this.buffer, other.buffer);
+
+      case PGATypes.IdealLine:
+        return innerPlaneIdeal(this.buffer, other.buffer);
+
+      case PGATypes.OriginLine:
+        return innerPlaneOrigin(this.buffer, other.buffer);
+
+      case PGATypes.Line:
+        return innerPlaneLine(this.buffer, other.buffer);
+
+      case PGATypes.Point:
+        return innerPlanePoint(this.buffer, other.buffer);
+
+      default:
+        throw new TypeError('Invalid or unsupported element passed to Plane::dot');
+    }
+  }
+
+  /* === Element outer products === */
+
+  /*
+   * See impl/outer.js for implementation details
+  */
+
+  /*
+   * Plane ∧ Plane -> Line
+  */
+  wedgePlane({ buffer }) {
+    return outerPlanePlane(this.buffer, buffer);
+  }
+
+  /*
+   * Plane ∧ Ideal -> Point
+  */
+  wedgeIdeal({ buffer }) {
+    return outerPlaneIdeal(this.buffer, buffer);
+  }
+
+  /*
+   * Plane ∧ Origin -> Point
+  */
+  wedgeOrigin({ buffer }) {
+    return outerPlaneOrigin(this.buffer, buffer);
+  }
+
+  /*
+   * Plane ∧ Line -> Point
+  */
+  wedgeLine({ buffer }) {
+    return outerPlaneLine(this.buffer, buffer);
+  }
+
+  /*
+   * Plane ∧ Point -> Pseudo-scalar
+  */
+  wedgePoint({ buffer }) {
+    return outerPlanePoint(this.buffer, buffer);
+  }
+
+  /*
+   * Outer product typed delegation for ease of use
+  */
+  wedge(other) {
+    const type = other.type();
+
+    switch (type) {
+      case PGATypes.Plane:
+        return outerPlanePlane(this.buffer, other.buffer);
+
+      case PGATypes.IdealLine:
+        return outerPlaneIdeal(this.buffer, other.buffer);
+
+      case PGATypes.OriginLine:
+        return outerPlaneOrigin(this.buffer, other.buffer);
+
+      case PGATypes.Line:
+        return outerPlaneLine(this.buffer, other.buffer);
+
+      case PGATypes.Point:
+        return outerPlanePoint(this.buffer, other.buffer);
+
+      default:
+        throw new TypeError('Invalid or unsupported element passed to Plane::wedge');
+    }
   }
 
   /* === Multivector component access === */

@@ -1,56 +1,81 @@
 import PGATypes from './types';
+import transform from './impl/helper';
+
+import {
+  pointNorm, pointNormSq,
+  euclideanNorm, euclideanNormSq,
+} from './impl/metric';
+
+import {
+  innerPointPlane,
+  innerPointOrigin,
+  innerPointLine,
+  innerPointPoint,
+} from './impl/inner';
+
+import {
+  outerPointPlane,
+} from './impl/outer';
 
 class PointElement {
   /*
-   * Set our multivector buffer (Float32Array of length 4) and element type (Point)
+   * Set our multivector buffer (Float32Array) and element type (Point)
   */
   constructor(buffer) {
     this.buffer = buffer;
     this.elementType = PGATypes.Point;
   }
 
-  /* === Core === */
+  /* === Unary operations === */
 
   /*
-   * Familiar Euclidean length function, same as R^3
+   * Euclidean length/L2 norm
+  */
+  euclideanLength() {
+    return euclideanNorm(this.buffer);
+  }
+
+  /*
+   * Squared length, faster for distance comparisons
+  */
+  euclideanLengthSq() {
+    return euclideanNormSq(this.buffer);
+  }
+
+  /*
+   * PGA metric norm
   */
   length() {
-    let result = 0;
-    for (let i = 0; i < 4; i += 1) {
-      result += this.buffer[i] ** 2;
-    }
-
-    return result ** 0.5;
+    return pointNorm(this.buffer);
   }
 
   /*
-   * [e032, e013, e021, e123] has a metric of [0, 0, 0, -1], so discard all but e123
-   * As the result will be sqrt(|w^2|), discard the negation
+   * Same as above, no sqrt for faster comparisons
   */
-  metricLength() {
-    return (this.buffer[3] ** 2) ** 0.5;
+  lengthSq() {
+    return pointNormSq(this.buffer);
   }
 
   /*
-   * Point normalization satisfies X^2 = +-1
+   * Point normalization satisfies P^2 = +-1
   */
   normalize() {
     const rcp = (1.0 / this.buffer[3]);
-    for (let i = 0; i < 4; i += 1) {
-      this.buffer[i] *= rcp;
-    }
+
+    const normalizeElement = (x) => x * rcp;
+    transform(normalizeElement, this.buffer);
 
     return this;
   }
 
   /*
-   * Inversion satisfies X * Xinv = X.normalize(), or a homogeneous weight of +-1
+   * Inversion satisfies P * Pinv = P.normalize(), or a homogeneous weight of +-1
   */
   invert() {
     const rcp = (1.0 / this.buffer[3]) ** 2;
-    for (let i = 0; i < 4; i += 1) {
-      this.buffer[i] *= rcp;
-    }
+
+    const invertElement = (x) => x * rcp;
+    transform(invertElement, this.buffer);
 
     return this;
   }
@@ -59,9 +84,8 @@ class PointElement {
    * Reversion is a flip of all k-vector components, as they are grade 3
   */
   reverse() {
-    for (let i = 0; i < 4; i += 1) {
-      this.buffer[i] = -this.buffer[i];
-    }
+    const reverseElement = (x) => -x;
+    transform(reverseElement, this.buffer);
 
     return this;
   }
@@ -71,6 +95,107 @@ class PointElement {
   */
   conjugate() {
     return this;
+  }
+
+  /* === Element inner products === */
+
+  /*
+   * See impl/inner.js for implementation details
+  */
+
+  /*
+   * Point ∙ Plane -> Line
+  */
+  dotPlane({ buffer }) {
+    return innerPointPlane(this.buffer, buffer);
+  }
+
+  /*
+   * Point ∙ Origin -> Plane
+  */
+  dotOrigin({ buffer }) {
+    return innerPointOrigin(this.buffer, buffer);
+  }
+
+  /*
+   * Point ∙ Line -> Plane
+  */
+  dotLine({ buffer }) {
+    return innerPointLine(this.buffer, buffer);
+  }
+
+  /*
+   * Point ∙ Point -> Scalar
+  */
+  dotPoint({ buffer }) {
+    return innerPointPoint(this.buffer, buffer);
+  }
+
+  /*
+   * Inner product typed delegation for ease of use
+  */
+  dot(other) {
+    const type = other.type();
+
+    switch (type) {
+      case PGATypes.Plane:
+        return innerPointPlane(this.buffer, other.buffer);
+
+      case PGATypes.IdealLine:
+        throw new TypeError('Invalid element: Point ∙ Ideal is a null operation');
+
+      case PGATypes.OriginLine:
+        return innerPointOrigin(this.buffer, other.buffer);
+
+      case PGATypes.Line:
+        return innerPointLine(this.buffer, other.buffer);
+
+      case PGATypes.Point:
+        return innerPointPoint(this.buffer, other.buffer);
+
+      default:
+        throw new TypeError('Invalid or unsupported element passed to Point::dot');
+    }
+  }
+
+  /* === Element outer products === */
+
+  /*
+   * See impl/outer.js for implementation details
+  */
+
+  /*
+   * Point ∧ Plane -> Pseudo-scalar
+  */
+  wedgePlane({ buffer }) {
+    return outerPointPlane(this.buffer, buffer);
+  }
+
+  /*
+   * Outer product typed delegation for ease of use
+  */
+  wedge(other) {
+    const type = other.type();
+
+    switch (type) {
+      case PGATypes.Plane:
+        return outerPointPlane(this.buffer, other.buffer);
+
+      case PGATypes.IdealLine:
+        throw new TypeError('Invalid element: Point ∧ Ideal is a null operation');
+
+      case PGATypes.OriginLine:
+        throw new TypeError('Invalid element: Point ∧ Origin is a null operation');
+
+      case PGATypes.Line:
+        throw new TypeError('Invalid element: Point ∧ Line is a null operation');
+
+      case PGATypes.Point:
+        throw new TypeError('Invalid element: Point ∧ Point is a null operation');
+
+      default:
+        throw new TypeError('Invalid or unsupported element passed to Point::wedge');
+    }
   }
 
   /* === Multivector component access === */
@@ -121,7 +246,7 @@ class PointElement {
   }
 
   /*
-   * Explicit setters, simpler as their projective elements
+   * Explicit setters, intuitive as their projective elements
   */
   setX(x) {
     this.buffer[0] = x;

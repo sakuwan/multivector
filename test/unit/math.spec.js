@@ -6,7 +6,7 @@ describe('PGA element - Plane', () => {
   });
 
   it('Performs core element operations: Normalization', () => {
-    // Satisfy X∙X = 1
+    // Satisfy p∙p = 1
     const toBeNormalized = Plane(1, 1, 1, 2);
 
     toBeNormalized.normalize();
@@ -39,6 +39,10 @@ describe('PGA element - Plane', () => {
       const innerProduct = [e1, e2, e3].reduce((a, c) => a + c * c, 0);
       expect(innerProduct).toBeCloseTo(1, 5);
     }
+
+    const toBeInverted = Plane(1, 1, 1, 2);
+    toBeInverted.invert();
+    console.log(toBeInverted);
   });
 });
 
@@ -101,15 +105,15 @@ describe('PGA element - Point', () => {
     // Metric will simply be e123
     const farPoint = Point(10, 10, 10, 5);
 
-    const metricLength = farPoint.metricLength();
+    const metricLength = farPoint.length();
     expect(metricLength).toBe(5);
 
-    const euclideanLength = farPoint.length();
+    const euclideanLength = farPoint.euclideanLength();
     expect(euclideanLength).toBeCloseTo(18.0277);
   });
 
   it('Performs core element operations: Normalization', () => {
-    // Satisfy X^2 = +-1, the homogeneous coordinate should be of weight 1
+    // Satisfy P^2 = +-1, the homogeneous coordinate should be of weight 1
     const toBeNormalized = Point(1, 1, 1, 2);
 
     toBeNormalized.normalize();
@@ -129,7 +133,7 @@ describe('PGA element - Point', () => {
   });
 
   it('Performs core element operations: Inversion', () => {
-    // Satisfy X * Xinv = X^2 = +-1
+    // Satisfy P * Pinv = P^2 = +-1
     const toBeInverted = Point(1, 1, 1, 2);
 
     toBeInverted.invert();
