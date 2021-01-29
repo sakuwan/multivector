@@ -80,6 +80,18 @@ class PointElement {
     return this;
   }
 
+  /* === Grade antiautomorphisms === */
+
+  /*
+   * Involution is a flip of all k-vector components, as they are grade 3
+  */
+  involute() {
+    const involuteElement = (x) => -x;
+    transform(involuteElement, this.buffer);
+
+    return this;
+  }
+
   /*
    * Reversion is a flip of all k-vector components, as they are grade 3
   */
@@ -94,6 +106,16 @@ class PointElement {
    * Conjugation is a no-op, as grade 3 k-vectors are untouched
   */
   conjugate() {
+    return this;
+  }
+
+  /*
+   * Negate all elements
+  */
+  negate() {
+    const negateElement = (x) => -x;
+    transform(negateElement, this.buffer);
+
     return this;
   }
 

@@ -28,7 +28,7 @@ class PlaneElement {
   */
   constructor(buffer) {
     this.buffer = buffer;
-    this.elementType = PGATypes.Point;
+    this.elementType = PGATypes.Plane;
   }
 
   /* === Unary operations === */
@@ -81,6 +81,45 @@ class PlaneElement {
 
     const normalizeElement = (x) => x * invSqrt;
     transform(normalizeElement, this.buffer);
+
+    return this;
+  }
+
+  /* === Grade antiautomorphisms === */
+
+  /*
+   * Involution is a flip of all k-vector components, as they are grade 1
+  */
+  involute() {
+    const involuteElement = (x) => -x;
+    transform(involuteElement, this.buffer);
+
+    return this;
+  }
+
+  /*
+   * Reversion is a no-op, as grade 1 k-vectors are untouched
+  */
+  reverse() {
+    return this;
+  }
+
+  /*
+   * Conjugation is a flip of all k-vector components, as they are grade 1
+  */
+  conjugate() {
+    const conjugateElements = (x) => -x;
+    transform(conjugateElements, this.buffer);
+
+    return this;
+  }
+
+  /*
+   * Negate all elements
+  */
+  negate() {
+    const negateElement = (x) => -x;
+    transform(negateElement, this.buffer);
 
     return this;
   }
