@@ -1,5 +1,5 @@
 /*
- * PGA (3, 0, 1) outer products
+ * PGA (3, 0, 1) outer products (meet)
 */
 
 /* === Plane outer products === */
@@ -13,7 +13,7 @@
 */
 
 /*
- * Plane ∧ Plane -> Line (e01, e02, e03, 0, e23, e31, e12, 0)
+ * Plane ∧ Plane -> Ideal line (e01, e02, e03, 0)
  * The intersection of the subspaces spanned by two planes produces a
  * line element, the positional element extracted simplifies to:
  * (a.e0 * b.e1 - a.e1 * b.e0) -> e01
@@ -136,7 +136,7 @@ export const outerPlanePoint = (a, b) => (
 /* === Ideal outer products === */
 
 /*
- * Ideal ∧ Plane  -> Plane (0, 0, 0, e0)
+ * Ideal ∧ Plane  -> Point (e032, e013, e021, 0)
  * Ideal ∧ Ideal  -> Vanishes completely
  * Ideal ∧ Origin -> Pseudo-scalar
  * Ideal ∧ Line   -> Pseudo-scalar
@@ -309,7 +309,7 @@ export const outerLineLine = (a, b) => (
 */
 
 /*
- * Plane ∧ Point -> Pseudo-scalar
+ * Point ∧ Plane -> Pseudo-scalar
  * The meet of a point and plane determines whether or not a point lies on
  * the plane, satisfying the familiar equation of x∙n = 0, assuming both
  * elements are normalized. The calculation simplifies to:
