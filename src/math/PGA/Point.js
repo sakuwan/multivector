@@ -17,7 +17,19 @@ import {
   outerPointPlane,
 } from './impl/outer';
 
-class PointElement {
+import {
+  dualPoint,
+} from './impl/dual';
+
+import {
+  regressivePointPlane,
+  regressivePointIdeal,
+  regressivePointOrigin,
+  regressivePointLine,
+  regressivePointPoint,
+} from './impl/regressive';
+
+export class PointElement {
   /*
    * Set our multivector buffer (Float32Array) and element type (Point)
   */
@@ -220,6 +232,12 @@ class PointElement {
     }
   }
 
+  /* === Duality === */
+
+  dual() {
+    return dualPoint(this.buffer);
+  }
+
   /* === Multivector component access === */
 
   /*
@@ -324,6 +342,6 @@ class PointElement {
 /*
  * ((x * e032), (y * e013), (z * e021), (w * e123))
 */
-export default function makePoint(x = 0, y = 0, z = 0, w = 1) {
-  return new PointElement(new Float32Array([x, y, z, w]));
-}
+export const Point = (x = 0, y = 0, z = 0, w = 1) => (
+  new PointElement(new Float32Array([x, y, z, w]))
+);

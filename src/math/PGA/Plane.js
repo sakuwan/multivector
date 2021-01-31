@@ -22,7 +22,15 @@ import {
   outerPlanePoint,
 } from './impl/outer';
 
-class PlaneElement {
+import {
+  dualPlane,
+} from './impl/dual';
+
+import {
+  regressivePlanePoint,
+} from './impl/regressive';
+
+export class PlaneElement {
   /*
    * Set our multivector buffer (Float32Array) and element type (Point)
   */
@@ -260,6 +268,12 @@ class PlaneElement {
     }
   }
 
+  /* === Duality === */
+
+  dual() {
+    return dualPlane(this.buffer);
+  }
+
   /* === Multivector component access === */
 
   /*
@@ -364,6 +378,6 @@ class PlaneElement {
 /*
  * ((x * e1), (y * e2), (z * e3), (w * e0))
 */
-export default function makePlane(x = 0, y = 0, z = 0, w = 0) {
-  return new PlaneElement(new Float32Array([x, y, z, w]));
-}
+export const Plane = (x = 0, y = 0, z = 0, w = 0) => (
+  new PlaneElement(new Float32Array([x, y, z, w]))
+);

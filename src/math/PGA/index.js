@@ -7,6 +7,6 @@
  * Visit bivector.net for said resources & more
 */
 
-export { default as Plane } from './Plane';
-export { default as Point } from './Point';
+export { Plane } from './Plane';
+export { Point } from './Point';
 export { default as PGATypes } from './types';
