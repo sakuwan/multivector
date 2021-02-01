@@ -6,72 +6,52 @@ import {
   euclideanNorm, euclideanNormSq,
 } from './impl/metric';
 
-import {
-  innerPlanePlane,
-  innerPlaneIdeal,
-  innerPlaneOrigin,
-  innerPlaneLine,
-  innerPlanePoint,
-} from './impl/inner';
-
-import {
-  outerPlanePlane,
-  outerPlaneIdeal,
-  outerPlaneOrigin,
-  outerPlaneLine,
-  outerPlanePoint,
-} from './impl/outer';
-
-import {
-  dualPlane,
-} from './impl/dual';
-
-import {
-  regressivePlanePoint,
-} from './impl/regressive';
-
+/* === Plane (e1, e2, e3, e0)
+ *
+ * The fundamental element in PGA, all elements are constructed from planes,
+ * and the plane itself is a simple k-vector, as its components are grade 1.
+ *
+ * The PlaneElement class represents a plane, and its provided methods are
+ * unary, and focused on the element itself, rather than the vector space
+*/
 export class PlaneElement {
-  /*
-   * Set our multivector buffer (Float32Array) and element type (Point)
+  /* === Element construction ===
+   *
+   * Set our multivector buffer (Float32Array) and element type (Plane)
   */
+
   constructor(buffer) {
     this.buffer = buffer;
     this.elementType = PGATypes.Plane;
   }
 
-  /* === Unary operations === */
-
-  /*
-   * Euclidean length/L2 norm
+  /* === Metric operations ===
+   *
+   * euclideanLength: Euclidean/L2 norm
+   * euclideanLengthSq: Squared Euclidean length, faster for comparisons
+   * length: PGA metric norm
+   * lengthSq: Squared PGA metric norm, faster for comparisons
+   *
+   * normalize: Normalization satisfies p∙p = 1
+   * invert: Inversion satisfies p∙pinv = 1
   */
+
   euclideanLength() {
     return euclideanNorm(this.buffer);
   }
 
-  /*
-   * Squared length, faster for distance comparisons
-  */
   euclideanLengthSq() {
     return euclideanNormSq(this.buffer);
   }
 
-  /*
-   * PGA metric norm
-  */
   length() {
     return planeNorm(this.buffer);
   }
 
-  /*
-   * Same as above, no sqrt for faster comparisons
-  */
   lengthSq() {
     return planeNormSq(this.buffer);
   }
 
-  /*
-   * Plane normalization satisfies p∙p = 1, or p^2 = 1
-  */
   normalize() {
     const invSqrt = (1.0 / planeNorm(this.buffer));
 
@@ -81,9 +61,6 @@ export class PlaneElement {
     return this;
   }
 
-  /*
-   * Plane inversion satisfies p∙pinv = 1
-  */
   invert() {
     const invSqrt = (1.0 / planeNorm(this.buffer)) ** 2;
 
@@ -93,11 +70,18 @@ export class PlaneElement {
     return this;
   }
 
-  /* === Grade antiautomorphisms === */
-
-  /*
-   * Involution is a flip of all k-vector components, as they are grade 1
+  /* === Grade antiautomorphisms ===
+   * Antiautomorphisms flip the signs of k-vectors depending on their grade
+   * Involute  -> Flip the signs of grades 1 and 3
+   * Reverse   -> Flip the signs of grades 2 and 3
+   * Conjugate -> Flip the signs of grades 1 and 2
+   *
+   * involute:  [e1, e2, e3, e0] = [-e1, -e2, -e3, -e0]
+   * reverse:   [e1, e2, e3, e0] = [e1, e2, e3, e0]
+   * conjugate: [e1, e2, e3, e0] = [-e1, -e2, -e3, -e0]
+   * negate:    [e1, e2, e3, e0] = [-e1, -e2, -e3, -e0]
   */
+
   involute() {
     const involuteElement = (x) => -x;
     transform(involuteElement, this.buffer);
@@ -105,16 +89,10 @@ export class PlaneElement {
     return this;
   }
 
-  /*
-   * Reversion is a no-op, as grade 1 k-vectors are untouched
-  */
   reverse() {
     return this;
   }
 
-  /*
-   * Conjugation is a flip of all k-vector components, as they are grade 1
-  */
   conjugate() {
     const conjugateElements = (x) => -x;
     transform(conjugateElements, this.buffer);
@@ -122,9 +100,6 @@ export class PlaneElement {
     return this;
   }
 
-  /*
-   * Negate all elements
-  */
   negate() {
     const negateElement = (x) => -x;
     transform(negateElement, this.buffer);
@@ -132,161 +107,30 @@ export class PlaneElement {
     return this;
   }
 
-  /* === Element inner products === */
-
-  /*
-   * See impl/inner.js for implementation details
+  /* === Multivector component access ===
+   *
+   * mv: Alias for accessing buffer property
+   *
+   * x / e1: Projective / k-vector component access (0)
+   * y / e2: Projective / k-vector component access (1)
+   * z / e3: Projective / k-vector component access (2)
+   * w / e0: Projective / k-vector component access (3)
+   *
+   * setX: Set the value of the k-vector component at index 0
+   * setY: Set the value of the k-vector component at index 1
+   * setZ: Set the value of the k-vector component at index 2
+   * setW: Set the value of the k-vector component at index 3
   */
 
-  /*
-   * Plane ∙ Plane -> Scalar
-  */
-  dotPlane({ buffer }) {
-    return innerPlanePlane(this.buffer, buffer);
-  }
-
-  /*
-   * Plane ∙ Ideal -> Plane
-  */
-  dotIdeal({ buffer }) {
-    return innerPlaneIdeal(this.buffer, buffer);
-  }
-
-  /*
-   * Plane ∙ Origin -> Plane
-  */
-  dotOrigin({ buffer }) {
-    return innerPlaneOrigin(this.buffer, buffer);
-  }
-
-  /*
-   * Plane ∙ Line -> Plane
-  */
-  dotLine({ buffer }) {
-    return innerPlaneLine(this.buffer, buffer);
-  }
-
-  /*
-   * Plane ∙ Point -> Line
-  */
-  dotPoint({ buffer }) {
-    return innerPlanePoint(this.buffer, buffer);
-  }
-
-  /*
-   * Inner product typed delegation for ease of use
-  */
-  dot(other) {
-    const type = other.type();
-
-    switch (type) {
-      case PGATypes.Plane:
-        return innerPlanePlane(this.buffer, other.buffer);
-
-      case PGATypes.IdealLine:
-        return innerPlaneIdeal(this.buffer, other.buffer);
-
-      case PGATypes.OriginLine:
-        return innerPlaneOrigin(this.buffer, other.buffer);
-
-      case PGATypes.Line:
-        return innerPlaneLine(this.buffer, other.buffer);
-
-      case PGATypes.Point:
-        return innerPlanePoint(this.buffer, other.buffer);
-
-      default:
-        throw new TypeError('Invalid or unsupported element passed to Plane::dot');
-    }
-  }
-
-  /* === Element outer products === */
-
-  /*
-   * See impl/outer.js for implementation details
-  */
-
-  /*
-   * Plane ∧ Plane -> Line
-  */
-  wedgePlane({ buffer }) {
-    return outerPlanePlane(this.buffer, buffer);
-  }
-
-  /*
-   * Plane ∧ Ideal -> Point
-  */
-  wedgeIdeal({ buffer }) {
-    return outerPlaneIdeal(this.buffer, buffer);
-  }
-
-  /*
-   * Plane ∧ Origin -> Point
-  */
-  wedgeOrigin({ buffer }) {
-    return outerPlaneOrigin(this.buffer, buffer);
-  }
-
-  /*
-   * Plane ∧ Line -> Point
-  */
-  wedgeLine({ buffer }) {
-    return outerPlaneLine(this.buffer, buffer);
-  }
-
-  /*
-   * Plane ∧ Point -> Pseudo-scalar
-  */
-  wedgePoint({ buffer }) {
-    return outerPlanePoint(this.buffer, buffer);
-  }
-
-  /*
-   * Outer product typed delegation for ease of use
-  */
-  wedge(other) {
-    const type = other.type();
-
-    switch (type) {
-      case PGATypes.Plane:
-        return outerPlanePlane(this.buffer, other.buffer);
-
-      case PGATypes.IdealLine:
-        return outerPlaneIdeal(this.buffer, other.buffer);
-
-      case PGATypes.OriginLine:
-        return outerPlaneOrigin(this.buffer, other.buffer);
-
-      case PGATypes.Line:
-        return outerPlaneLine(this.buffer, other.buffer);
-
-      case PGATypes.Point:
-        return outerPlanePoint(this.buffer, other.buffer);
-
-      default:
-        throw new TypeError('Invalid or unsupported element passed to Plane::wedge');
-    }
-  }
-
-  /* === Duality === */
-
-  dual() {
-    return dualPlane(this.buffer);
-  }
-
-  /* === Multivector component access === */
-
-  /*
-   * Alias to access buffer property
-  */
   mv() {
     return this.buffer;
   }
 
-  /*
-   * Access components as their projective elements
-  */
   x() {
+    return this.buffer[0];
+  }
+
+  e1() {
     return this.buffer[0];
   }
 
@@ -294,7 +138,15 @@ export class PlaneElement {
     return this.buffer[1];
   }
 
+  e2() {
+    return this.buffer[1];
+  }
+
   z() {
+    return this.buffer[2];
+  }
+
+  e3() {
     return this.buffer[2];
   }
 
@@ -302,28 +154,10 @@ export class PlaneElement {
     return this.buffer[3];
   }
 
-  /*
-   * Access components as their multivector elements
-  */
-  e1() {
-    return this.buffer[0];
-  }
-
-  e2() {
-    return this.buffer[1];
-  }
-
-  e3() {
-    return this.buffer[2];
-  }
-
   e0() {
     return this.buffer[3];
   }
 
-  /*
-   * Explicit setters, simpler as their projective elements
-  */
   setX(x) {
     this.buffer[0] = x;
     return this;
@@ -344,27 +178,25 @@ export class PlaneElement {
     return this;
   }
 
-  /* === Element-related Utility === */
-
-  /*
-   * Create a new PointElement instance initialized with the same multivector
+  /* === Element-related Utility ===
+   *
+   * clone: Create a new element instance initialized with the same multivector
   */
+
   clone() {
     return new PlaneElement(new Float32Array(this.buffer));
   }
 
-  /* === General Utility === */
-
-  /*
-   * Return a specific Symbol('Plane') instance, used for internal typechecking
+  /* === General Utility ===
+   *
+   * type: Return a specific Symbol('Plane') instance, used for typechecking
+   * toPrimitive: Semi-automatic string coercion for string literals
   */
+
   type() {
     return this.elementType;
   }
 
-  /*
-   * toPrimitive, primarily for printing in string coercion
-  */
   [Symbol.toPrimitive](type) {
     if (type === 'string') {
       const [x, y, z, w] = this.buffer;
@@ -375,8 +207,9 @@ export class PlaneElement {
   }
 }
 
-/*
- * ((x * e1), (y * e2), (z * e3), (w * e0))
+/* === Plane factory
+ *
+ * (x, y, z, w) -> Plane((x * e1), (y * e2), (z * e3), (w * e0))
 */
 export const Plane = (x = 0, y = 0, z = 0, w = 0) => (
   new PlaneElement(new Float32Array([x, y, z, w]))

@@ -152,7 +152,7 @@ describe('PGA element - Point', () => {
   });
 
   it('Performs core element operations: Normalization', () => {
-    // Satisfy P^2 = +-1, the homogeneous coordinate should be of weight 1
+    // Satisfy P∙P = +-1, the homogeneous coordinate should be of weight 1
     const toBeNormalized = Point(1, 1, 1, 2);
 
     toBeNormalized.normalize();
@@ -172,7 +172,7 @@ describe('PGA element - Point', () => {
   });
 
   it('Performs core element operations: Inversion', () => {
-    // Satisfy P * Pinv = P^2 = +-1
+    // Satisfy P∙Pinv = P∙P = +-1
     const toBeInverted = Point(1, 1, 1, 2);
 
     toBeInverted.invert();

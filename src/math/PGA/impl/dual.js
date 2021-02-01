@@ -14,7 +14,7 @@
  * As this isn't Typescript or any superset with actual types, this is quite
  * redundant as the buffers are already always "dualized." Nevertheless, it
  * has some use for Line elements, but the rest are essentially no-ops and is
- * merely here for the sake of the concept.
+ * merely here for the sake of the concept
 */
 
 /*
