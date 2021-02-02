@@ -6,7 +6,7 @@ import {
   euclideanNorm, euclideanNormSq,
 } from './impl/metric';
 
-/* === Plane (e1, e2, e3, e0)
+/* === Plane (e1, e2, e3, e0) ===
  *
  * The fundamental element in PGA, all elements are constructed from planes,
  * and the plane itself is a simple k-vector, as its components are grade 1.
@@ -207,7 +207,7 @@ export class PlaneElement {
   }
 }
 
-/* === Plane factory
+/* === Plane factory ===
  *
  * (x, y, z, w) -> Plane((x * e1), (y * e2), (z * e3), (w * e0))
 */

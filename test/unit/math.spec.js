@@ -1,4 +1,9 @@
-import { Plane, Point, PGATypes } from '../../src/math/PGA';
+import {
+  PGATypes,
+
+  Plane,
+  Point,
+} from '../../src/math/PGA';
 
 describe('PGA element - Plane', () => {
   it('Initializes a proper element', () => {

@@ -6,7 +6,7 @@ import {
   euclideanNorm, euclideanNormSq,
 } from './impl/metric';
 
-/* === Point (e032, e013, e021, e123)
+/* === Point (e032, e013, e021, e123) ===
  *
  * The trivector element of PGA, points are represented as a result of the
  * intersection of three planes, and has components of grade 3.
@@ -207,7 +207,7 @@ export class PointElement {
   }
 }
 
-/* === Point factory
+/* === Point factory ===
  *
  * (x, y, z, w) -> Point((x * e032), (y * e013), (z * e021), (w * e123))
 */

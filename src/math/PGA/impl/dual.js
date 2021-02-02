@@ -8,9 +8,7 @@
  * Origin -> (<G> - <lο>) -> (4 - 2) -> Ideal
  * Line   -> (<G> - <ℓ>)  -> (4 - 2) -> Line (Ideal and Origin swapped)
  * Point  -> (<G> - <P>)  -> (4 - 3) -> Plane
-*/
-
-/*
+ *
  * As this isn't Typescript or any superset with actual types, this is quite
  * redundant as the buffers are already always "dualized." Nevertheless, it
  * has some use for Line elements, but the rest are essentially no-ops and is
