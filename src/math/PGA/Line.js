@@ -1,4 +1,5 @@
 import PGATypes from './types';
+import transform from './impl/helper';
 
 export class LineElement {
   /* === Element construction ===
@@ -9,6 +10,180 @@ export class LineElement {
   constructor(buffer) {
     this.buffer = buffer;
     this.elementType = PGATypes.Line;
+  }
+
+  /* === Grade antiautomorphisms ===
+   * Antiautomorphisms flip the signs of k-vectors depending on their grade
+   * Involute  -> Flip the signs of grades 1 and 3
+   * Reverse   -> Flip the signs of grades 2 and 3
+   * Conjugate -> Flip the signs of grades 1 and 2
+   *
+   * involute:  [e01, e02, e03, e0123, e23, e31, e12, s]
+   *          = [e01, e02, e03, e0123, e23, e31, e12, s]
+   * reverse:   [e01, e02, e03, e0123, e23, e31, e12, s]
+   *          = [-e01, -e02, -e03, e0123, -e23, -e31, -e12, s]
+   * conjugate: [e01, e02, e03, e0123, e23, e31, e12, s]
+   *          = [-e01, -e02, -e03, e0123, -e23, -e31, -e12, s]
+   * negate:    [e01, e02, e03, e0123, e23, e31, e12, s]
+   *          = [-e01, -e02, -e03, -e0123, -e23, -e31, -e12, -s]
+  */
+
+  involute() {
+    return this;
+  }
+
+  reverse() {
+    const reverseElement = (x) => -x;
+    transform(reverseElement, this.buffer, 0, 3);
+    transform(reverseElement, this.buffer, 4, 7);
+
+    return this;
+  }
+
+  conjugate() {
+    const conjugateElements = (x) => -x;
+    transform(conjugateElements, this.buffer, 0, 3);
+    transform(conjugateElements, this.buffer, 4, 7);
+
+    return this;
+  }
+
+  negate() {
+    const negateElement = (x) => -x;
+    transform(negateElement, this.buffer);
+
+    return this;
+  }
+
+  /* === Multivector component access ===
+   *
+   * mv: Alias for accessing buffer property
+   *
+   * px / e01: Projective / k-vector component access (0)
+   * py / e02: Projective / k-vector component access (1)
+   * pz / e03: Projective / k-vector component access (2)
+   * pw / e0123: Projective / k-vector component access (3)
+   * dx / e23: Projective / k-vector component access (4)
+   * dy / e31: Projective / k-vector component access (5)
+   * dz / e12: Projective / k-vector component access (6)
+   * dw / s: Projective / k-vector component access (7)
+   *
+   * setPX: Set the value of the k-vector component at index 0
+   * setPY: Set the value of the k-vector component at index 1
+   * setPZ: Set the value of the k-vector component at index 2
+   * setPW: Set the value of the k-vector component at index 3
+   * setDX: Set the value of the k-vector component at index 4
+   * setDY: Set the value of the k-vector component at index 5
+   * setDZ: Set the value of the k-vector component at index 6
+   * setDW: Set the value of the k-vector component at index 7
+  */
+
+  mv() {
+    return this.buffer;
+  }
+
+  px() {
+    return this.buffer[0];
+  }
+
+  e01() {
+    return this.buffer[0];
+  }
+
+  py() {
+    return this.buffer[1];
+  }
+
+  e02() {
+    return this.buffer[1];
+  }
+
+  pz() {
+    return this.buffer[2];
+  }
+
+  e03() {
+    return this.buffer[2];
+  }
+
+  pw() {
+    return this.buffer[3];
+  }
+
+  e0123() {
+    return this.buffer[3];
+  }
+
+  dx() {
+    return this.buffer[4];
+  }
+
+  e23() {
+    return this.buffer[4];
+  }
+
+  dy() {
+    return this.buffer[5];
+  }
+
+  e31() {
+    return this.buffer[5];
+  }
+
+  dz() {
+    return this.buffer[6];
+  }
+
+  e12() {
+    return this.buffer[6];
+  }
+
+  dw() {
+    return this.buffer[7];
+  }
+
+  s() {
+    return this.buffer[7];
+  }
+
+  setPX(x) {
+    this.buffer[0] = x;
+    return this;
+  }
+
+  setPY(y) {
+    this.buffer[1] = y;
+    return this;
+  }
+
+  setPZ(z) {
+    this.buffer[2] = z;
+    return this;
+  }
+
+  setPW(w) {
+    this.buffer[3] = w;
+    return this;
+  }
+
+  setDX(x) {
+    this.buffer[4] = x;
+    return this;
+  }
+
+  setDY(y) {
+    this.buffer[5] = y;
+    return this;
+  }
+
+  setDZ(z) {
+    this.buffer[6] = z;
+    return this;
+  }
+
+  setDW(w) {
+    this.buffer[7] = w;
+    return this;
   }
 
   /* === Element-related Utility ===
