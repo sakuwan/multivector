@@ -1,15 +1,14 @@
-/*
- * PGA (3, 0, 1) outer products (meet)
+/* === PGA (3, 0, 1) outer products (meet) ===
+ *
 */
 
-/* === Plane outer products === */
-
-/*
- * Plane ∧ Plane  -> Line (e01, e02, e03, 0, e23, e31, e12, 0)
- * Plane ∧ Ideal  -> Point (e032, e013, e021, 0)
- * Plane ∧ Origin -> Point (e032, e013, e021, e123)
- * Plane ∧ Line   -> Point (e032, e013, e021, e123)
- * Plane ∧ Point  -> Pseudo-scalar
+/* === Plane outer products ===
+ *
+ * Plane ∧ Plane       -> Line (e01, e02, e03, 0, e23, e31, e12, 0)
+ * Plane ∧ Ideal line  -> Point (e032, e013, e021, 0)
+ * Plane ∧ Origin line -> Point (e032, e013, e021, e123)
+ * Plane ∧ Line        -> Point (e032, e013, e021, e123)
+ * Plane ∧ Point       -> Pseudo-scalar
 */
 
 /*
@@ -133,14 +132,13 @@ export const outerPlanePoint = (a, b) => (
   a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3]
 );
 
-/* === Ideal outer products === */
-
-/*
- * Ideal ∧ Plane  -> Point (e032, e013, e021, 0)
- * Ideal ∧ Ideal  -> Vanishes completely
- * Ideal ∧ Origin -> Pseudo-scalar
- * Ideal ∧ Line   -> Pseudo-scalar
- * Ideal ∧ Point  -> Vanishes completely
+/* === Ideal line outer products ===
+ *
+ * Ideal line ∧ Plane       -> Point (e032, e013, e021, 0)
+ * Ideal line ∧ Ideal line  -> Vanishes completely
+ * Ideal line ∧ Origin line -> Pseudo-scalar
+ * Ideal line ∧ Line        -> Pseudo-scalar
+ * Ideal line ∧ Point       -> Vanishes completely
 */
 
 /*
@@ -181,14 +179,13 @@ export const outerIdealLine = (a, b) => (
   a[0] * b[4] + a[1] * b[5] + a[2] * b[6]
 );
 
-/* === Origin outer products === */
-
-/*
- * Origin ∧ Plane  -> Point (e032, e013, e021, e123)
- * Origin ∧ Ideal  -> Pseudo-scalar
- * Origin ∧ Origin -> Vanishes completely
- * Origin ∧ Line   -> Pseudo-scalar
- * Origin ∧ Point  -> Vanishes completely
+/* === Origin line outer products ===
+ *
+ * Origin line ∧ Plane       -> Point (e032, e013, e021, e123)
+ * Origin line ∧ Ideal line  -> Pseudo-scalar
+ * Origin line ∧ Origin line -> Vanishes completely
+ * Origin line ∧ Line        -> Pseudo-scalar
+ * Origin line ∧ Point       -> Vanishes completely
 */
 
 /*
@@ -211,7 +208,7 @@ export const outerOriginPlane = (a, b) => {
 };
 
 /*
- * Origin line ∧ Ideal -> Pseudo-scalar
+ * Origin line ∧ Ideal line -> Pseudo-scalar
  * The intersection or meet of lines results in the relative chirality and
  * is a combination of spatial and angular distances, zero when the lines
  * intersect and zero when they are parallel. The calculation simplifies to:
@@ -232,14 +229,13 @@ export const outerOriginLine = (a, b) => (
   a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
 );
 
-/* === Line outer products === */
-
-/*
- * Line ∧ Plane  -> Point (e032, e013, e021, e123)
- * Line ∧ Ideal  -> Pseudo-scalar
- * Line ∧ Origin -> Pseudo-scalar
- * Line ∧ Line   -> Pseudo-scalar
- * Line ∧ Point  -> Vanishes completely
+/* === Line outer products ===
+ *
+ * Line ∧ Plane       -> Point (e032, e013, e021, e123)
+ * Line ∧ Ideal line  -> Pseudo-scalar
+ * Line ∧ Origin line -> Pseudo-scalar
+ * Line ∧ Line        -> Pseudo-scalar
+ * Line ∧ Point       -> Vanishes completely
 */
 
 /*
@@ -298,14 +294,13 @@ export const outerLineLine = (a, b) => (
   a[0] * b[4] + a[1] * b[5] + a[2] * b[6] + a[4] * b[0] + a[5] * b[1] + a[6] * b[2]
 );
 
-/* === Point outer products === */
-
-/*
- * Point ∧ Plane  -> Pseudo-scalar
- * Point ∧ Ideal  -> Vanishes completely
- * Point ∧ Origin -> Vanishes completely
- * Point ∧ Line   -> Vanishes completely
- * Point ∧ Point  -> Vanishes completely
+/* === Point outer products ===
+ *
+ * Point ∧ Plane       -> Pseudo-scalar
+ * Point ∧ Ideal line  -> Vanishes completely
+ * Point ∧ Origin line -> Vanishes completely
+ * Point ∧ Line        -> Vanishes completely
+ * Point ∧ Point       -> Vanishes completely
 */
 
 /*

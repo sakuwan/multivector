@@ -2,9 +2,20 @@ import PGATypes from './types';
 import transform from './impl/helper';
 
 import {
-  planeNorm, planeNormSq,
-  euclideanNorm, euclideanNormSq,
+  euclideanNormSq,
+  planeNormSq,
+  planeInfinityNormSq,
 } from './impl/metric';
+
+/* === Coordinate indices map ===
+ *
+ * A more clear way (that is fully optimized away) to deal with the constant
+ * <Element>.buffer access throughout the implementation
+*/
+const PL_COORD_X = 0;
+const PL_COORD_Y = 1;
+const PL_COORD_Z = 2;
+const PL_COORD_W = 3;
 
 /* === Plane (e1, e2, e3, e0) ===
  *
@@ -31,13 +42,15 @@ export class PlaneElement {
    * euclideanLengthSq: Squared Euclidean length, faster for comparisons
    * length: PGA metric norm
    * lengthSq: Squared PGA metric norm, faster for comparisons
+   * infinityLength: PGA infinity/ideal norm
+   * infinityLengthSq: Squared PGA infinity/ideal norm, faster for comparisons
    *
    * normalize: Normalization satisfies p∙p = 1
    * invert: Inversion satisfies p∙pinv = 1
   */
 
   euclideanLength() {
-    return euclideanNorm(this.buffer);
+    return euclideanNormSq(this.buffer) ** 0.5;
   }
 
   euclideanLengthSq() {
@@ -45,15 +58,23 @@ export class PlaneElement {
   }
 
   length() {
-    return planeNorm(this.buffer);
+    return planeNormSq(this.buffer) ** 0.5;
   }
 
   lengthSq() {
     return planeNormSq(this.buffer);
   }
 
+  infinityLength() {
+    return planeInfinityNormSq(this.buffer) ** 0.5;
+  }
+
+  infinityLengthSq() {
+    return planeInfinityNormSq(this.buffer);
+  }
+
   normalize() {
-    const invSqrt = (1.0 / planeNorm(this.buffer));
+    const invSqrt = (1.0 / (planeNormSq(this.buffer) ** 0.5));
 
     const normalizeElement = (x) => x * invSqrt;
     transform(normalizeElement, this.buffer, 0, 3);
@@ -62,7 +83,7 @@ export class PlaneElement {
   }
 
   invert() {
-    const invSqrt = (1.0 / planeNorm(this.buffer)) ** 2;
+    const invSqrt = (1.0 / planeNormSq(this.buffer));
 
     const normalizeElement = (x) => x * invSqrt;
     transform(normalizeElement, this.buffer);
@@ -111,72 +132,27 @@ export class PlaneElement {
    *
    * mv: Alias for accessing buffer property
    *
-   * x / e1: Projective / k-vector component access (0)
-   * y / e2: Projective / k-vector component access (1)
-   * z / e3: Projective / k-vector component access (2)
-   * w / e0: Projective / k-vector component access (3)
-   *
-   * setX: Set the value of the k-vector component at index 0
-   * setY: Set the value of the k-vector component at index 1
-   * setZ: Set the value of the k-vector component at index 2
-   * setW: Set the value of the k-vector component at index 3
+   * get / set e1: k-vector component access (0 / x)
+   * get / set e2: k-vector component access (1 / y)
+   * get / set e3: k-vector component access (2 / z)
+   * get / set e0: k-vector component access (3 / w)
   */
 
   mv() {
     return this.buffer;
   }
 
-  x() {
-    return this.buffer[0];
-  }
+  /* eslint-disable lines-between-class-members */
+  get e1() { return this.buffer[PL_COORD_X]; }
+  get e2() { return this.buffer[PL_COORD_Y]; }
+  get e3() { return this.buffer[PL_COORD_Z]; }
+  get e0() { return this.buffer[PL_COORD_W]; }
 
-  e1() {
-    return this.buffer[0];
-  }
-
-  y() {
-    return this.buffer[1];
-  }
-
-  e2() {
-    return this.buffer[1];
-  }
-
-  z() {
-    return this.buffer[2];
-  }
-
-  e3() {
-    return this.buffer[2];
-  }
-
-  w() {
-    return this.buffer[3];
-  }
-
-  e0() {
-    return this.buffer[3];
-  }
-
-  setX(x) {
-    this.buffer[0] = x;
-    return this;
-  }
-
-  setY(y) {
-    this.buffer[1] = y;
-    return this;
-  }
-
-  setZ(z) {
-    this.buffer[2] = z;
-    return this;
-  }
-
-  setW(w) {
-    this.buffer[3] = w;
-    return this;
-  }
+  set e1(v) { this.buffer[PL_COORD_X] = v; }
+  set e2(v) { this.buffer[PL_COORD_Y] = v; }
+  set e3(v) { this.buffer[PL_COORD_Z] = v; }
+  set e0(v) { this.buffer[PL_COORD_W] = v; }
+  /* eslint-enable lines-between-class-members */
 
   /* === Element-related Utility ===
    *
@@ -209,8 +185,9 @@ export class PlaneElement {
 
 /* === Plane factory ===
  *
- * (x, y, z, w) -> Plane((x * e1), (y * e2), (z * e3), (w * e0))
+ * Represents the usual formula: ax + by + cz + d
+ * (a, b, c, d) -> Plane((a * e1), (b * e2), (c * e3), (d * e0))
 */
-export const Plane = (x = 0, y = 0, z = 0, w = 0) => (
-  new PlaneElement(new Float32Array([x, y, z, w]))
+export const Plane = (a = 0, b = 0, c = 0, d = 0) => (
+  new PlaneElement(new Float32Array([a, b, c, d]))
 );

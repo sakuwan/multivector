@@ -1,6 +1,25 @@
 import PGATypes from './types';
 import transform from './impl/helper';
 
+/* === Coordinate indices map ===
+ *
+ * A more clear way (that is fully optimized away) to deal with the constant
+ * <Element>.buffer access throughout the implementation
+*/
+const IL_COORD_X = 0;
+const IL_COORD_Y = 1;
+const IL_COORD_Z = 2;
+const IL_COORD_W = 3;
+
+/* === Ideal Line (e01, e02, e03, e0123) ===
+ *
+ * One of the bivector elements of PGA, the ideal line represents the lines
+ * at infinity, or the degenerate lines. Throughout this implementation and
+ * others, e0123 will be assumed to be 0.
+ *
+ * The IdealElement class represents an ideal line, and its provided methods
+ * are unary, and focused on the element itself, rather than the vector space
+*/
 export class IdealElement {
   /* === Element construction ===
    *
@@ -53,72 +72,27 @@ export class IdealElement {
    *
    * mv: Alias for accessing buffer property
    *
-   * x / e01: Projective / k-vector component access (0)
-   * y / e02: Projective / k-vector component access (1)
-   * z / e03: Projective / k-vector component access (2)
-   * w / e0123: Projective / k-vector component access (3)
-   *
-   * setX: Set the value of the k-vector component at index 0
-   * setY: Set the value of the k-vector component at index 1
-   * setZ: Set the value of the k-vector component at index 2
-   * setW: Set the value of the k-vector component at index 3
+   * get / set e01:   k-vector component access (0 / x)
+   * get / set e02:   k-vector component access (1 / y)
+   * get / set e03:   k-vector component access (2 / z)
+   * get / set e0123: k-vector component access (3 / w)
   */
 
   mv() {
     return this.buffer;
   }
 
-  x() {
-    return this.buffer[0];
-  }
+  /* eslint-disable lines-between-class-members */
+  get e01() { return this.buffer[IL_COORD_X]; }
+  get e02() { return this.buffer[IL_COORD_Y]; }
+  get e03() { return this.buffer[IL_COORD_Z]; }
+  get e0123() { return this.buffer[IL_COORD_W]; }
 
-  e01() {
-    return this.buffer[0];
-  }
-
-  y() {
-    return this.buffer[1];
-  }
-
-  e02() {
-    return this.buffer[1];
-  }
-
-  z() {
-    return this.buffer[2];
-  }
-
-  e03() {
-    return this.buffer[2];
-  }
-
-  w() {
-    return this.buffer[3];
-  }
-
-  e0123() {
-    return this.buffer[3];
-  }
-
-  setX(x) {
-    this.buffer[0] = x;
-    return this;
-  }
-
-  setY(y) {
-    this.buffer[1] = y;
-    return this;
-  }
-
-  setZ(z) {
-    this.buffer[2] = z;
-    return this;
-  }
-
-  setW(w) {
-    this.buffer[3] = w;
-    return this;
-  }
+  set e01(v) { this.buffer[IL_COORD_X] = v; }
+  set e02(v) { this.buffer[IL_COORD_Y] = v; }
+  set e03(v) { this.buffer[IL_COORD_Z] = v; }
+  set e0123(v) { this.buffer[IL_COORD_W] = v; }
+  /* eslint-enable lines-between-class-members */
 
   /* === Element-related Utility ===
    *
@@ -151,8 +125,8 @@ export class IdealElement {
 
 /* === IdealLine factory ===
  *
- * (x, y, z, w) -> IdealLine((x * e01), (y * e02), (z * e03), (w * e0123))
+ * (a, b, c, d) -> IdealLine((a * e01), (b * e02), (c * e03), (d * e0123))
 */
-export const IdealLine = (x = 0, y = 0, z = 0, w = 0) => (
-  new IdealElement(new Float32Array([x, y, z, w]))
+export const IdealLine = (a = 0, b = 0, c = 0, d = 0) => (
+  new IdealElement(new Float32Array([a, b, c, d]))
 );

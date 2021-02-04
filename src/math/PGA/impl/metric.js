@@ -1,5 +1,5 @@
-/*
- * PGA (3, 0, 1) metric operations
+/* === PGA (3, 0, 1) metric operations ===
+ *
 */
 
 /* === Shared metric operations === */
@@ -8,92 +8,80 @@
  * The standard L2 norm, Euclidean length
 */
 
-export const euclideanNorm = (a) => (
-  (a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]) ** 0.5
-);
-
 export const euclideanNormSq = (a) => (
   a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]
 );
 
-/* === Plane metric operations === */
-
-/*
+/* === Plane metric operations ===
+ *
  * Plane k-vectors: [e1, e2, e3, e0]
  * Plane metric: [1, 1, 1, 0]
+ * ||p||∞ = ||P||
  *
  * e0 squares to zero and is ignored in the calculation
 */
-
-export const planeNorm = (a) => (
-  (a[0] * a[0] + a[1] * a[1] + a[2] * a[2]) ** 0.5
-);
 
 export const planeNormSq = (a) => (
   a[0] * a[0] + a[1] * a[1] + a[2] * a[2]
 );
 
-/* === Ideal metric operations === */
+export const planeInfinityNormSq = (a) => a[3] * a[3];
 
-/*
- * Ideal k-vectors: [e01, e02, e03, e0123]
- * Ideal metric: [0, 0, 0, 0]
+/* === Ideal line metric operations ===
+ *
+ * Ideal line k-vectors: [e01, e02, e03, e0123]
+ * Ideal line metric: [0, 0, 0, 0]
+ * ||l∞||∞ = ||lο||
  *
  * e0 squares to zero, so all components vanish
- * The norm at infinity of ||a||∞ = ||*a||, where *a is the Hodge dual
+ * The norm at infinity of ||a||∞ = ||*a||, where *a is Poincare duality
 */
 
-export const idealNorm = (a) => (
-  (a[0] * a[0] + a[1] * a[1] + a[2] * a[2]) ** 0.5
+export const idealInfinityNormSq = (a) => (
+  a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]
 );
 
-export const idealNormSq = (a) => (
-  a[0] * a[0] + a[1] * a[1] + a[2] * a[2]
-);
-
-/* === Origin metric operations === */
-
-/*
- * Origin k-vectors: [e23, e31, e12, s]
- * Origin metric: [-1, -1, -1, 1]
+/* === Origin line metric operations ===
  *
- * Through reversion, the scalar does not contribute
+ * Origin line k-vectors: [e23, e31, e12, s]
+ * Origin line metric: [-1, -1, -1, 1]
+ * ||lο||∞ = ||l∞||
+ *
+ * All components of the Origin line element contribute to the norm
 */
-
-export const originNorm = (a) => (
-  (a[0] * a[0] + a[1] * a[1] + a[2] * a[2]) ** 0.5
-);
 
 export const originNormSq = (a) => (
-  a[0] * a[0] + a[1] * a[1] + a[2] * a[2]
+  a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]
 );
 
-/* === Line metric operations === */
-
-/*
+/* === Line metric operations ===
+ *
  * Line k-vectors: [e01, e02, e03, e0123, e23, e31, e12, s]
  * Line metric: [0, 0, 0, 0, -1, -1, -1, 1]
+ * ||ℓ||∞ == ||l∞||∞
  *
  * The norm of the line element is simply considered as the norm of the origin
 */
 
-export const lineNorm = (a) => (
-  (a[0] * a[0] + a[1] * a[1] + a[2] * a[2]) ** 0.5
-);
-
 export const lineNormSq = (a) => (
-  a[0] * a[0] + a[1] * a[1] + a[2] * a[2]
+  a[4] * a[4] + a[5] * a[5] + a[6] * a[6] + a[7] * a[7]
 );
 
-/* === Point metric operations === */
+export const lineInfinityNormSq = (a) => (
+  a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]
+);
 
-/*
+/* === Point metric operations ===
+ *
  * Point k-vectors: [e032, e013, e021, e123]
  * Point metric: [0, 0, 0, -1]
+ * ||P||∞ = ||p||
  *
  * e0 squares to zero, so the contributing component is simply e123
 */
 
-export const pointNorm = (a) => (a[3] * a[3]) ** 0.5;
-
 export const pointNormSq = (a) => a[3] * a[3];
+
+export const pointInfinityNormSq = (a) => (
+  a[0] * a[0] + a[1] * a[1] + a[2] * a[2]
+);

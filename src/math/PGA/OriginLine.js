@@ -1,6 +1,25 @@
 import PGATypes from './types';
 import transform from './impl/helper';
 
+/* === Coordinate indices map ===
+ *
+ * A more clear way (that is fully optimized away) to deal with the constant
+ * <Element>.buffer access throughout the implementation
+*/
+const OL_COORD_X = 0;
+const OL_COORD_Y = 1;
+const OL_COORD_Z = 2;
+const OL_COORD_W = 3;
+
+/* === Origin Line (e23, e31, e12, s) ===
+ *
+ * One of the bivector elements of PGA, the origin line represents the lines
+ * through the origin, and are non-degenerate. Throughout this implementation
+ * and others, s will be assumed to be 0.
+ *
+ * The OriginElement class represents an origin line, and its provided methods
+ * are unary, and focused on the element itself, rather than the vector space
+*/
 export class OriginElement {
   /* === Element construction ===
    *
@@ -53,72 +72,27 @@ export class OriginElement {
    *
    * mv: Alias for accessing buffer property
    *
-   * x / e23: Projective / k-vector component access (0)
-   * y / e31: Projective / k-vector component access (1)
-   * z / e12: Projective / k-vector component access (2)
-   * w / s: Projective / k-vector component access (3)
-   *
-   * setX: Set the value of the k-vector component at index 0
-   * setY: Set the value of the k-vector component at index 1
-   * setZ: Set the value of the k-vector component at index 2
-   * setW: Set the value of the k-vector component at index 3
+   * get / set e23: k-vector component access (0 / x)
+   * get / set e31: k-vector component access (1 / y)
+   * get / set e12: k-vector component access (2 / z)
+   * get / set s:   k-vector component access (3 / w)
   */
 
   mv() {
     return this.buffer;
   }
 
-  x() {
-    return this.buffer[0];
-  }
+  /* eslint-disable lines-between-class-members */
+  get e23() { return this.buffer[OL_COORD_X]; }
+  get e31() { return this.buffer[OL_COORD_Y]; }
+  get e12() { return this.buffer[OL_COORD_Z]; }
+  get s() { return this.buffer[OL_COORD_W]; }
 
-  e23() {
-    return this.buffer[0];
-  }
-
-  y() {
-    return this.buffer[1];
-  }
-
-  e31() {
-    return this.buffer[1];
-  }
-
-  z() {
-    return this.buffer[2];
-  }
-
-  e12() {
-    return this.buffer[2];
-  }
-
-  w() {
-    return this.buffer[3];
-  }
-
-  s() {
-    return this.buffer[3];
-  }
-
-  setX(x) {
-    this.buffer[0] = x;
-    return this;
-  }
-
-  setY(y) {
-    this.buffer[1] = y;
-    return this;
-  }
-
-  setZ(z) {
-    this.buffer[2] = z;
-    return this;
-  }
-
-  setW(w) {
-    this.buffer[3] = w;
-    return this;
-  }
+  set e23(v) { this.buffer[OL_COORD_X] = v; }
+  set e31(v) { this.buffer[OL_COORD_Y] = v; }
+  set e12(v) { this.buffer[OL_COORD_Z] = v; }
+  set s(v) { this.buffer[OL_COORD_W] = v; }
+  /* eslint-enable lines-between-class-members */
 
   /* === Element-related Utility ===
    *
@@ -151,8 +125,8 @@ export class OriginElement {
 
 /* === OriginLine factory ===
  *
- * (x, y, z, w) -> OriginLine((x * e23), (y * e31), (z * e12), (w * s))
+ * (a, b, c, d) -> OriginLine((a * e23), (b * e31), (c * e12), (d * s))
 */
-export const OriginLine = (x = 0, y = 0, z = 0, w = 0) => (
-  new OriginElement(new Float32Array([x, y, z, w]))
+export const OriginLine = (a = 0, b = 0, c = 0, d = 0) => (
+  new OriginElement(new Float32Array([a, b, c, d]))
 );

@@ -1,6 +1,29 @@
 import PGATypes from './types';
 import transform from './impl/helper';
 
+/* === Coordinate indices map ===
+ *
+ * A more clear way (that is fully optimized away) to deal with the constant
+ * <Element>.buffer access throughout the implementation
+*/
+const L_COORD_IX = 0;
+const L_COORD_IY = 1;
+const L_COORD_IZ = 2;
+const L_COORD_IW = 3;
+const L_COORD_OX = 4;
+const L_COORD_OY = 5;
+const L_COORD_OZ = 6;
+const L_COORD_OW = 7;
+
+/* === Line (e01, e02, e03, e0123, e23, e31, e12, s) ===
+ *
+ * The combination element and representation of general lines is a 6-bivector
+ * coordinate multivector, lines are Plücker coordinates that happen to arise
+ * naturally in PGA. Both e0123 and s are assumed to be 0 throughout.
+ *
+ * The LineElement class represents a full line, and its provided methods
+ * are unary, and focused on the element itself, rather than the vector space
+*/
 export class LineElement {
   /* === Element construction ===
    *
@@ -59,132 +82,41 @@ export class LineElement {
    *
    * mv: Alias for accessing buffer property
    *
-   * px / e01: Projective / k-vector component access (0)
-   * py / e02: Projective / k-vector component access (1)
-   * pz / e03: Projective / k-vector component access (2)
-   * pw / e0123: Projective / k-vector component access (3)
-   * dx / e23: Projective / k-vector component access (4)
-   * dy / e31: Projective / k-vector component access (5)
-   * dz / e12: Projective / k-vector component access (6)
-   * dw / s: Projective / k-vector component access (7)
-   *
-   * setPX: Set the value of the k-vector component at index 0
-   * setPY: Set the value of the k-vector component at index 1
-   * setPZ: Set the value of the k-vector component at index 2
-   * setPW: Set the value of the k-vector component at index 3
-   * setDX: Set the value of the k-vector component at index 4
-   * setDY: Set the value of the k-vector component at index 5
-   * setDZ: Set the value of the k-vector component at index 6
-   * setDW: Set the value of the k-vector component at index 7
+   * get / set e01:   k-vector component access (0 / px)
+   * get / set e02:   k-vector component access (1 / py)
+   * get / set e03:   k-vector component access (2 / pz)
+   * get / set e0123: k-vector component access (3 / I)
+   * get / set e23:   k-vector component access (4 / dx)
+   * get / set e31:   k-vector component access (5 / dy)
+   * get / set e12:   k-vector component access (6 / dz)
+   * get / set s:     k-vector component access (7 / s)
   */
 
   mv() {
     return this.buffer;
   }
 
-  px() {
-    return this.buffer[0];
-  }
+  /* eslint-disable lines-between-class-members */
+  get e01() { return this.buffer[L_COORD_IX]; }
+  get e02() { return this.buffer[L_COORD_IY]; }
+  get e03() { return this.buffer[L_COORD_IZ]; }
+  get e0123() { return this.buffer[L_COORD_IW]; }
 
-  e01() {
-    return this.buffer[0];
-  }
+  get e23() { return this.buffer[L_COORD_OX]; }
+  get e31() { return this.buffer[L_COORD_OY]; }
+  get e12() { return this.buffer[L_COORD_OZ]; }
+  get s() { return this.buffer[L_COORD_OW]; }
 
-  py() {
-    return this.buffer[1];
-  }
+  set e01(v) { this.buffer[L_COORD_IX] = v; }
+  set e02(v) { this.buffer[L_COORD_IY] = v; }
+  set e03(v) { this.buffer[L_COORD_IZ] = v; }
+  set e0123(v) { this.buffer[L_COORD_IW] = v; }
 
-  e02() {
-    return this.buffer[1];
-  }
-
-  pz() {
-    return this.buffer[2];
-  }
-
-  e03() {
-    return this.buffer[2];
-  }
-
-  pw() {
-    return this.buffer[3];
-  }
-
-  e0123() {
-    return this.buffer[3];
-  }
-
-  dx() {
-    return this.buffer[4];
-  }
-
-  e23() {
-    return this.buffer[4];
-  }
-
-  dy() {
-    return this.buffer[5];
-  }
-
-  e31() {
-    return this.buffer[5];
-  }
-
-  dz() {
-    return this.buffer[6];
-  }
-
-  e12() {
-    return this.buffer[6];
-  }
-
-  dw() {
-    return this.buffer[7];
-  }
-
-  s() {
-    return this.buffer[7];
-  }
-
-  setPX(x) {
-    this.buffer[0] = x;
-    return this;
-  }
-
-  setPY(y) {
-    this.buffer[1] = y;
-    return this;
-  }
-
-  setPZ(z) {
-    this.buffer[2] = z;
-    return this;
-  }
-
-  setPW(w) {
-    this.buffer[3] = w;
-    return this;
-  }
-
-  setDX(x) {
-    this.buffer[4] = x;
-    return this;
-  }
-
-  setDY(y) {
-    this.buffer[5] = y;
-    return this;
-  }
-
-  setDZ(z) {
-    this.buffer[6] = z;
-    return this;
-  }
-
-  setDW(w) {
-    this.buffer[7] = w;
-    return this;
-  }
+  set e23(v) { this.buffer[L_COORD_OX] = v; }
+  set e31(v) { this.buffer[L_COORD_OY] = v; }
+  set e12(v) { this.buffer[L_COORD_OZ] = v; }
+  set s(v) { this.buffer[L_COORD_OW] = v; }
+  /* eslint-enable lines-between-class-members */
 
   /* === Element-related Utility ===
    *
@@ -207,8 +139,8 @@ export class LineElement {
 
   [Symbol.toPrimitive](type) {
     if (type === 'string') {
-      const [x, y, z, w, d, f, g, s] = this.buffer;
-      return `Line(${x}e01 + ${y}e02 + ${z}e03 + ${w}e0123 + ${d}e23 + ${f}e31 + ${g}e12 + ${s}s)`;
+      const [a, b, c, i, d, f, g, s] = this.buffer;
+      return `Line(${a}e01 + ${b}e02 + ${c}e03 + ${i}e0123 + ${d}e23 + ${f}e31 + ${g}e12 + ${s}s)`;
     }
 
     return (type === 'number') ? NaN : true;
@@ -217,11 +149,11 @@ export class LineElement {
 
 /* === Line factory ===
  *
- * (px, py, pz, 0, dx, dy, dz, 0) -> Line(
- *   (px * e01), (py * e02), (pz * e03), (0 * e0123)),
- *   (dx * e23), (dy * e31), (dz * e12), (0 * s)),
+ * (a, b, c, 0, d, f, g, 0) -> Line(
+ *   (a * e01), (b * e02), (c * e03), (0 * e0123)),
+ *   (d * e23), (f * e31), (g * e12), (0 * s)),
  * )
 */
-export const Line = (px = 0, py = 0, pz = 0, dx = 0, dy = 0, dz = 0) => (
-  new LineElement(new Float32Array([px, py, pz, 0, dx, dy, dz, 0]))
+export const Line = (a = 0, b = 0, c = 0, d = 0, f = 0, g = 0) => (
+  new LineElement(new Float32Array([a, b, c, 0, d, f, g, 0]))
 );

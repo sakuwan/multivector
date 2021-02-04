@@ -1,16 +1,15 @@
-/*
- * PGA (3, 0, 1) inner products
+/* === PGA (3, 0, 1) inner products ===
+ *
  * Commutativity matters, the following assumes a ∙ b
 */
 
-/* === Plane inner products === */
-
-/*
- * Plane ∙ Plane  -> Scalar
- * Plane ∙ Ideal  -> Plane (0, 0, 0, e0)
- * Plane ∙ Origin -> Plane (e1, e2, e3, 0)
- * Plane ∙ Line   -> Plane (e1, e2, e3, e0)
- * Plane ∙ Point  -> Line (e01, e02, e03, 0, e23, e31, e12, 0)
+/* === Plane inner products ===
+ *
+ * Plane ∙ Plane       -> Scalar
+ * Plane ∙ Ideal line  -> Plane (0, 0, 0, e0)
+ * Plane ∙ Origin line -> Plane (e1, e2, e3, 0)
+ * Plane ∙ Line        -> Plane (e1, e2, e3, e0)
+ * Plane ∙ Point       -> Line (e01, e02, e03, 0, e23, e31, e12, 0)
 */
 
 /*
@@ -105,14 +104,13 @@ export const innerPlanePoint = (a, b) => {
   return new Float32Array([e01, e02, e03, 0, e23, e31, e12, 0]);
 };
 
-/* === Ideal inner products === */
-
-/*
- * Ideal ∙ Plane  -> Plane (0, 0, 0, e0)
- * Ideal ∙ Ideal  -> Vanishes completely
- * Ideal ∙ Origin -> Vanishes completely (assuming pseudo is 0)
- * Ideal ∙ Line   -> Vanishes completely (assuming pseudo is 0)
- * Ideal ∙ Point  -> Vanishes completely (assuming pseudo is 0)
+/* === Ideal line inner products ===
+ *
+ * Ideal line ∙ Plane       -> Plane (0, 0, 0, e0)
+ * Ideal line ∙ Ideal line  -> Vanishes completely
+ * Ideal line ∙ Origin line -> Vanishes completely (assuming pseudo is 0)
+ * Ideal line ∙ Line        -> Vanishes completely (assuming pseudo is 0)
+ * Ideal line ∙ Point       -> Vanishes completely (assuming pseudo is 0)
 */
 
 /*
@@ -124,14 +122,13 @@ export const innerIdealPlane = (a, b) => (
   a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
 );
 
-/* === Origin inner products === */
-
-/*
- * Origin ∙ Plane  -> Plane (e1, e2, e3, 0)
- * Origin ∙ Ideal  -> Vanishes completely (assuming pseudo is 0)
- * Origin ∙ Origin -> Scalar
- * Origin ∙ Line   -> Scalar
- * Origin ∙ Point  -> Plane (e1, e2, e3, e0)
+/* === Origin line inner products ===
+ *
+ * Origin line ∙ Plane       -> Plane (e1, e2, e3, 0)
+ * Origin line ∙ Ideal line  -> Vanishes completely (assuming pseudo is 0)
+ * Origin line ∙ Origin line -> Scalar
+ * Origin line ∙ Line        -> Scalar
+ * Origin line ∙ Point       -> Plane (e1, e2, e3, e0)
 */
 
 /*
@@ -187,14 +184,13 @@ export const innerOriginPoint = (a, b) => {
   return new Float32Array([e1, e2, e3, e0]);
 };
 
-/* === Line inner products === */
-
-/*
- * Line ∙ Plane  -> Plane(e1, e2, e3, e0)
- * Line ∙ Ideal  -> Vanishes completely
- * Line ∙ Origin -> Scalar
- * Line ∙ Line   -> Scalar
- * Line ∙ Point  -> Plane(e1, e2, e3, e0)
+/* === Line inner products ===
+ *
+ * Line ∙ Plane       -> Plane(e1, e2, e3, e0)
+ * Line ∙ Ideal line  -> Vanishes completely
+ * Line ∙ Origin line -> Scalar
+ * Line ∙ Line        -> Scalar
+ * Line ∙ Point       -> Plane(e1, e2, e3, e0)
 */
 
 /*
@@ -253,14 +249,13 @@ export const innerLinePoint = (a, b) => {
   return new Float32Array([e1, e2, e3, e0]);
 };
 
-/* === Point inner products === */
-
-/*
- * Point ∙ Plane  -> Line (e01, e02, e03, 0, e23, e31, e12, 0)
- * Point ∙ Ideal  -> Vanishes completely
- * Point ∙ Origin -> Plane(e1, e2, e3, e0)
- * Point ∙ Line   -> Plane(e1, e2, e3, e0)
- * Point ∙ Point  -> Scalar
+/* === Point inner products ===
+ *
+ * Point ∙ Plane       -> Line (e01, e02, e03, 0, e23, e31, e12, 0)
+ * Point ∙ Ideal line  -> Vanishes completely
+ * Point ∙ Origin line -> Plane(e1, e2, e3, e0)
+ * Point ∙ Line        -> Plane(e1, e2, e3, e0)
+ * Point ∙ Point       -> Scalar
 */
 
 /*

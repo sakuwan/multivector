@@ -127,20 +127,15 @@ describe('PGA element - Point', () => {
 
     expect(pointElement.mv()).toEqual(new Float32Array([1, 2, 3, 4]));
 
-    expect(pointElement.x()).toBe(1);
-    expect(pointElement.y()).toBe(2);
-    expect(pointElement.z()).toBe(3);
-    expect(pointElement.w()).toBe(4);
+    expect(pointElement.e032).toBe(1);
+    expect(pointElement.e013).toBe(2);
+    expect(pointElement.e021).toBe(3);
+    expect(pointElement.e123).toBe(4);
 
-    expect(pointElement.e032()).toBe(1);
-    expect(pointElement.e013()).toBe(2);
-    expect(pointElement.e021()).toBe(3);
-    expect(pointElement.e123()).toBe(4);
-
-    pointElement.setX(4);
-    pointElement.setY(3);
-    pointElement.setZ(2);
-    pointElement.setW(1);
+    pointElement.e032 = 4;
+    pointElement.e013 = 3;
+    pointElement.e021 = 2;
+    pointElement.e123 = 1;
 
     expect(pointElement.mv()).toEqual(new Float32Array([4, 3, 2, 1]));
   });
@@ -199,10 +194,10 @@ describe('PGA element - Point', () => {
     const negativeInvert = Point(-1, -2, -3, -10);
 
     negativeInvert.invert();
-    expect(negativeInvert.x()).toBeCloseTo(-0.01);
-    expect(negativeInvert.y()).toBeCloseTo(-0.02);
-    expect(negativeInvert.z()).toBeCloseTo(-0.03);
-    expect(negativeInvert.w()).toBeCloseTo(-0.1);
+    expect(negativeInvert.e032).toBeCloseTo(-0.01);
+    expect(negativeInvert.e013).toBeCloseTo(-0.02);
+    expect(negativeInvert.e021).toBeCloseTo(-0.03);
+    expect(negativeInvert.e123).toBeCloseTo(-0.1);
   });
 
   it('Performs core element operations: Reversion', () => {

@@ -2,9 +2,20 @@ import PGATypes from './types';
 import transform from './impl/helper';
 
 import {
-  pointNorm, pointNormSq,
-  euclideanNorm, euclideanNormSq,
+  euclideanNormSq,
+  pointNormSq,
+  pointInfinityNormSq,
 } from './impl/metric';
+
+/* === Coordinate indices map ===
+ *
+ * A more clear way (that is fully optimized away) to deal with the constant
+ * <Element>.buffer access throughout the implementation
+*/
+const PT_COORD_X = 0;
+const PT_COORD_Y = 1;
+const PT_COORD_Z = 2;
+const PT_COORD_W = 3;
 
 /* === Point (e032, e013, e021, e123) ===
  *
@@ -31,13 +42,15 @@ export class PointElement {
    * euclideanLengthSq: Squared Euclidean length, faster for comparisons
    * length: PGA metric norm
    * lengthSq: Squared PGA metric norm, faster for comparisons
+   * infinityLength: PGA infinity/ideal norm
+   * infinityLengthSq: Squared PGA infinity/ideal norm, faster for comparisons
    *
    * normalize: Normalization satisfies P∙P = +-1
    * invert: Inversion satisfies P∙Pinv = P.normalize
   */
 
   euclideanLength() {
-    return euclideanNorm(this.buffer);
+    return euclideanNormSq(this.buffer) ** 0.5;
   }
 
   euclideanLengthSq() {
@@ -45,15 +58,23 @@ export class PointElement {
   }
 
   length() {
-    return pointNorm(this.buffer);
+    return pointNormSq(this.buffer) ** 0.5;
   }
 
   lengthSq() {
     return pointNormSq(this.buffer);
   }
 
+  infinityLength() {
+    return pointInfinityNormSq(this.buffer) ** 0.5;
+  }
+
+  infinityLengthSq() {
+    return pointInfinityNormSq(this.buffer);
+  }
+
   normalize() {
-    const rcp = (1.0 / this.buffer[3]);
+    const rcp = (1.0 / this.buffer[PT_COORD_W]);
 
     const normalizeElement = (x) => x * rcp;
     transform(normalizeElement, this.buffer);
@@ -62,7 +83,7 @@ export class PointElement {
   }
 
   invert() {
-    const rcp = (1.0 / this.buffer[3]) ** 2;
+    const rcp = (1.0 / this.buffer[PT_COORD_W]) ** 2;
 
     const invertElement = (x) => x * rcp;
     transform(invertElement, this.buffer);
@@ -111,72 +132,27 @@ export class PointElement {
    *
    * mv: Alias for accessing buffer property
    *
-   * x / e032: Projective / k-vector component access (0)
-   * y / e013: Projective / k-vector component access (1)
-   * z / e021: Projective / k-vector component access (2)
-   * w / e123: Projective / k-vector component access (3)
-   *
-   * setX: Set the value of the k-vector component at index 0
-   * setY: Set the value of the k-vector component at index 1
-   * setZ: Set the value of the k-vector component at index 2
-   * setW: Set the value of the k-vector component at index 3
+   * get / set e032: k-vector component access (0 / x)
+   * get / set e013: k-vector component access (1 / y)
+   * get / set e021: k-vector component access (2 / z)
+   * get / set e123: k-vector component access (3 / w)
   */
 
   mv() {
     return this.buffer;
   }
 
-  x() {
-    return this.buffer[0];
-  }
+  /* eslint-disable lines-between-class-members */
+  get e032() { return this.buffer[PT_COORD_X]; }
+  get e013() { return this.buffer[PT_COORD_Y]; }
+  get e021() { return this.buffer[PT_COORD_Z]; }
+  get e123() { return this.buffer[PT_COORD_W]; }
 
-  e032() {
-    return this.buffer[0];
-  }
-
-  y() {
-    return this.buffer[1];
-  }
-
-  e013() {
-    return this.buffer[1];
-  }
-
-  z() {
-    return this.buffer[2];
-  }
-
-  e021() {
-    return this.buffer[2];
-  }
-
-  w() {
-    return this.buffer[3];
-  }
-
-  e123() {
-    return this.buffer[3];
-  }
-
-  setX(x) {
-    this.buffer[0] = x;
-    return this;
-  }
-
-  setY(y) {
-    this.buffer[1] = y;
-    return this;
-  }
-
-  setZ(z) {
-    this.buffer[2] = z;
-    return this;
-  }
-
-  setW(w) {
-    this.buffer[3] = w;
-    return this;
-  }
+  set e032(v) { this.buffer[PT_COORD_X] = v; }
+  set e013(v) { this.buffer[PT_COORD_Y] = v; }
+  set e021(v) { this.buffer[PT_COORD_Z] = v; }
+  set e123(v) { this.buffer[PT_COORD_W] = v; }
+  /* eslint-enable lines-between-class-members */
 
   /* === Element-related Utility ===
    *

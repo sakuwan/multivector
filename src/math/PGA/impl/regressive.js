@@ -1,15 +1,15 @@
-/*
- * PGA (3, 0, 1) regressive products (join)
+/* === PGA (3, 0, 1) regressive products (join) ===
+ *
 */
 
 /* === Plane regressive products === */
 
 /*
- * Plane ∨ Plane  -> Vanishes completely
- * Plane ∨ Ideal  -> Vanishes completely
- * Plane ∨ Origin -> Vanishes completely
- * Plane ∨ Line   -> Vanishes completely
- * Plane ∨ Point  -> Scalar
+ * Plane ∨ Plane       -> Vanishes completely
+ * Plane ∨ Ideal line  -> Vanishes completely
+ * Plane ∨ Origin line -> Vanishes completely
+ * Plane ∨ Line        -> Vanishes completely
+ * Plane ∨ Point       -> Scalar
 */
 
 /*
@@ -23,14 +23,13 @@ export const regressivePlanePoint = (a, b) => (
   -(a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3])
 );
 
-/* === Ideal regressive products === */
-
-/*
- * Ideal ∨ Plane  -> Vanishes completely
- * Ideal ∨ Ideal  -> Vanishes completely
- * Ideal ∨ Origin -> Scalar
- * Ideal ∨ Line   -> Scalar
- * Ideal ∨ Point  -> Plane (e1, e2, e3, e0)
+/* === Ideal line regressive products ===
+ *
+ * Ideal line ∨ Plane       -> Vanishes completely
+ * Ideal line ∨ Ideal line  -> Vanishes completely
+ * Ideal line ∨ Origin line -> Scalar
+ * Ideal line ∨ Line        -> Scalar
+ * Ideal line ∨ Point       -> Plane (e1, e2, e3, e0)
 */
 
 /*
@@ -72,14 +71,13 @@ export const regressiveIdealPoint = (a, b) => {
   return new Float32Array([e1, e2, e3, e0]);
 };
 
-/* === Origin regressive products === */
-
-/*
- * Origin ∨ Plane  -> Vanishes completely
- * Origin ∨ Ideal  -> Scalar
- * Origin ∨ Origin -> Vanishes completely
- * Origin ∨ Line   -> Scalar
- * Origin ∨ Point  -> Plane(e1, e2, e3, 0)
+/* === Origin line regressive products ===
+ *
+ * Origin line ∨ Plane       -> Vanishes completely
+ * Origin line ∨ Ideal line  -> Scalar
+ * Origin line ∨ Origin line -> Vanishes completely
+ * Origin line ∨ Line        -> Scalar
+ * Origin line ∨ Point       -> Plane(e1, e2, e3, 0)
 */
 
 /*
@@ -120,14 +118,13 @@ export const regressiveOriginPoint = (a, b) => {
   return new Float32Array([e1, e2, e3, 0]);
 };
 
-/* === Line regressive products === */
-
-/*
- * Line ∨ Plane  -> Vanishes completely
- * Line ∨ Ideal  -> Scalar
- * Line ∨ Origin -> Scalar
- * Line ∨ Line   -> Scalar
- * Line ∨ Point  -> Plane (e1, e2, e3, e0)
+/* === Line regressive products ===
+ *
+ * Line ∨ Plane       -> Vanishes completely
+ * Line ∨ Ideal line  -> Scalar
+ * Line ∨ Origin line -> Scalar
+ * Line ∨ Line        -> Scalar
+ * Line ∨ Point       -> Plane (e1, e2, e3, e0)
 */
 
 /*
@@ -183,14 +180,13 @@ export const regressiveLinePoint = (a, b) => {
   return new Float32Array([e1, e2, e3, e0]);
 };
 
-/* === Point regressive products === */
-
-/*
- * Point ∨ Plane  -> Scalar
- * Point ∨ Ideal  -> Plane (e1, e2, e3, e0)
- * Point ∨ Origin -> Plane (e1, e2, e3, 0)
- * Point ∨ Line   -> Plane (e1, e2, e3, e0)
- * Point ∨ Point  -> Line (e01, e02, e03, 0, e23, e31, e12, 0)
+/* === Point regressive products ===
+ *
+ * Point ∨ Plane       -> Scalar
+ * Point ∨ Ideal line  -> Plane (e1, e2, e3, e0)
+ * Point ∨ Origin line -> Plane (e1, e2, e3, 0)
+ * Point ∨ Line        -> Plane (e1, e2, e3, e0)
+ * Point ∨ Point       -> Line (e01, e02, e03, 0, e23, e31, e12, 0)
 */
 
 /*
