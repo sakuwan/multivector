@@ -74,7 +74,7 @@ export class PlaneElement {
   }
 
   normalize() {
-    const invSqrt = (1.0 / (planeNormSq(this.buffer) ** 0.5));
+    const invSqrt = (1.0 / this.length());
 
     const normalizeElement = (x) => x * invSqrt;
     transform(normalizeElement, this.buffer, 0, 3);
@@ -83,7 +83,7 @@ export class PlaneElement {
   }
 
   invert() {
-    const invSqrt = (1.0 / planeNormSq(this.buffer));
+    const invSqrt = (1.0 / this.lengthSq());
 
     const normalizeElement = (x) => x * invSqrt;
     transform(normalizeElement, this.buffer);
@@ -166,6 +166,7 @@ export class PlaneElement {
   /* === General Utility ===
    *
    * type: Return a specific Symbol('Plane') instance, used for typechecking
+   * print: Return a formatted string of the element instance
    * toPrimitive: Semi-automatic string coercion for string literals
   */
 
@@ -173,11 +174,13 @@ export class PlaneElement {
     return this.elementType;
   }
 
+  print() {
+    const [x, y, z, w] = this.buffer;
+    return `Plane(${x}e1 + ${y}e2 + ${z}e3 + ${w}e0)`;
+  }
+
   [Symbol.toPrimitive](type) {
-    if (type === 'string') {
-      const [x, y, z, w] = this.buffer;
-      return `Plane(${x}e1 + ${y}e2 + ${z}e3 + ${w}e0)`;
-    }
+    if (type === 'string') this.print();
 
     return (type === 'number') ? NaN : true;
   }

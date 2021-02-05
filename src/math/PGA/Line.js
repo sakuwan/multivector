@@ -130,6 +130,7 @@ export class LineElement {
   /* === General Utility ===
    *
    * type: Return a specific Symbol('Line') instance, used for typechecking
+   * print: Return a formatted string of the element instance
    * toPrimitive: Semi-automatic string coercion for string literals
   */
 
@@ -137,11 +138,13 @@ export class LineElement {
     return this.elementType;
   }
 
+  print() {
+    const [a, b, c, i, d, f, g, s] = this.buffer;
+    return `Line(${a}e01 + ${b}e02 + ${c}e03 + ${i}e0123 + ${d}e23 + ${f}e31 + ${g}e12 + ${s}s)`;
+  }
+
   [Symbol.toPrimitive](type) {
-    if (type === 'string') {
-      const [a, b, c, i, d, f, g, s] = this.buffer;
-      return `Line(${a}e01 + ${b}e02 + ${c}e03 + ${i}e0123 + ${d}e23 + ${f}e31 + ${g}e12 + ${s}s)`;
-    }
+    if (type === 'string') return this.print();
 
     return (type === 'number') ? NaN : true;
   }

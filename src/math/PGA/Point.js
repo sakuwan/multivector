@@ -166,6 +166,7 @@ export class PointElement {
   /* === General Utility ===
    *
    * type: Return a specific Symbol('Point') instance, used for typechecking
+   * print: Return a formatted string of the element instance
    * toPrimitive: Semi-automatic string coercion for string literals
   */
 
@@ -173,11 +174,13 @@ export class PointElement {
     return this.elementType;
   }
 
+  print() {
+    const [x, y, z, w] = this.buffer;
+    return `Point(${x}e032 + ${y}e013 + ${z}e021 + ${w}e123)`;
+  }
+
   [Symbol.toPrimitive](type) {
-    if (type === 'string') {
-      const [x, y, z, w] = this.buffer;
-      return `Point(${x}e032 + ${y}e013 + ${z}e021 + ${w}e123)`;
-    }
+    if (type === 'string') return this.print();
 
     return (type === 'number') ? NaN : true;
   }

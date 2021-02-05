@@ -1,4 +1,5 @@
 import {
+  PGA,
   PGATypes,
 
   Plane,
@@ -50,7 +51,7 @@ describe('PGA element - Plane', () => {
       // e0 is untouched by normalization
       expect(e0).toBeCloseTo(2);
 
-      const innerProduct = [e1, e2, e3].reduce((a, c) => a + c * c, 0);
+      const innerProduct = PGA.dot(toBeNormalized, toBeNormalized);
       expect(innerProduct).toBeCloseTo(1, 5);
     }
 
@@ -67,7 +68,7 @@ describe('PGA element - Plane', () => {
       // e0 is untouched by normalization
       expect(e0).toBeCloseTo(4);
 
-      const innerProduct = [e1, e2, e3].reduce((a, c) => a + c * c, 0);
+      const innerProduct = PGA.dot(mixedSigns, mixedSigns);
       expect(innerProduct).toBeCloseTo(1, 5);
     }
   });
@@ -83,8 +84,8 @@ describe('PGA element - Plane', () => {
       expect(e3).toBeCloseTo(0.333);
       expect(e0).toBeCloseTo(0.666);
 
-      const initialP = [1, 1, 1, 3];
-      const innerProduct = [e1, e2, e3].reduce((a, c, i) => a + c * initialP[i], 0);
+      const initialP = Plane(1, 1, 1, 2);
+      const innerProduct = PGA.dot(initialP, toBeInverted);
       expect(innerProduct).toBeCloseTo(1, 5);
     }
   });

@@ -1,6 +1,11 @@
 import PGATypes from './types';
 import transform from './impl/helper';
 
+import {
+  euclideanNormSq,
+  originNormSq,
+} from './impl/metric';
+
 /* === Coordinate indices map ===
  *
  * A more clear way (that is fully optimized away) to deal with the constant
@@ -29,6 +34,63 @@ export class OriginElement {
   constructor(buffer) {
     this.buffer = buffer;
     this.elementType = PGATypes.OriginLine;
+  }
+
+  /* === Metric operations ===
+   *
+   * euclideanLength: Euclidean/L2 norm
+   * euclideanLengthSq: Squared Euclidean length, faster for comparisons
+   * length: PGA metric norm
+   * lengthSq: Squared PGA metric norm, faster for comparisons
+   * infinityLength: Vanishes completely
+   * infinityLengthSq: Vanishes completely
+   *
+   * normalize: Normalization satisfies lο∙lο = +-1
+   * invert: Inversion satisfies lο∙lοinv = lο.normalize
+  */
+
+  euclideanLength() {
+    return euclideanNormSq(this.buffer) ** 0.5;
+  }
+
+  euclideanLengthSq() {
+    return euclideanNormSq(this.buffer);
+  }
+
+  length() {
+    return originNormSq(this.buffer) ** 0.5;
+  }
+
+  lengthSq() {
+    return originNormSq(this.buffer);
+  }
+
+  infinityLength() {
+    const fmt = this.print();
+    throw new TypeError(`Invalid call: Origin lines do not have an infinite norm ${fmt}`);
+  }
+
+  infinityLengthSq() {
+    const fmt = this.print();
+    throw new TypeError(`Invalid call: Origin lines do not have an infinite norm ${fmt}`);
+  }
+
+  normalize() {
+    const invSqrt = (1.0 / this.length());
+
+    const normalizeElement = (x) => x * invSqrt;
+    transform(normalizeElement, this.buffer);
+
+    return this;
+  }
+
+  invert() {
+    const invSqrt = (1.0 / this.lengthSq());
+
+    const normalizeElement = (x) => x * invSqrt;
+    transform(normalizeElement, this.buffer);
+
+    return this;
   }
 
   /* === Grade antiautomorphisms ===
@@ -106,6 +168,7 @@ export class OriginElement {
   /* === General Utility ===
    *
    * type: Return a specific Symbol('OriginLine') instance, used for typechecking
+   * print: Return a formatted string of the element instance
    * toPrimitive: Semi-automatic string coercion for string literals
   */
 
@@ -113,11 +176,13 @@ export class OriginElement {
     return this.elementType;
   }
 
+  print() {
+    const [x, y, z, w] = this.buffer;
+    return `OriginLine(${x}e23 + ${y}e31 + ${z}e12 + ${w}s)`;
+  }
+
   [Symbol.toPrimitive](type) {
-    if (type === 'string') {
-      const [x, y, z, w] = this.buffer;
-      return `OriginLine(${x}e23 + ${y}e31 + ${z}e12 + ${w}s)`;
-    }
+    if (type === 'string') return this.print();
 
     return (type === 'number') ? NaN : true;
   }

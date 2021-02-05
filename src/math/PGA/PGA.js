@@ -41,11 +41,6 @@ import * as Duality from './impl/dual';
 /* === Element type delegation maps ===
  *
  * Create the maps that will forward calls to their respective implementations.
- *
- * Inner product: IP_MAP
- * Outer product: OP_MAP
- * Regessive product: RP_MAP
- * Geometric product: GP_MAP
 */
 
 const createForwardingMap = (prefix, impl) => {
@@ -77,30 +72,32 @@ const createForwardingMap = (prefix, impl) => {
   return Object.keys(symbolTypes).reduce(makeElementMaps, {});
 };
 
-const IP_MAP = createForwardingMap('inner', IP);
-const OP_MAP = createForwardingMap('outer', OP);
-const RP_MAP = createForwardingMap('regressive', RP);
-
 export default class PGA {
+  static innerMap = createForwardingMap('inner', IP);
+
   static dot(a, b) {
     const lhsType = a.type();
     const rhsType = b.type();
 
-    return IP_MAP[lhsType][rhsType](a.buffer, b.buffer);
+    return PGA.innerMap[lhsType][rhsType](a.buffer, b.buffer);
   }
+
+  static outerMap = createForwardingMap('outer', OP);
 
   static meet(a, b) {
     const lhsType = a.type();
     const rhsType = b.type();
 
-    return OP_MAP[lhsType][rhsType](a.buffer, b.buffer);
+    return PGA.outerMap[lhsType][rhsType](a.buffer, b.buffer);
   }
+
+  static regressiveMap = createForwardingMap('regressive', RP);
 
   static join(a, b) {
     const lhsType = a.type();
     const rhsType = b.type();
 
-    return RP_MAP[lhsType][rhsType](a.buffer, b.buffer);
+    return PGA.regressiveMap[lhsType][rhsType](a.buffer, b.buffer);
   }
 
   static dual(a) {
