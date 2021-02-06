@@ -1,4 +1,4 @@
-/* === PGA -- Projective vector space operations
+/* === PGA vector space operations
  *
  * The PGA class provides the actual vector space operations and interactions
  * between elements, such as the inner, outer and regressive products.
@@ -42,7 +42,6 @@ import * as Duality from './impl/dual';
  *
  * Create the maps that will forward calls to their respective implementations.
 */
-
 const createForwardingMap = (prefix, impl) => {
   const symbolTypes = {
     Plane: PGATypes.Plane,
