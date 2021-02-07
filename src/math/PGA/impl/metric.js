@@ -7,6 +7,10 @@
  * The standard L2 norm, Euclidean length
 */
 
+export const euclideanNorm = (a) => (
+  (a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]) ** 0.5
+);
+
 export const euclideanNormSq = (a) => (
   a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]
 );
@@ -20,9 +24,15 @@ export const euclideanNormSq = (a) => (
  * infinity norm: ||p||∞ = ||P||
 */
 
+export const planeNorm = (a) => (
+  (a[0] * a[0] + a[1] * a[1] + a[2] * a[2]) ** 0.5
+);
+
 export const planeNormSq = (a) => (
   a[0] * a[0] + a[1] * a[1] + a[2] * a[2]
 );
+
+export const planeInfinityNorm = (a) => (a[3] * a[3]) ** 0.5;
 
 export const planeInfinityNormSq = (a) => a[3] * a[3];
 
@@ -34,6 +44,14 @@ export const planeInfinityNormSq = (a) => a[3] * a[3];
  * norm: e0 squares to zero and all components vanish
  * infinity norm: ||l∞||∞ = ||lο||
 */
+
+export const idealNorm = () => 0;
+
+export const idealNormSq = () => 0;
+
+export const idealInfinityNorm = (a) => (
+  (a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]) ** 0.5
+);
 
 export const idealInfinityNormSq = (a) => (
   a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]
@@ -48,9 +66,17 @@ export const idealInfinityNormSq = (a) => (
  * infinity norm: ||lο||∞ = ||l∞||
 */
 
+export const originNorm = (a) => (
+  (a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]) ** 0.5
+);
+
 export const originNormSq = (a) => (
   a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]
 );
+
+export const originInfinityNorm = () => 0;
+
+export const originInfinityNormSq = () => 0;
 
 /* === Line metric operations ===
  *
@@ -61,8 +87,16 @@ export const originNormSq = (a) => (
  * infinity norm: ||ℓ||∞ == ||l∞||∞
 */
 
+export const lineNorm = (a) => (
+  (a[4] * a[4] + a[5] * a[5] + a[6] * a[6] + a[7] * a[7]) ** 0.5
+);
+
 export const lineNormSq = (a) => (
   a[4] * a[4] + a[5] * a[5] + a[6] * a[6] + a[7] * a[7]
+);
+
+export const lineInfinityNorm = (a) => (
+  (a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]) ** 0.5
 );
 
 export const lineInfinityNormSq = (a) => (
@@ -78,7 +112,13 @@ export const lineInfinityNormSq = (a) => (
  * infinity norm: ||P||∞ = ||p||
 */
 
+export const pointNorm = (a) => (a[3] * a[3]) ** 0.5;
+
 export const pointNormSq = (a) => a[3] * a[3];
+
+export const pointInfinityNorm = (a) => (
+  (a[0] * a[0] + a[1] * a[1] + a[2] * a[2]) ** 0.5
+);
 
 export const pointInfinityNormSq = (a) => (
   a[0] * a[0] + a[1] * a[1] + a[2] * a[2]

@@ -7,6 +7,8 @@
 import { Benchmark } from 'benchmark';
 import { cvec4 } from '../../src/vector';
 
+import { PGA, Plane, PlaneMixins } from '../../src/math/PGA';
+
 describe('benchmark', () => {
   let tableCollection = [];
 
@@ -130,30 +132,26 @@ describe('benchmark', () => {
     .run({ async: false });
   });
 
-  it.only('Arithmetic operations', () =>{
-    const v1 = cvec4(0);
+  it.only('Plane element construction', () =>{
+    const planeA = Plane(1, 1, 1, 1);
+    const planeB = PlaneMixins(1, 1, 1, 1);
 
-    const v2 = cvec4(0);
-    const v3 = cvec4(1);
+    new Benchmark.Suite('PlaneElement')
+    .add('PlaneElement: Class full', () => {
+      const e1 = planeA.e1;
+      const e2 = planeA.e2;
+      const e3 = planeA.e3;
+      const e0 = planeA.e0;
 
-    const v4 = cvec4(0);
-
-    const fl32 = new Float32Array(4);
-
-    new Benchmark.Suite('Arithmetic')
-    .add('Arithmetic: ComponentVector add scalar', () => {
-      v1.addS(1);
+      const newPlane = Plane(e1, e2, e3, e0);
     })
-    .add('Arithmetic: ComponentVector add vector', () => {
-      v2.add(v3);
-    })
-    .add('Arithmetic: ComponentVector add transform', () => {
-      v4.addT(1);
-    })
-    .add('Arithmetic: Float32Array add loop', () => {
-      for (let i = 0; i < fl32.length; i += 1) {
-        fl32[i] += 1;
-      }
+    .add('PlaneElement: Class mixins', () => {
+      const e1 = planeB.e1;
+      const e2 = planeB.e2;
+      const e3 = planeB.e3;
+      const e0 = planeB.e0;
+
+      const newPlane = PlaneMixins(e1, e2, e3, e0);
     })
     .on('cycle', function(event) {
       tableCollection.push(String(event.target));
