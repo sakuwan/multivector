@@ -144,6 +144,8 @@ describe('benchmark', () => {
       const e0 = planeA.e0;
 
       const newPlane = Plane(e1, e2, e3, e0);
+
+      expect(newPlane.lengthSq()).toBe(3);
     })
     .add('PlaneElement: Class mixins', () => {
       const e1 = planeB.e1;
@@ -152,6 +154,8 @@ describe('benchmark', () => {
       const e0 = planeB.e0;
 
       const newPlane = PlaneMixins(e1, e2, e3, e0);
+
+      expect(newPlane.lengthSq()).toBe(3);
     })
     .on('cycle', function(event) {
       tableCollection.push(String(event.target));

@@ -4,7 +4,7 @@ import transform from './impl/helper';
 import {
   euclideanNormSq,
   idealInfinityNormSq,
-} from './impl/metric';
+} from './impl/norm';
 
 /* === Coordinate indices map ===
  *

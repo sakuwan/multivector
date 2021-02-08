@@ -1,7 +1,7 @@
 /* === Base PGA element creation ===
  *
  * The createPGAElement function constructs a base for the provided element
- * class, extending the provided element with its basis vectors, metric and
+ * class, extending the provided element with its basis vectors, norm and
  * other general methods
 */
 
@@ -9,7 +9,7 @@
 import transform from './impl/helper';
 
 /* === Metric === */
-import * as PGAMetric from './impl/metric';
+import * as PGANorm from './impl/norm';
 
 /* === Helper functions & class composition ===
  *
@@ -176,48 +176,68 @@ const createGradeMixin = (basis) => {
   };
 };
 
-/* === Metric operations ===
+/* === Norm operations ===
  *
- * Metric operations are automatically inferred from their implementations in
- * './impl/metric', based on the provided element name and whether or not they
- * are valid operations
+ * Norm operations are automatically inferred from their implementations in
+ * './impl/norm', based on the provided element name, and the norms are renamed
+ * to length due to familiarity and standard libraries
  *
- * length: PGA metric norm
- * lengthSq: Squared PGA metric norm, faster for comparisons
+ * length: PGA norm
+ * lengthSq: Squared PGA norm, faster for comparisons
  *
  * infinityLength: PGA infinity / ideal norm
- * infinityLengthSq: Squared PGA infinity/ideal norm, faster for comparisons
+ * infinityLengthSq: Squared PGA infinity / ideal norm, faster for comparisons
  *
  * euclideanLength: Euclidean / L2 norm
  * euclideanLengthSq: Squared Euclidean length, faster for comparisons
 */
-const createMetricMixin = (name) => {
+const createNormMixin = (name) => {
   const prefix = String(name).toLowerCase();
   const prefixRegex = new RegExp(`^(${prefix})`);
 
-  const isOwnMethod = (x) => prefixRegex.test(x);
-  const methodsList = Object.keys(PGAMetric).filter(isOwnMethod);
+  const fetchNormMethods = (a, c) => {
+    const normRegex = /^(Norm)+(?=$|[A-Z])/;
+    const methodName = c.replace(prefixRegex, '');
+    const isNormMethod = normRegex.test(methodName);
 
-  const fetchMetricMethods = (a, c) => {
-    
+    const lowercaseFirst = (str) => {
+      const [first, ...rest] = str;
+      return first.toLowerCase() + rest.join('');
+    };
+
+    return Object.assign(a, isNormMethod ? {
+      [lowercaseFirst(methodName.replace(normRegex, 'Length'))]() {
+        return PGANorm[c](this.buffer);
+      },
+    } : {
+      [lowercaseFirst(methodName)]() {
+        PGANorm[c](this.buffer);
+        return this;
+      },
+    });
   };
 
+  const isOwnMethod = (x) => prefixRegex.test(x);
+  const methodsList = Object.keys(PGANorm).filter(isOwnMethod);
+
   return {
+    ...methodsList.reduce(fetchNormMethods, {}),
+
     euclideanLength() {
-      return PGAMetric.euclideanNorm(this.buffer);
+      return PGANorm.euclideanNorm(this.buffer);
     },
 
     euclideanLengthSq() {
-      return PGAMetric.euclideanNormSq(this.buffer);
+      return PGANorm.euclideanNormSq(this.buffer);
     },
   };
 };
 
 export default function createPGAElement(element, name, basis) {
   const grade = createGradeMixin(basis);
-  const metric = createMetricMixin(name);
+  const norm = createNormMixin(name);
   const utility = createUtilityMixin(element, name, basis);
 
   applyBasisMixins(element, basis);
-  applyMethodMixins(element, grade, metric, utility);
+  applyMethodMixins(element, grade, norm, utility);
 }

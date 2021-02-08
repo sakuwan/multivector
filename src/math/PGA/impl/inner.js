@@ -152,7 +152,7 @@ export const innerOriginPlane = (a, b) => {
  * -((a.e23 * b.e23) + (a.e31 * b.e31) + (a.12 * b.e12))
 */
 export const innerOriginOrigin = (a, b) => (
-  a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
+  -(a[0] * b[0] + a[1] * b[1] + a[2] * b[2])
 );
 
 /*
@@ -161,7 +161,7 @@ export const innerOriginOrigin = (a, b) => (
  * -((a.e23 * b.e23) + (a.e31 * b.e31) + (a.12 * b.e12))
 */
 export const innerOriginLine = (a, b) => (
-  a[0] * b[4] + a[1] * b[5] + a[2] * b[6] // Offset by 4 for indices 4-7
+  -(a[0] * b[4] + a[1] * b[5] + a[2] * b[6]) // Offset by 4 for indices 4-7
 );
 
 /*
@@ -217,7 +217,7 @@ export const innerLinePlane = (a, b) => {
  * -((a.e23 * b.e23) + (a.e31 * b.e31) + (a.12 * b.e12))
 */
 export const innerLineOrigin = (a, b) => (
-  a[4] * b[0] + a[5] * b[1] + a[6] * b[2] // Offset by 4 for indices 4-7
+  -(a[4] * b[0] + a[5] * b[1] + a[6] * b[2]) // Offset by 4 for indices 4-7
 );
 
 /*
@@ -226,7 +226,7 @@ export const innerLineOrigin = (a, b) => (
  * -((a.e23 * b.e23) + (a.e31 * b.e31) + (a.12 * b.e12))
 */
 export const innerLineLine = (a, b) => (
-  a[4] * b[0] + a[5] * b[0] + a[6] * b[0] // Offset by 4 for indices 4-7
+  -(a[4] * b[4] + a[5] * b[5] + a[6] * b[6]) // Offset by 4 for indices 4-7
 );
 
 /*

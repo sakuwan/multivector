@@ -129,31 +129,3 @@ const createSwizzleProxyHandler = (mask, generators) => {
 };
 
 export default createSwizzleProxyHandler;
-
-/*
- * Map a pattern mask to their component indexes, e.g.
- * [x, y, z, w] -> { x: 0, y: 1, z: 2, w: 3 }
-*/
-
-/* Previous implementation, depreciated
-const mapComponents = (mask) => {
-  const reducer = (a, key, i) => ({ ...a, [key]: i });
-  return mask.reduce(reducer, {});
-};
-*/
-
-/*
- * Build a array of valid component swizzles from a pattern mask, e.g.
- * [x, y] -> [x, xx, xy, y, yy, yx]
- * Recursive approach, simply reduce each component and cycle the mask
-*/
-
-/* Previous implementation, depreciated
-const componentSwizzles = (mask) => {
-  const limit = (d) => d >= mask.length - 1;
-  const reducer = (fn, lead, d) => (a, x) => [...a, ...fn(lead + x, d)];
-  const permute = (x, d) => (limit(d) ? [x] : mask.reduce(reducer(permute, x, d + 1), [x]));
-
-  return mask.reduce(reducer(permute, '', 0), []);
-};
-*/

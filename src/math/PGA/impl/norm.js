@@ -1,8 +1,10 @@
-/* === PGA (3, 0, 1) metric operations ===
+/* === PGA (3, 0, 1) norm operations ===
  *
+ * Norm-related operations range from length functions in the normed vector
+ * space, and to normalization / inversion, due to their reliance on the norm
 */
 
-/* === Shared metric operations ===
+/* === Shared norm operations ===
  *
  * The standard L2 norm, Euclidean length
 */
@@ -15,7 +17,7 @@ export const euclideanNormSq = (a) => (
   a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]
 );
 
-/* === Plane metric operations ===
+/* === Plane norm operations ===
  *
  * Plane k-vectors: [e1, e2, e3, e0]
  * Plane metric: [1, 1, 1, 0]
@@ -36,7 +38,7 @@ export const planeInfinityNorm = (a) => (a[3] * a[3]) ** 0.5;
 
 export const planeInfinityNormSq = (a) => a[3] * a[3];
 
-/* === Ideal line metric operations ===
+/* === Ideal line norm operations ===
  *
  * Ideal line k-vectors: [e01, e02, e03, e0123]
  * Ideal line metric: [0, 0, 0, 0]
@@ -57,7 +59,7 @@ export const idealInfinityNormSq = (a) => (
   a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]
 );
 
-/* === Origin line metric operations ===
+/* === Origin line norm operations ===
  *
  * Origin line k-vectors: [e23, e31, e12, s]
  * Origin line metric: [-1, -1, -1, 1]
@@ -78,7 +80,7 @@ export const originInfinityNorm = () => 0;
 
 export const originInfinityNormSq = () => 0;
 
-/* === Line metric operations ===
+/* === Line norm operations ===
  *
  * Line k-vectors: [e01, e02, e03, e0123, e23, e31, e12, s]
  * Line metric: [0, 0, 0, 0, -1, -1, -1, 1]
@@ -103,7 +105,7 @@ export const lineInfinityNormSq = (a) => (
   a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]
 );
 
-/* === Point metric operations ===
+/* === Point norm operations ===
  *
  * Point k-vectors: [e032, e013, e021, e123]
  * Point metric: [0, 0, 0, -1]

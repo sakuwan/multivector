@@ -5,7 +5,7 @@ import {
   euclideanNormSq,
   planeNormSq,
   planeInfinityNormSq,
-} from './impl/metric';
+} from './impl/norm';
 
 /* === Coordinate indices map ===
  *
