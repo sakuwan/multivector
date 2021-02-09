@@ -24,6 +24,9 @@ export const euclideanNormSq = (a) => (
  *
  * norm: e0 squares to zero and vanishes
  * infinity norm: ||p||∞ = ||P||
+ *
+ * normalize: p∙p = 1
+ * invert: p∙p⁻¹ = 1
 */
 
 export const planeNorm = (a) => (
@@ -34,9 +37,35 @@ export const planeNormSq = (a) => (
   a[0] * a[0] + a[1] * a[1] + a[2] * a[2]
 );
 
-export const planeInfinityNorm = (a) => (a[3] * a[3]) ** 0.5;
+export const planeInfinityNorm = (a) => a[3];
 
 export const planeInfinityNormSq = (a) => a[3] * a[3];
+
+export const planeNormalize = (a) => { /* eslint-disable no-param-reassign */
+  const invNorm = (1.0 / ((a[0] * a[0] + a[1] * a[1] + a[2] * a[2]) ** 0.5));
+
+  a[0] *= invNorm;
+  a[1] *= invNorm;
+  a[2] *= invNorm;
+
+  /* === TODO: Ask Gunn, Keninck or Ong about this in regards to 3,0,1 PGA
+   * I will admit, I honestly have no idea when it comes to e0 and normalization, as I see a blend
+   * of approaches from multiple authors and papers. Some ignore it entirely, some normalize it
+   * by the same value as the k-vectors, and others add scalars and then normalize. I will stand to
+   * simply treat it the same as the other k-vectors here, similar to what Ganja and others do.
+  */
+
+  a[3] *= invNorm;
+}; /* eslint-enable no-param-reassign */
+
+export const planeInvert = (a) => { /* eslint-disable no-param-reassign */
+  const invNorm = (1.0 / (a[0] * a[0] + a[1] * a[1] + a[2] * a[2]));
+
+  a[0] *= invNorm;
+  a[1] *= invNorm;
+  a[2] *= invNorm;
+  a[3] *= invNorm;
+}; /* eslint-enable no-param-reassign */
 
 /* === Ideal line norm operations ===
  *
@@ -45,6 +74,9 @@ export const planeInfinityNormSq = (a) => a[3] * a[3];
  *
  * norm: e0 squares to zero and all components vanish
  * infinity norm: ||l∞||∞ = ||lο||
+ *
+ * normalize: assuming l∞ / ||l∞||∞, l∞∙l∞ = -1
+ * invert: assuming l∞ / ||l∞||∞, l∞∙l∞⁻¹ = 1
 */
 
 export const idealNorm = () => 0;
@@ -59,6 +91,24 @@ export const idealInfinityNormSq = (a) => (
   a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]
 );
 
+export const idealNormalize = (a) => { /* eslint-disable no-param-reassign */
+  const invNorm = (1.0 / ((a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]) ** 0.5));
+
+  a[0] *= invNorm;
+  a[1] *= invNorm;
+  a[2] *= invNorm;
+  a[3] *= invNorm;
+}; /* eslint-enable no-param-reassign */
+
+export const idealInvert = (a) => { /* eslint-disable no-param-reassign */
+  const invNorm = (1.0 / (a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]));
+
+  a[0] *= -invNorm;
+  a[1] *= -invNorm;
+  a[2] *= -invNorm;
+  a[3] *= invNorm;
+}; /* eslint-enable no-param-reassign */
+
 /* === Origin line norm operations ===
  *
  * Origin line k-vectors: [e23, e31, e12, s]
@@ -66,6 +116,9 @@ export const idealInfinityNormSq = (a) => (
  *
  * norm: No components vanish
  * infinity norm: ||lο||∞ = ||l∞||
+ *
+ * normalize: lο∙lο = -1
+ * invert: lο∙lο⁻¹ = 1
 */
 
 export const originNorm = (a) => (
@@ -79,6 +132,24 @@ export const originNormSq = (a) => (
 export const originInfinityNorm = () => 0;
 
 export const originInfinityNormSq = () => 0;
+
+export const originNormalize = (a) => { /* eslint-disable no-param-reassign */
+  const invNorm = (1.0 / ((a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]) ** 0.5));
+
+  a[0] *= invNorm;
+  a[1] *= invNorm;
+  a[2] *= invNorm;
+  a[3] *= invNorm;
+}; /* eslint-enable no-param-reassign */
+
+export const originInvert = (a) => { /* eslint-disable no-param-reassign */
+  const invNorm = (1.0 / (a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]));
+
+  a[0] *= -invNorm;
+  a[1] *= -invNorm;
+  a[2] *= -invNorm;
+  a[3] *= invNorm;
+}; /* eslint-enable no-param-reassign */
 
 /* === Line norm operations ===
  *
@@ -112,9 +183,12 @@ export const lineInfinityNormSq = (a) => (
  *
  * norm: e0 squares to zero, e123 remains
  * infinity norm: ||P||∞ = ||p||
+ *
+ * normalize: P∙P = 1
+ * invert: P∙P⁻¹ = 1
 */
 
-export const pointNorm = (a) => (a[3] * a[3]) ** 0.5;
+export const pointNorm = (a) => a[3];
 
 export const pointNormSq = (a) => a[3] * a[3];
 
@@ -125,3 +199,21 @@ export const pointInfinityNorm = (a) => (
 export const pointInfinityNormSq = (a) => (
   a[0] * a[0] + a[1] * a[1] + a[2] * a[2]
 );
+
+export const pointNormalize = (a) => { /* eslint-disable no-param-reassign */
+  const invNorm = (1.0 / a[3]);
+
+  a[0] *= invNorm;
+  a[1] *= invNorm;
+  a[2] *= invNorm;
+  a[3] *= invNorm;
+}; /* eslint-enable no-param-reassign */
+
+export const pointInvert = (a) => { /* eslint-disable no-param-reassign */
+  const invNorm = (1.0 / (a[3] * a[3]));
+
+  a[0] *= invNorm;
+  a[1] *= invNorm;
+  a[2] *= invNorm;
+  a[3] *= invNorm;
+}; /* eslint-enable no-param-reassign */

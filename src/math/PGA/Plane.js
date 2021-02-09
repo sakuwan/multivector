@@ -194,36 +194,3 @@ export class PlaneElement {
 export const Plane = (a = 0, b = 0, c = 0, d = 0) => (
   new PlaneElement(new Float32Array([a, b, c, d]))
 );
-
-import createPGAElement from './PGAElement';
-
-export class PlaneElementMixins {
-  constructor(buffer) {
-    this.buffer = buffer;
-    this.elementType = PGATypes.Plane;
-  }
-
-  normalize() {
-    const invSqrt = (1.0 / this.length());
-
-    const normalizeElement = (x) => x * invSqrt;
-    transform(normalizeElement, this.buffer, 0, 3);
-
-    return this;
-  }
-
-  invert() {
-    const invSqrt = (1.0 / this.lengthSq());
-
-    const normalizeElement = (x) => x * invSqrt;
-    transform(normalizeElement, this.buffer);
-
-    return this;
-  }
-}
-
-createPGAElement(PlaneElementMixins, 'Plane', ['e1', 'e2', 'e3', 'e0']);
-
-export const PlaneMixins = (a = 0, b = 0, c = 0, d = 0) => (
-  new PlaneElementMixins(new Float32Array([a, b, c, d]))
-);

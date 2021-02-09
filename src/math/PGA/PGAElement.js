@@ -5,9 +5,6 @@
  * other general methods
 */
 
-/* === Utility === */
-import transform from './impl/helper';
-
 /* === Metric === */
 import * as PGANorm from './impl/norm';
 
@@ -85,7 +82,7 @@ const applyBasisMixins = (obj, basis) => {
  *
  * clone: Create a new element instance initialized with the same multivector
  *
- * describe: Return a formatted string of the element instance
+ * format: Return a formatted string of the element instance
  * toPrimitive: Semi-automatic string coercion for string literals
 */
 const createUtilityMixin = (ElementClass, name, basis) => ({
@@ -101,7 +98,7 @@ const createUtilityMixin = (ElementClass, name, basis) => ({
     return new ElementClass(new Float32Array(this.buffer));
   },
 
-  describe() {
+  format() {
     const formatElement = (a, c, i) => {
       const vectorValue = `${Math.abs(c)}${basis[i]}`;
       const vectorSign = (i === 0)
@@ -115,7 +112,7 @@ const createUtilityMixin = (ElementClass, name, basis) => ({
   },
 
   [Symbol.toPrimitive](type) {
-    if (type === 'string') return this.describe();
+    if (type === 'string') return this.format();
     return (type === 'number') ? NaN : true;
   },
 });
@@ -147,29 +144,37 @@ const createGradeMixin = (basis) => {
 
   return {
     involute() {
-      const involuteElement = (x, i) => x * involuteMap[basisGrades[i]];
-      transform(involuteElement, this.buffer);
+      const { buffer } = this;
+      for (let i = 0; i < buffer.length; i += 1) {
+        buffer[i] *= involuteMap[basisGrades[i]];
+      }
 
       return this;
     },
 
     reverse() {
-      const reverseElement = (x, i) => x * reverseMap[basisGrades[i]];
-      transform(reverseElement, this.buffer);
+      const { buffer } = this;
+      for (let i = 0; i < buffer.length; i += 1) {
+        buffer[i] *= reverseMap[basisGrades[i]];
+      }
 
       return this;
     },
 
     conjugate() {
-      const conjugateElement = (x, i) => x * conjugateMap[basisGrades[i]];
-      transform(conjugateElement, this.buffer);
+      const { buffer } = this;
+      for (let i = 0; i < buffer.length; i += 1) {
+        buffer[i] *= conjugateMap[basisGrades[i]];
+      }
 
       return this;
     },
 
     negate() {
-      const negateElement = (x) => -x;
-      transform(negateElement, this.buffer);
+      const { buffer } = this;
+      for (let i = 0; i < buffer.length; i += 1) {
+        buffer[i] = -buffer[i];
+      }
 
       return this;
     },
@@ -190,39 +195,39 @@ const createGradeMixin = (basis) => {
  *
  * euclideanLength: Euclidean / L2 norm
  * euclideanLengthSq: Squared Euclidean length, faster for comparisons
+ *
+ * normalize: Normalize the element, usually meaning x∙x = +-1
+ * invert: Invert an element, usually meaning x∙x⁻¹ = +-1
 */
 const createNormMixin = (name) => {
-  const prefix = String(name).toLowerCase();
-  const prefixRegex = new RegExp(`^(${prefix})`);
+  const normRegex = /(Norm)+(?=$|[A-Z])/;
+  const prefixRegex = new RegExp(`^(${name.toLowerCase()})`);
+
+  const renameNormMethod = (x) => {
+    const [first, ...rest] = x.replace(prefixRegex, '').replace(normRegex, 'Length');
+    return first.toLowerCase() + rest.join('');
+  };
 
   const fetchNormMethods = (a, c) => {
-    const normRegex = /^(Norm)+(?=$|[A-Z])/;
-    const methodName = c.replace(prefixRegex, '');
-    const isNormMethod = normRegex.test(methodName);
-
-    const lowercaseFirst = (str) => {
-      const [first, ...rest] = str;
-      return first.toLowerCase() + rest.join('');
-    };
+    const isNormMethod = normRegex.test(c);
+    const methodName = renameNormMethod(c);
 
     return Object.assign(a, isNormMethod ? {
-      [lowercaseFirst(methodName.replace(normRegex, 'Length'))]() {
+      [methodName]() {
         return PGANorm[c](this.buffer);
       },
     } : {
-      [lowercaseFirst(methodName)]() {
+      [methodName]() {
         PGANorm[c](this.buffer);
         return this;
       },
     });
   };
 
-  const isOwnMethod = (x) => prefixRegex.test(x);
-  const methodsList = Object.keys(PGANorm).filter(isOwnMethod);
+  const isValidMethod = (x) => prefixRegex.test(x);
+  const methodList = Object.keys(PGANorm).filter(isValidMethod);
 
-  return {
-    ...methodsList.reduce(fetchNormMethods, {}),
-
+  return methodList.reduce(fetchNormMethods, {
     euclideanLength() {
       return PGANorm.euclideanNorm(this.buffer);
     },
@@ -230,7 +235,7 @@ const createNormMixin = (name) => {
     euclideanLengthSq() {
       return PGANorm.euclideanNormSq(this.buffer);
     },
-  };
+  });
 };
 
 export default function createPGAElement(element, name, basis) {

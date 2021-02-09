@@ -9,7 +9,7 @@
 
 export { default as PGATypes } from './types';
 
-export { Plane, PlaneMixins } from './Plane';
+export { Plane } from './Plane';
 export { IdealLine } from './IdealLine';
 export { OriginLine } from './OriginLine';
 export { Line } from './Line';

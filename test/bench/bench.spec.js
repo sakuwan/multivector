@@ -7,8 +7,6 @@
 import { Benchmark } from 'benchmark';
 import { cvec4 } from '../../src/vector';
 
-import { PGA, Plane, PlaneMixins } from '../../src/math/PGA';
-
 describe('benchmark', () => {
   let tableCollection = [];
 
@@ -121,41 +119,6 @@ describe('benchmark', () => {
     })
     .add('Property: Float32Array length', () => {
       const { length } = fl1;
-    })
-    .on('cycle', function(event) {
-      tableCollection.push(String(event.target));
-    })
-    .on('complete', function() {
-      tableCollection.push(`\nFastest is ${this.filter('fastest').map('name')}`);
-      console.log(tableCollection.join('\n'));
-    })
-    .run({ async: false });
-  });
-
-  it.only('Plane element construction', () =>{
-    const planeA = Plane(1, 1, 1, 1);
-    const planeB = PlaneMixins(1, 1, 1, 1);
-
-    new Benchmark.Suite('PlaneElement')
-    .add('PlaneElement: Class full', () => {
-      const e1 = planeA.e1;
-      const e2 = planeA.e2;
-      const e3 = planeA.e3;
-      const e0 = planeA.e0;
-
-      const newPlane = Plane(e1, e2, e3, e0);
-
-      expect(newPlane.lengthSq()).toBe(3);
-    })
-    .add('PlaneElement: Class mixins', () => {
-      const e1 = planeB.e1;
-      const e2 = planeB.e2;
-      const e3 = planeB.e3;
-      const e0 = planeB.e0;
-
-      const newPlane = PlaneMixins(e1, e2, e3, e0);
-
-      expect(newPlane.lengthSq()).toBe(3);
     })
     .on('cycle', function(event) {
       tableCollection.push(String(event.target));
