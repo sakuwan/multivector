@@ -42,7 +42,7 @@ export const planeInfinityNorm = (a) => a[3];
 export const planeInfinityNormSq = (a) => a[3] * a[3];
 
 export const planeNormalize = (a) => { /* eslint-disable no-param-reassign */
-  const invNorm = (1.0 / ((a[0] * a[0] + a[1] * a[1] + a[2] * a[2]) ** 0.5));
+  const invNorm = (1.0 / (a[0] * a[0] + a[1] * a[1] + a[2] * a[2])) ** 0.5;
 
   a[0] *= invNorm;
   a[1] *= invNorm;
@@ -52,7 +52,7 @@ export const planeNormalize = (a) => { /* eslint-disable no-param-reassign */
    * I will admit, I honestly have no idea when it comes to e0 and normalization, as I see a blend
    * of approaches from multiple authors and papers. Some ignore it entirely, some normalize it
    * by the same value as the k-vectors, and others add scalars and then normalize. I will stand to
-   * simply treat it the same as the other k-vectors here, similar to what Ganja and others do.
+   * simply treat it the same as the other k-vectors here, similar to what ganja and others do.
   */
 
   a[3] *= invNorm;
@@ -92,7 +92,7 @@ export const idealInfinityNormSq = (a) => (
 );
 
 export const idealNormalize = (a) => { /* eslint-disable no-param-reassign */
-  const invNorm = (1.0 / ((a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]) ** 0.5));
+  const invNorm = (1.0 / (a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3])) ** 0.5;
 
   a[0] *= invNorm;
   a[1] *= invNorm;
@@ -134,7 +134,7 @@ export const originInfinityNorm = () => 0;
 export const originInfinityNormSq = () => 0;
 
 export const originNormalize = (a) => { /* eslint-disable no-param-reassign */
-  const invNorm = (1.0 / ((a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]) ** 0.5));
+  const invNorm = (1.0 / (a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3])) ** 0.5;
 
   a[0] *= invNorm;
   a[1] *= invNorm;
@@ -156,8 +156,11 @@ export const originInvert = (a) => { /* eslint-disable no-param-reassign */
  * Line k-vectors: [e01, e02, e03, e0123, e23, e31, e12, s]
  * Line metric: [0, 0, 0, 0, -1, -1, -1, 1]
  *
- * norm: Ideal line vanishes, origin line contributes
+ * norm: ℓ∙ℓ = -1 (||ℓ|| = ||lο||)
  * infinity norm: ||ℓ||∞ == ||l∞||∞
+ *
+ * normalize: ℓ∙ℓ = -1
+ * invert: ℓ∙ℓ⁻¹ = 1
 */
 
 export const lineNorm = (a) => (
@@ -175,6 +178,55 @@ export const lineInfinityNorm = (a) => (
 export const lineInfinityNormSq = (a) => (
   a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]
 );
+
+/* === Complex Bivector normalization & inversion ===
+ *
+ * Based on the papers from SIGGRAPH 2019 by Charles G. Gunn
+ * "Geometric Algebra for Computer Graphics"
+ *
+ * The concept is based on the square root of dual numbers,
+ * where sqrt(s + pI) = sqrt(s) + (p / 2 sqrt(s))I
+ * ||Θ|| = u + vI = sqrt(-(Θ∙Θ + Θ∧Θ))
+ *
+ * The process of decomposing complex bivectors into their components is
+ * useful for normalization, inversion, and exponentiation, which is later
+ * used in motors
+*/
+export const lineNormalize = (a) => { /* eslint-disable no-param-reassign */
+  const u2 = (a[4] * a[4] + a[5] * a[5] + a[6] * a[6]);
+  const uv = (a[0] * a[4] + a[1] * a[5] + a[2] * a[6]);
+
+  const s = (1.0 / u2) ** 0.5;
+  const p = (1.0 / u2) * uv * s;
+
+  a[0] = (a[0] * s) - (a[4] * p);
+  a[1] = (a[1] * s) - (a[5] * p);
+  a[2] = (a[2] * s) - (a[6] * p);
+  a[3] = (a[3] * s) - (a[7] * p);
+
+  a[4] *= s;
+  a[5] *= s;
+  a[6] *= s;
+  a[7] *= s;
+}; /* eslint-enable no-param-reassign */
+
+export const lineInvert = (a) => { /* eslint-disable no-param-reassign */
+  const u2 = (a[4] * a[4] + a[5] * a[5] + a[6] * a[6]);
+  const uv = (a[0] * a[4] + a[1] * a[5] + a[2] * a[6]);
+
+  const invSq = (1.0 / u2);
+  const perpAxis = 2 * invSq * invSq * uv;
+
+  a[0] = -((a[0] * invSq) - a[4] * perpAxis);
+  a[1] = -((a[1] * invSq) - a[5] * perpAxis);
+  a[2] = -((a[2] * invSq) - a[6] * perpAxis);
+  a[3] = (a[3] * invSq) - a[7] * perpAxis;
+
+  a[4] *= -invSq;
+  a[5] *= -invSq;
+  a[6] *= -invSq;
+  a[7] *= invSq;
+}; /* eslint-enable no-param-reassign */
 
 /* === Point norm operations ===
  *

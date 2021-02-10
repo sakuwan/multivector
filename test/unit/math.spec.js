@@ -47,9 +47,7 @@ describe('PGA element - Plane', () => {
       expect(e1).toBeCloseTo(0.5773);
       expect(e2).toBeCloseTo(0.5773);
       expect(e3).toBeCloseTo(0.5773);
-
-      // e0 is untouched by normalization
-      expect(e0).toBeCloseTo(2);
+      expect(e0).toBeCloseTo(1.1547);
 
       const innerProduct = PGA.dot(toBeNormalized, toBeNormalized);
       expect(innerProduct).toBeCloseTo(1, 5);
@@ -64,9 +62,7 @@ describe('PGA element - Plane', () => {
       expect(e1).toBeCloseTo(-0.2672);
       expect(e2).toBeCloseTo(0.5345);
       expect(e3).toBeCloseTo(-0.8017);
-
-      // e0 is untouched by normalization
-      expect(e0).toBeCloseTo(4);
+      expect(e0).toBeCloseTo(1.0690);
 
       const innerProduct = PGA.dot(mixedSigns, mixedSigns);
       expect(innerProduct).toBeCloseTo(1, 5);
@@ -74,7 +70,7 @@ describe('PGA element - Plane', () => {
   });
 
   it('Performs core element operations: Inversion', () => {
-    // Satisfy p∙pinv = 1
+    // Satisfy p∙p⁻¹ = 1
     const toBeInverted = Plane(1, 1, 1, 2);
     toBeInverted.invert();
     {
@@ -173,7 +169,7 @@ describe('PGA element - Point', () => {
   });
 
   it('Performs core element operations: Inversion', () => {
-    // Satisfy P∙Pinv = P∙P = +-1
+    // Satisfy P∙P⁻¹ = P∙P = +-1
     const toBeInverted = Point(1, 1, 1, 2);
 
     toBeInverted.invert();

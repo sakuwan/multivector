@@ -75,6 +75,100 @@ const applyBasisMixins = (obj, basis) => {
   Object.defineProperties(objPrototype, basis.reduce(makeAccessorDescriptors, {}));
 };
 
+/* === Element arithmetic ===
+ *
+ * add: Add a scalar uniformly or an equivalently typed element across the
+ * calling element
+ *
+ * sub: Subtract a scalar uniformly or an equivalently typed element across the
+ * calling element
+ *
+ * mul: Scale a scalar uniformly or an equivalently typed element across the
+ * calling element
+ *
+ * div: Inverse scale a scalar uniformly, or an equivalently typed element
+ * across the calling element
+*/
+const createArithmeticMixin = () => ({
+  add(v) {
+    if ((v instanceof Object) && (v.type() === this.elementType)) {
+      const { buffer } = this;
+      const { buffer: other } = v;
+      for (let i = 0; i < buffer.length; i += 1) {
+        buffer[i] += other[i];
+      }
+
+      return this;
+    }
+
+    const { buffer } = this;
+    for (let i = 0; i < buffer.length; i += 1) {
+      buffer[i] += v;
+    }
+
+    return this;
+  },
+
+  sub(v) {
+    if ((v instanceof Object) && (v.type() === this.elementType)) {
+      const { buffer } = this;
+      const { buffer: other } = v;
+      for (let i = 0; i < buffer.length; i += 1) {
+        buffer[i] -= other[i];
+      }
+
+      return this;
+    }
+
+    const { buffer } = this;
+    for (let i = 0; i < buffer.length; i += 1) {
+      buffer[i] -= v;
+    }
+
+    return this;
+  },
+
+  mul(v) {
+    if ((v instanceof Object) && (v.type() === this.elementType)) {
+      const { buffer } = this;
+      const { buffer: other } = v;
+      for (let i = 0; i < buffer.length; i += 1) {
+        buffer[i] *= other[i];
+      }
+
+      return this;
+    }
+
+    const { buffer } = this;
+    for (let i = 0; i < buffer.length; i += 1) {
+      buffer[i] *= v;
+    }
+
+    return this;
+  },
+
+  div(v) {
+    if ((v instanceof Object) && (v.type() === this.elementType)) {
+      const { buffer } = this;
+      const { buffer: other } = v;
+      for (let i = 0; i < buffer.length; i += 1) {
+        buffer[i] *= (1.0 / other[i]);
+      }
+
+      return this;
+    }
+
+    const invRcp = (1.0 / v);
+
+    const { buffer } = this;
+    for (let i = 0; i < buffer.length; i += 1) {
+      buffer[i] *= invRcp;
+    }
+
+    return this;
+  },
+});
+
 /* === Element-related utility ===
  *
  * mv: Alias for accessing buffer property
@@ -239,10 +333,11 @@ const createNormMixin = (name) => {
 };
 
 export default function createPGAElement(element, name, basis) {
+  const arithmetic = createArithmeticMixin();
   const grade = createGradeMixin(basis);
   const norm = createNormMixin(name);
   const utility = createUtilityMixin(element, name, basis);
 
   applyBasisMixins(element, basis);
-  applyMethodMixins(element, grade, norm, utility);
+  applyMethodMixins(element, arithmetic, grade, norm, utility);
 }
