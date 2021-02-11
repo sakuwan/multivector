@@ -215,12 +215,12 @@ export const lineInvert = (a) => { /* eslint-disable no-param-reassign */
   const uv = (a[0] * a[4] + a[1] * a[5] + a[2] * a[6]);
 
   const invSq = (1.0 / u2);
-  const perpAxis = 2 * invSq * invSq * uv;
+  const sp = 2 * invSq * invSq * uv;
 
-  a[0] = -((a[0] * invSq) - a[4] * perpAxis);
-  a[1] = -((a[1] * invSq) - a[5] * perpAxis);
-  a[2] = -((a[2] * invSq) - a[6] * perpAxis);
-  a[3] = (a[3] * invSq) - a[7] * perpAxis;
+  a[0] = -((a[0] * invSq) - a[4] * sp);
+  a[1] = -((a[1] * invSq) - a[5] * sp);
+  a[2] = -((a[2] * invSq) - a[6] * sp);
+  a[3] = (a[3] * invSq) - a[7] * sp;
 
   a[4] *= -invSq;
   a[5] *= -invSq;

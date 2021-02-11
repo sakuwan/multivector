@@ -18,9 +18,9 @@ import createPGAElement from './PGAElement';
  *
  * === Norm operations ===
  *
- * euclideanLength, euclideanLengthSq
  * length, lengthSq
  * infinityLength, infinityLengthSq
+ * euclideanLength, euclideanLengthSq
  *
  * normalize: Normalization satisfies p∙p = 1
  * invert: Inversion satisfies p∙p⁻¹ = 1
@@ -33,11 +33,6 @@ import createPGAElement from './PGAElement';
  * negate:    [e1, e2, e3, e0] = [-e1, -e2, -e3, -e0]
 */
 export class PlaneElement {
-  /* === Plane element construction ===
-   *
-   * Set buffer (Float32Array({ length: 4 })) and element type (Plane)
-  */
-
   constructor(buffer) {
     this.buffer = buffer;
     this.elementType = PGATypes.Plane;

@@ -5,7 +5,7 @@
  * other general methods
 */
 
-/* === Metric === */
+/* === Norm === */
 import * as PGANorm from './impl/norm';
 
 /* === Helper functions & class composition ===
@@ -179,7 +179,7 @@ const createArithmeticMixin = () => ({
  * format: Return a formatted string of the element instance
  * toPrimitive: Semi-automatic string coercion for string literals
 */
-const createUtilityMixin = (ElementClass, name, basis) => ({
+const createUtilityMixin = (name, basis) => ({
   mv() {
     return this.buffer;
   },
@@ -189,7 +189,7 @@ const createUtilityMixin = (ElementClass, name, basis) => ({
   },
 
   clone() {
-    return new ElementClass(new Float32Array(this.buffer));
+    return new this.constructor(new Float32Array(this.buffer));
   },
 
   format() {
@@ -197,7 +197,7 @@ const createUtilityMixin = (ElementClass, name, basis) => ({
       const vectorValue = `${Math.abs(c)}${basis[i]}`;
       const vectorSign = (i === 0)
         ? `${c < 0 ? '-' : ''}`
-        : `${c > 0 ? ' + ' : ' - '}`;
+        : `${c >= 0 ? ' + ' : ' - '}`;
 
       return `${a}${vectorSign}${vectorValue}`;
     };
@@ -336,7 +336,7 @@ export default function createPGAElement(element, name, basis) {
   const arithmetic = createArithmeticMixin();
   const grade = createGradeMixin(basis);
   const norm = createNormMixin(name);
-  const utility = createUtilityMixin(element, name, basis);
+  const utility = createUtilityMixin(name, basis);
 
   applyBasisMixins(element, basis);
   applyMethodMixins(element, arithmetic, grade, norm, utility);
