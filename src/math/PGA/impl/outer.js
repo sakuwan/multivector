@@ -68,8 +68,9 @@ export const outerPlanePlane = (a, b) => {
 
 /*
  * Plane ∧ Ideal line -> Point (e032, e013, e021, 0)
- * The intersection of a plane and an ideal yields a positional (vanishing point)
- * point element, the directional vector calculation simplifies to:
+ * The intersection of a plane and an ideal line yields a positional
+ * (vanishing point) point element, the directional vector calculation
+ * simplifies to:
  * (a.e2 * b.e03 - a.e3 * b.e02) -> e032
  * (a.e3 * b.e01 - a.e1 * b.e03) -> e013
  * (a.e1 * b.e02 - a.e2 * b.e01) -> e021

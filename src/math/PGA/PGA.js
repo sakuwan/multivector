@@ -35,6 +35,7 @@ import {
 import * as IP from './impl/inner';
 import * as OP from './impl/outer';
 import * as RP from './impl/regressive';
+import * as GP from './impl/geometric';
 
 import * as Duality from './impl/dual';
 
@@ -97,6 +98,15 @@ export default class PGA {
     const rhsType = b.type();
 
     return PGA.regressiveMap[lhsType][rhsType](a.buffer, b.buffer);
+  }
+
+  static geometricMap = createForwardingMap('geometric', GP);
+
+  static mul(a, b) {
+    const lhsType = a.type();
+    const rhsType = b.type();
+
+    return PGA.geometricMap[lhsType][rhsType](a.buffer, b.buffer);
   }
 
   static dual(a) {
