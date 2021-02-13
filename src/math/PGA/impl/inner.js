@@ -3,6 +3,8 @@
  * Commutativity matters, the following assumes a ∙ b
 */
 
+import { PGATypes } from './types';
+
 /* === Plane inner products ===
  *
  * Plane ∙ Plane       -> Scalar
@@ -352,3 +354,45 @@ export const innerPointLine = (a, b) => {
 export const innerPointPoint = (a, b) => (
   -(a[3] * b[3])
 );
+
+/* === Operation map === *
+ *
+ * Utility map for delegating elements to their proper inner products, coupled
+ * with the result element type, intended for use in '../PGA.js'
+ *
+ * { [Lhs]: [Rhs] -> [Operation, Result] }
+*/
+export const innerProductMap = {
+  [PGATypes.Plane]: {
+    [PGATypes.Plane]: [innerPlanePlane, PGATypes.Scalar],
+    [PGATypes.IdealLine]: [innerPlaneIdeal, PGATypes.Plane],
+    [PGATypes.OriginLine]: [innerPlaneOrigin, PGATypes.Plane],
+    [PGATypes.Line]: [innerPlaneLine, PGATypes.Plane],
+    [PGATypes.Point]: [innerPlanePoint, PGATypes.Line],
+  },
+
+  [PGATypes.IdealLine]: {
+    [PGATypes.Plane]: [innerIdealPlane, PGATypes.Plane],
+  },
+
+  [PGATypes.OriginLine]: {
+    [PGATypes.Plane]: [innerOriginPlane, PGATypes.Plane],
+    [PGATypes.OriginLine]: [innerOriginOrigin, PGATypes.Scalar],
+    [PGATypes.Line]: [innerOriginLine, PGATypes.Scalar],
+    [PGATypes.Point]: [innerOriginPoint, PGATypes.Plane],
+  },
+
+  [PGATypes.Line]: {
+    [PGATypes.Plane]: [innerLinePlane, PGATypes.Plane],
+    [PGATypes.OriginLine]: [innerLineOrigin, PGATypes.Scalar],
+    [PGATypes.Line]: [innerLineLine, PGATypes.Scalar],
+    [PGATypes.Point]: [innerLinePoint, PGATypes.Plane],
+  },
+
+  [PGATypes.Point]: {
+    [PGATypes.Plane]: [innerPointPlane, PGATypes.Line],
+    [PGATypes.OriginLine]: [innerPointOrigin, PGATypes.Plane],
+    [PGATypes.Line]: [innerPointLine, PGATypes.Plane],
+    [PGATypes.Point]: [innerPointPoint, PGATypes.Scalar],
+  },
+};

@@ -7,73 +7,88 @@
  * delegate elements to their respective implementations
 */
 
-/* === Types === */
-import PGATypes from './types';
-
 /* === Elements === */
-import {
-  PlaneElement,
-} from './Plane';
+import { PlaneElement } from './Plane';
+import { IdealElement } from './IdealLine';
+import { OriginElement } from './OriginLine';
+import { LineElement } from './Line';
+import { PointElement } from './Point';
 
-import {
-  IdealElement,
-} from './IdealLine';
-
-import {
-  OriginElement,
-} from './OriginLine';
-
-import {
-  LineElement,
-} from './Line';
-
-import {
-  PointElement,
-} from './Point';
+import { MotorElement } from './Motor';
 
 /* === Implementations === */
-import * as IP from './impl/inner';
-import * as OP from './impl/outer';
-import * as RP from './impl/regressive';
-import * as GP from './impl/geometric';
+import {
+  PGATypes,
+  formatPGAType,
+} from './impl/types';
+
+import { innerProductMap } from './impl/inner';
+import { outerProductMap } from './impl/outer';
+import { regressiveProductMap } from './impl/regressive';
+import { geometricProductMap } from './impl/geometric';
 
 import * as Duality from './impl/dual';
 
 /* === Element type delegation maps ===
  *
- * Create the maps that will forward calls to their respective implementations.
+ * Using the provided implementation map, create a wrapper that will result
+ * in the proper element of the operation
 */
-const createForwardingMap = (prefix, impl) => {
-  const symbolTypes = {
-    Plane: PGATypes.Plane,
-    Ideal: PGATypes.IdealLine,
-    Origin: PGATypes.OriginLine,
-    Line: PGATypes.Line,
-    Point: PGATypes.Point,
+const createForwardingMap = (impl, operator) => {
+  const wrapMethods = (a, b) => {
+    const currentOp = `[${formatPGAType(a)}${operator}${formatPGAType(b)}]`;
+    const errorMessage = `Invalid arguments: ${currentOp} is a vanishing or invalid operation`;
+
+    const [method, result] = impl?.[a]?.[b] ?? [];
+    if (!method) {
+      return () => { throw new TypeError(errorMessage); };
+    }
+
+    switch (result) {
+      case PGATypes.Scalar: return method;
+      case PGATypes.Pseudoscalar: return method;
+
+      case PGATypes.Plane: return (lhs, rhs) => new PlaneElement(method(lhs, rhs));
+      case PGATypes.IdealLine: return (lhs, rhs) => new IdealElement(method(lhs, rhs));
+      case PGATypes.OriginLine: return (lhs, rhs) => new OriginElement(method(lhs, rhs));
+      case PGATypes.Line: return (lhs, rhs) => new LineElement(method(lhs, rhs));
+      case PGATypes.Point: return (lhs, rhs) => new PointElement(method(lhs, rhs));
+
+      case PGATypes.Motor: return (lhs, rhs) => new MotorElement(method(lhs, rhs));
+        /* === TODO: Implement ===
+      case PGATypes.Rotor: return (lhs, rhs) => new RotorElement(method(lhs, rhs));
+      case PGATypes.Translator: return (lhs, rhs) => new TranslatorElement(method(lhs, rhs));
+        */
+
+      case PGATypes.Multivector: return method;
+
+      default: {
+        throw new TypeError('Invalid type: Unsupported result type');
+      }
+    }
   };
 
-  const fetchValidFunction = (a, b) => {
-    const funcName = `${prefix}${a}${b}`;
-    const errorMessage = `Invalid arguments: ${funcName} is a fully vanishing operation`;
+  const makeRhsElements = (lhs) => (a, rhs) => Object.assign(
+    a, { [rhs]: wrapMethods(lhs, rhs) },
+  );
 
-    return (funcName in impl)
-      ? impl[funcName]
-      : () => { throw new TypeError(errorMessage); };
-  };
+  const makeLhsElements = (a, lhs, _, arr) => Object.assign(
+    a, { [lhs]: arr.reduce(makeRhsElements(lhs), {}) },
+  );
 
-  const makeImplMap = (el) => (a, c) => ({
-    ...a, [symbolTypes[c]]: fetchValidFunction(el, c),
-  });
+  const validElements = [
+    PGATypes.Plane,
+    PGATypes.IdealLine, PGATypes.OriginLine, PGATypes.Line,
+    PGATypes.Point,
+    PGATypes.Motor, PGATypes.Rotor, PGATypes.Translator,
+    PGATypes.Multivector,
+  ];
 
-  const makeElementMaps = (a, c, _, arr) => ({
-    ...a, [symbolTypes[c]]: arr.reduce(makeImplMap(c), {}),
-  });
-
-  return Object.keys(symbolTypes).reduce(makeElementMaps, {});
+  return validElements.reduce(makeLhsElements, {});
 };
 
 export default class PGA {
-  static innerMap = createForwardingMap('inner', IP);
+  static innerMap = createForwardingMap(innerProductMap, '∙');
 
   static dot(a, b) {
     const lhsType = a.type();
@@ -82,7 +97,7 @@ export default class PGA {
     return PGA.innerMap[lhsType][rhsType](a.buffer, b.buffer);
   }
 
-  static outerMap = createForwardingMap('outer', OP);
+  static outerMap = createForwardingMap(outerProductMap, '∧');
 
   static meet(a, b) {
     const lhsType = a.type();
@@ -91,7 +106,7 @@ export default class PGA {
     return PGA.outerMap[lhsType][rhsType](a.buffer, b.buffer);
   }
 
-  static regressiveMap = createForwardingMap('regressive', RP);
+  static regressiveMap = createForwardingMap(regressiveProductMap, '∨');
 
   static join(a, b) {
     const lhsType = a.type();
@@ -100,7 +115,7 @@ export default class PGA {
     return PGA.regressiveMap[lhsType][rhsType](a.buffer, b.buffer);
   }
 
-  static geometricMap = createForwardingMap('geometric', GP);
+  static geometricMap = createForwardingMap(geometricProductMap, '*');
 
   static mul(a, b) {
     const lhsType = a.type();

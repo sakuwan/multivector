@@ -1,4 +1,8 @@
-import PGATypes from './types';
+import {
+  PGATypes,
+  formatPGAType,
+} from './impl/types';
+
 import createPGAElement from './PGAElement';
 
 /* === Point (e032, e013, e021, e123) ===
@@ -39,9 +43,8 @@ export class PointElement {
   }
 }
 
-const POINT_NAME = 'Point';
 const POINT_BASIS = ['e032', 'e013', 'e021', 'e123'];
-createPGAElement(PointElement, POINT_NAME, POINT_BASIS);
+createPGAElement(PointElement, formatPGAType(PGATypes.Point), POINT_BASIS);
 
 /* === Point factory ===
  *

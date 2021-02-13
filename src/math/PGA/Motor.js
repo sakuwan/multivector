@@ -5,14 +5,11 @@ import {
 
 import createPGAElement from './PGAElement';
 
-/* === Line (e01, e02, e03, e0123, e23, e31, e12, s) ===
+/* === Motor (e01, e02, e03, e0123, e23, e31, e12, s) ===
  *
- * The combination element and representation of general lines is a 6-bivector
- * coordinate multivector, lines are Plücker coordinates that happen to arise
- * naturally in PGA. Both e0123 and s are assumed to be 0 throughout.
- *
- * The LineElement class represents a line, and its provided methods
- * are unary, and focused on the element itself, rather than the vector space
+ * Normalized, even grade elements of PGA are called motors, and are
+ * generally represented as the products of rotors and translators. Motors
+ * represent kinematic motion in PGA, and satisfy m * ∼m = 1
  *
  * === Component access ===
  *
@@ -32,8 +29,8 @@ import createPGAElement from './PGAElement';
  * infinityLength, infinityLengthSq (Vanishes completely to 0)
  * euclideanLength, euclideanLengthSq
  *
- * normalize: Normalization satisfies ℓ∙ℓ = -1
- * invert: Inversion satisfies ℓ∙ℓ⁻¹ = 1
+ * normalize: Normalization satisfies m * ∼m = 1
+ * invert: Inversion satisfies m * m⁻¹ = 1
  *
  * === Antiautomorphisms ===
  *
@@ -49,23 +46,23 @@ import createPGAElement from './PGAElement';
  * negate:    [e01, e02, e03, e0123, e23, e31, e12, s]
  *          = [-e01, -e02, -e03, -e0123, -e23, -e31, -e12, -s]
 */
-export class LineElement {
+export class MotorElement {
   constructor(buffer) {
     this.buffer = buffer;
-    this.elementType = PGATypes.Line;
+    this.elementType = PGATypes.Motor;
   }
 }
 
-const LINE_BASIS = ['e01', 'e02', 'e03', 'e0123', 'e23', 'e31', 'e12', 's'];
-createPGAElement(LineElement, formatPGAType(PGATypes.Line), LINE_BASIS);
+const MOTOR_BASIS = ['e01', 'e02', 'e03', 'e0123', 'e23', 'e31', 'e12', 's'];
+createPGAElement(MotorElement, formatPGAType(PGATypes.Motor), MOTOR_BASIS);
 
-/* === Line factory ===
+/* === Motor factory ===
  *
- * (a, b, c, 0, d, f, g, 0) -> Line(
- *   (a * e01), (b * e02), (c * e03), (0 * e0123)),
- *   (d * e23), (f * e31), (g * e12), (0 * s)),
+ * (a, b, c, d, e, f, g, h) -> Motor(
+ *   (a * e01), (b * e02), (c * e03), (d * e0123)),
+ *   (e * e23), (f * e31), (g * e12), (h * s)),
  * )
 */
-export const Line = (a = 0, b = 0, c = 0, d = 0, f = 0, g = 0) => (
-  new LineElement(new Float32Array([a, b, c, 0, d, f, g, 0]))
+export const Motor = (a = 0, b = 0, c = 0, d = 0, e = 0, f = 0, g = 0, h = 0) => (
+  new MotorElement(new Float32Array([a, b, c, d, e, f, g, h]))
 );

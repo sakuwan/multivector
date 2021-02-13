@@ -2,6 +2,8 @@
  *
 */
 
+import { PGATypes } from './types';
+
 /* === Plane regressive products === */
 
 /*
@@ -297,4 +299,44 @@ export const regressivePointPoint = (a, b) => {
   const e12 = a[3] * b[2] - a[2] * b[3];
 
   return new Float32Array([e01, e02, e03, 0, e23, e31, e12, 0]);
+};
+
+/* === Operation map === *
+ *
+ * Utility map for delegating elements to their proper regressive products, coupled
+ * with the result element type, intended for use in '../PGA.js'
+ *
+ * { [Lhs]: [Rhs] -> [Operation, Result] }
+*/
+export const regressiveProductMap = {
+  [PGATypes.Plane]: {
+    [PGATypes.Point]: [regressivePlanePoint, PGATypes.Scalar],
+  },
+
+  [PGATypes.IdealLine]: {
+    [PGATypes.OriginLine]: [regressiveIdealOrigin, PGATypes.Scalar],
+    [PGATypes.Line]: [regressiveIdealLine, PGATypes.Scalar],
+    [PGATypes.Point]: [regressiveIdealLine, PGATypes.Plane],
+  },
+
+  [PGATypes.OriginLine]: {
+    [PGATypes.IdealLine]: [regressiveOriginIdeal, PGATypes.Scalar],
+    [PGATypes.Line]: [regressiveOriginLine, PGATypes.Scalar],
+    [PGATypes.Point]: [regressiveOriginPoint, PGATypes.Plane],
+  },
+
+  [PGATypes.Line]: {
+    [PGATypes.IdealLine]: [regressiveLineIdeal, PGATypes.Scalar],
+    [PGATypes.OriginLine]: [regressiveLineOrigin, PGATypes.Scalar],
+    [PGATypes.Line]: [regressiveLineLine, PGATypes.Scalar],
+    [PGATypes.Point]: [regressiveLinePoint, PGATypes.Plane],
+  },
+
+  [PGATypes.Point]: {
+    [PGATypes.Plane]: [regressivePointPlane, PGATypes.Scalar],
+    [PGATypes.IdealLine]: [regressivePointIdeal, PGATypes.Plane],
+    [PGATypes.OriginLine]: [regressivePointOrigin, PGATypes.Plane],
+    [PGATypes.Line]: [regressivePointLine, PGATypes.Plane],
+    [PGATypes.Point]: [regressivePointPoint, PGATypes.Line],
+  },
 };

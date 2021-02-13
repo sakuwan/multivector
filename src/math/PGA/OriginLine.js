@@ -1,4 +1,8 @@
-import PGATypes from './types';
+import {
+  PGATypes,
+  formatPGAType,
+} from './impl/types';
+
 import createPGAElement from './PGAElement';
 
 /* === Origin Line (e23, e31, e12, s) ===
@@ -40,9 +44,8 @@ export class OriginElement {
   }
 }
 
-const ORIGIN_NAME = 'Origin';
 const ORIGIN_BASIS = ['e23', 'e31', 'e12', 's'];
-createPGAElement(OriginElement, ORIGIN_NAME, ORIGIN_BASIS);
+createPGAElement(OriginElement, formatPGAType(PGATypes.OriginLine), ORIGIN_BASIS);
 
 /* === OriginLine factory ===
  *

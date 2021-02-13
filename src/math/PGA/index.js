@@ -7,12 +7,14 @@
  * Visit bivector.net for said resources & more
 */
 
-export { default as PGATypes } from './types';
+export { PGATypes } from './impl/types';
 
 export { Plane } from './Plane';
 export { IdealLine } from './IdealLine';
 export { OriginLine } from './OriginLine';
 export { Line } from './Line';
 export { Point } from './Point';
+
+export { Motor } from './Motor';
 
 export { default as PGA } from './PGA';

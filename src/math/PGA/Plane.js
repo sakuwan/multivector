@@ -1,4 +1,8 @@
-import PGATypes from './types';
+import {
+  PGATypes,
+  formatPGAType,
+} from './impl/types';
+
 import createPGAElement from './PGAElement';
 
 /* === Plane (e1, e2, e3, e0) ===
@@ -39,9 +43,8 @@ export class PlaneElement {
   }
 }
 
-const PLANE_NAME = 'Plane';
 const PLANE_BASIS = ['e1', 'e2', 'e3', 'e0'];
-createPGAElement(PlaneElement, PLANE_NAME, PLANE_BASIS);
+createPGAElement(PlaneElement, formatPGAType(PGATypes.Plane), PLANE_BASIS);
 
 /* === Plane factory ===
  *

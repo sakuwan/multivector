@@ -269,3 +269,66 @@ export const pointInvert = (a) => { /* eslint-disable no-param-reassign */
   a[2] *= invNorm;
   a[3] *= invNorm;
 }; /* eslint-enable no-param-reassign */
+
+/* === Motor norm operations ===
+ *
+ * Motor k-vectors: [e01, e02, e03, e0123, e23, e31, e12, s]
+ * Motor metric: [0, 0, 0, 0, -1, -1, -1, 1]
+ *
+ * norm: ||R||
+ * infinity norm: ||T||∞ == ||T∞||∞
+ *
+ * normalize: m * ∼m = 1
+ * invert: m * m⁻¹ = 1
+*/
+export const motorNorm = (a) => (
+  (a[4] * a[4] + a[5] * a[5] + a[6] * a[6] + a[7] * a[7]) ** 0.5
+);
+
+export const motorNormSq = (a) => (
+  a[4] * a[4] + a[5] * a[5] + a[6] * a[6] + a[7] * a[7]
+);
+
+export const motorInfinityNorm = (a) => (
+  (a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]) ** 0.5
+);
+
+export const motorInfinityNormSq = (a) => (
+  a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]
+);
+
+export const motorNormalize = (a) => { /* eslint-disable no-param-reassign */
+  const u2 = (a[4] * a[4] + a[5] * a[5] + a[6] * a[6] + a[7] * a[7]);
+  const uv = (a[0] * a[4] + a[1] * a[5] + a[2] * a[6] - a[3] * a[7]);
+
+  const s = (1.0 / u2) ** 0.5;
+  const p = (1.0 / u2) * uv * s;
+
+  a[0] = (a[0] * s) - (a[4] * p);
+  a[1] = (a[1] * s) - (a[5] * p);
+  a[2] = (a[2] * s) - (a[6] * p);
+  a[3] = (a[3] * s) + (a[7] * p);
+
+  a[4] *= s;
+  a[5] *= s;
+  a[6] *= s;
+  a[7] *= s;
+}; /* eslint-enable no-param-reassign */
+
+export const motorInvert = (a) => { /* eslint-disable no-param-reassign */
+  const u2 = (a[4] * a[4] + a[5] * a[5] + a[6] * a[6] + a[7] * a[7]);
+  const uv = (a[0] * a[4] + a[1] * a[5] + a[2] * a[6] - a[3] * a[7]);
+
+  const invSq = (1.0 / u2);
+  const sp = 2 * invSq * invSq * uv;
+
+  a[0] = -((a[0] * invSq) - a[4] * sp);
+  a[1] = -((a[1] * invSq) - a[5] * sp);
+  a[2] = -((a[2] * invSq) - a[6] * sp);
+  a[3] = (a[3] * invSq) + a[7] * sp;
+
+  a[4] *= -invSq;
+  a[5] *= -invSq;
+  a[6] *= -invSq;
+  a[7] *= invSq;
+}; /* eslint-enable no-param-reassign */

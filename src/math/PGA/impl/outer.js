@@ -2,6 +2,8 @@
  *
 */
 
+import { PGATypes } from './types';
+
 /* === Plane outer products ===
  *
  * Plane ∧ Plane       -> Line (e01, e02, e03, 0, e23, e31, e12, 0)
@@ -314,3 +316,43 @@ export const outerLineLine = (a, b) => (
 export const outerPointPlane = (a, b) => (
   -(a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3])
 );
+
+/* === Operation map === *
+ *
+ * Utility map for delegating elements to their proper outer products, coupled
+ * with the result element type, intended for use in '../PGA.js'
+ *
+ * { [Lhs]: [Rhs] -> [Operation, Result] }
+*/
+export const outerProductMap = {
+  [PGATypes.Plane]: {
+    [PGATypes.Plane]: [outerPlanePlane, PGATypes.Line],
+    [PGATypes.IdealLine]: [outerPlaneIdeal, PGATypes.Point],
+    [PGATypes.OriginLine]: [outerPlaneOrigin, PGATypes.Point],
+    [PGATypes.Line]: [outerPlaneLine, PGATypes.Point],
+    [PGATypes.Point]: [outerPlanePoint, PGATypes.Pseudoscalar],
+  },
+
+  [PGATypes.IdealLine]: {
+    [PGATypes.Plane]: [outerIdealPlane, PGATypes.Point],
+    [PGATypes.OriginLine]: [outerIdealOrigin, PGATypes.Pseudoscalar],
+    [PGATypes.Line]: [outerIdealLine, PGATypes.Pseudoscalar],
+  },
+
+  [PGATypes.OriginLine]: {
+    [PGATypes.Plane]: [outerOriginPlane, PGATypes.Point],
+    [PGATypes.IdealLine]: [outerOriginIdeal, PGATypes.Pseudoscalar],
+    [PGATypes.Line]: [outerOriginLine, PGATypes.Pseudoscalar],
+  },
+
+  [PGATypes.Line]: {
+    [PGATypes.Plane]: [outerLinePlane, PGATypes.Point],
+    [PGATypes.IdealLine]: [outerLineIdeal, PGATypes.Pseudoscalar],
+    [PGATypes.OriginLine]: [outerLineOrigin, PGATypes.Pseudoscalar],
+    [PGATypes.Line]: [outerLineLine, PGATypes.Pseudoscalar],
+  },
+
+  [PGATypes.Point]: {
+    [PGATypes.Plane]: [outerPointPlane, PGATypes.Pseudoscalar],
+  },
+};

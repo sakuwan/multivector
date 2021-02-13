@@ -1,4 +1,8 @@
-import PGATypes from './types';
+import {
+  PGATypes,
+  formatPGAType,
+} from './impl/types';
+
 import createPGAElement from './PGAElement';
 
 /* === Ideal Line (e01, e02, e03, e0123) ===
@@ -40,9 +44,8 @@ export class IdealElement {
   }
 }
 
-const IDEAL_NAME = 'Ideal';
 const IDEAL_BASIS = ['e01', 'e02', 'e03', 'e0123'];
-createPGAElement(IdealElement, IDEAL_NAME, IDEAL_BASIS);
+createPGAElement(IdealElement, formatPGAType(PGATypes.IdealLine), IDEAL_BASIS);
 
 /* === IdealLine factory ===
  *

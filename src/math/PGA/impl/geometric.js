@@ -2,17 +2,19 @@
  *
 */
 
+import { PGATypes } from './types';
+
 /* === Plane geometric products ===
  *
- * Plane * Plane       -> Line (e01, e02, e03, 0, e23, e31, e12, s)
- * Plane * Ideal line  -> Plane + Point (0, 0, 0, e0, e032, e013, e021, 0)
- * Plane * Origin line -> Plane + Point (e1, e2, e3, 0, e032, e013, e021, e123)
- * Plane * Line        -> Plane + Point (e1, e2, e3, e0, e032, e013, e021, e123)
- * Plane * Point       -> Line (e01, e02, e03, e0123, e23, e31, e12, 0)
+ * Plane * Plane       -> Motor (e01, e02, e03, 0, e23, e31, e12, s)
+ * Plane * Ideal line  -> Multivector (e1, e2, e3, e0, e032, e013, e021, e123)
+ * Plane * Origin line -> Multivector (e1, e2, e3, e0, e032, e013, e021, e123)
+ * Plane * Line        -> Multivector (e1, e2, e3, e0, e032, e013, e021, e123)
+ * Plane * Point       -> Motor (e01, e02, e03, e0123, e23, e31, e12, 0)
 */
 
 /*
- * Plane * Plane -> Ideal line (e01, e02, e03, 0)
+ * Plane * Plane -> Translator (e01, e02, e03, 0)
  * p * p = p ∙ p + p ∧ p
  * Extract the ideal line portion of the full line result, identical to
  * p ∧ p -> l∞ and simplifies to:
@@ -30,7 +32,7 @@ export const geometricPlanePlaneI = (a, b) => {
 };
 
 /*
- * Plane * Plane -> Origin line (e23, e31, e12, s)
+ * Plane * Plane -> Rotor (e23, e31, e12, s)
  * p * p = p ∙ p + p ∧ p
  * Extract the origin line portion of the full line result, identical to
  * p ∧ p -> p ∙ p + lο and simplifies to:
@@ -50,7 +52,7 @@ export const geometricPlanePlaneO = (a, b) => {
 };
 
 /*
- * Plane * Plane -> Line (e01, e02, e03, 0, e23, e31, e12, s)
+ * Plane * Plane -> Motor (e01, e02, e03, 0, e23, e31, e12, s)
  * p * p = p ∙ p + p ∧ p
  * Identical to the inner and outer products, no cancellations, full product:
  * (a.e0 * b.e1 - a.e1 * b.e0) -> e01
@@ -75,7 +77,7 @@ export const geometricPlanePlane = (a, b) => {
 };
 
 /*
- * Plane * Ideal line -> Plane + Point (0, 0, 0, e0, e032, e013, e021, 0)
+ * Plane * Ideal line -> Multivector (e1, e2, e3, e0, e032, e013, e021, e123)
  * p * l∞ = p ∙ l∞ + p ∧ l∞
  * A valid operation that results in a multivector that is the combination
  * of multiple elements, while simply being equivalent to both the inner and
@@ -87,7 +89,7 @@ export const geometricPlaneIdeal = () => {
 };
 
 /*
- * Plane * Origin line -> Plane + Point (e1, e2, e3, 0, e032, e013, e021, e123)
+ * Plane * Origin line -> Multivector (e1, e2, e3, e0, e032, e013, e021, e123)
  * p * lο = p ∙ lο + p ∧ lο
  * A valid operation that results in a multivector that is the combination
  * of multiple elements, while simply being equivalent to both the inner and
@@ -99,7 +101,7 @@ export const geometricPlaneOrigin = () => {
 };
 
 /*
- * Plane * Line -> Plane + Point (e1, e2, e3, e0, e032, e013, e021, e123)
+ * Plane * Line -> Multivector (e1, e2, e3, e0, e032, e013, e021, e123)
  * p * ℓ = p ∙ ℓ + p ∧ ℓ
  * A valid operation that results in a multivector that is the combination
  * of multiple elements, while simply being equivalent to both the inner and
@@ -111,7 +113,7 @@ export const geometricPlaneLine = () => {
 };
 
 /*
- * Plane * Point -> Line (e01, e02, e03, e0123, e23, e31, e12, 0)
+ * Plane * Point -> Motor (e01, e02, e03, e0123, e23, e31, e12, 0)
  * p * P = p ∙ P + p ∧ P
  * Identical to the inner and outer products, no cancellations, full product:
  * (a.e3 * b.e013 - a.e2 * b.e021) -> e01
@@ -170,3 +172,20 @@ export const geometricPlanePoint = (a, b) => {
  * Point * Line        ->
  * Point * Point       ->
 */
+
+/* === Operation map === *
+ *
+ * Utility map for delegating elements to their proper geometric products, coupled
+ * with the result element type, intended for use in '../PGA.js'
+ *
+ * { [Lhs]: [Rhs] -> [Operation, Result] }
+*/
+export const geometricProductMap = {
+  [PGATypes.Plane]: {
+    [PGATypes.Plane]: [geometricPlanePlane, PGATypes.Motor],
+    [PGATypes.IdealLine]: [geometricPlaneIdeal, PGATypes.Multivector],
+    [PGATypes.OriginLine]: [geometricPlaneOrigin, PGATypes.Multivector],
+    [PGATypes.Line]: [geometricPlaneLine, PGATypes.Multivector],
+    [PGATypes.Point]: [geometricPlanePoint, PGATypes.Motor],
+  },
+};
