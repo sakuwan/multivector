@@ -56,8 +56,10 @@ export class LineElement {
   }
 }
 
-const LINE_BASIS = ['e01', 'e02', 'e03', 'e0123', 'e23', 'e31', 'e12', 's'];
-createPGAElement(LineElement, formatPGAType(PGATypes.Line), LINE_BASIS);
+createPGAElement(LineElement, {
+  basis: ['e01', 'e02', 'e03', 'e0123', 'e23', 'e31', 'e12', 's'],
+  name: formatPGAType(PGATypes.Line),
+});
 
 /* === Line factory ===
  *

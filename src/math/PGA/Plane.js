@@ -43,8 +43,10 @@ export class PlaneElement {
   }
 }
 
-const PLANE_BASIS = ['e1', 'e2', 'e3', 'e0'];
-createPGAElement(PlaneElement, formatPGAType(PGATypes.Plane), PLANE_BASIS);
+createPGAElement(PlaneElement, {
+  basis: ['e1', 'e2', 'e3', 'e0'],
+  name: formatPGAType(PGATypes.Plane),
+});
 
 /* === Plane factory ===
  *

@@ -43,8 +43,10 @@ export class PointElement {
   }
 }
 
-const POINT_BASIS = ['e032', 'e013', 'e021', 'e123'];
-createPGAElement(PointElement, formatPGAType(PGATypes.Point), POINT_BASIS);
+createPGAElement(PointElement, {
+  basis: ['e032', 'e013', 'e021', 'e123'],
+  name: formatPGAType(PGATypes.Point),
+});
 
 /* === Point factory ===
  *

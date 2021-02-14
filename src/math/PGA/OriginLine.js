@@ -44,8 +44,10 @@ export class OriginElement {
   }
 }
 
-const ORIGIN_BASIS = ['e23', 'e31', 'e12', 's'];
-createPGAElement(OriginElement, formatPGAType(PGATypes.OriginLine), ORIGIN_BASIS);
+createPGAElement(OriginElement, {
+  basis: ['e23', 'e31', 'e12', 's'],
+  name: formatPGAType(PGATypes.OriginLine),
+});
 
 /* === OriginLine factory ===
  *

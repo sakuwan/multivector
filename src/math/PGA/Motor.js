@@ -11,6 +11,9 @@ import createPGAElement from './PGAElement';
  * generally represented as the products of rotors and translators. Motors
  * represent kinematic motion in PGA, and satisfy m * ∼m = 1
  *
+ * The MotorElement class represents a motor, and its provided methods
+ * are unary, and focused on the element itself, rather than the vector space
+ *
  * === Component access ===
  *
  * get / set e01:   k-vector component access (0 / px)
@@ -53,8 +56,10 @@ export class MotorElement {
   }
 }
 
-const MOTOR_BASIS = ['e01', 'e02', 'e03', 'e0123', 'e23', 'e31', 'e12', 's'];
-createPGAElement(MotorElement, formatPGAType(PGATypes.Motor), MOTOR_BASIS);
+createPGAElement(MotorElement, {
+  basis: ['e01', 'e02', 'e03', 'e0123', 'e23', 'e31', 'e12', 's'],
+  name: formatPGAType(PGATypes.Motor),
+});
 
 /* === Motor factory ===
  *

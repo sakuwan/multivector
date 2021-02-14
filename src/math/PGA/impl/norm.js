@@ -332,3 +332,89 @@ export const motorInvert = (a) => { /* eslint-disable no-param-reassign */
   a[6] *= -invSq;
   a[7] *= invSq;
 }; /* eslint-enable no-param-reassign */
+
+/* === Rotor norm operations ===
+ *
+ * Rotor k-vectors: [e23, e31, e12, s]
+ * Rotor metric: [-1, -1, -1, 1]
+ *
+ * norm: No components vanish
+ * infinity norm: ||R||∞ = ||T||
+ *
+ * normalize: R * ∼R = 1
+ * invert: R * R⁻¹ = 1
+*/
+
+export const rotorNorm = (a) => (
+  (a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]) ** 0.5
+);
+
+export const rotorNormSq = (a) => (
+  a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]
+);
+
+export const rotorInfinityNorm = () => 0;
+
+export const rotorInfinityNormSq = () => 0;
+
+export const rotorNormalize = (a) => { /* eslint-disable no-param-reassign */
+  const invNorm = (1.0 / (a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3])) ** 0.5;
+
+  a[0] *= invNorm;
+  a[1] *= invNorm;
+  a[2] *= invNorm;
+  a[3] *= invNorm;
+}; /* eslint-enable no-param-reassign */
+
+export const rotorInvert = (a) => { /* eslint-disable no-param-reassign */
+  const invNorm = (1.0 / (a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]));
+
+  a[0] *= -invNorm;
+  a[1] *= -invNorm;
+  a[2] *= -invNorm;
+  a[3] *= invNorm;
+}; /* eslint-enable no-param-reassign */
+
+/* === Translator norm operations ===
+ *
+ * Translator k-vectors: [e01, e02, e03, e0123]
+ * Translator metric: [0, 0, 0, 0]
+ *
+ * norm: e0 squares to zero and all components vanish
+ * infinity norm: ||T∞||∞ = ||R||
+ *
+ * normalize: -sqrt(||R||) = d/2
+ * invert: -sqrt(||R||) = -d/2
+*/
+
+export const translatorNorm = () => 0;
+
+export const translatorNormSq = () => 0;
+
+export const translatorInfinityNorm = (a) => (
+  (a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]) ** 0.5
+);
+
+export const translatorInfinityNormSq = (a) => (
+  a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]
+);
+
+export const translatorNormalize = (a) => { /* eslint-disable no-param-reassign */
+  const invNorm = (1.0 / (a[0] * a[0] + a[1] * a[1] + a[2] * a[2])) ** 0.5;
+  const halfDisplacement = -0.5 * a[3] * invNorm;
+
+  a[0] *= halfDisplacement;
+  a[1] *= halfDisplacement;
+  a[2] *= halfDisplacement;
+  a[3] = 0;
+}; /* eslint-enable no-param-reassign */
+
+export const translatorInvert = (a) => { /* eslint-disable no-param-reassign */
+  const invNorm = (1.0 / (a[0] * a[0] + a[1] * a[1] + a[2] * a[2])) ** 0.5;
+  const halfDisplacement = 0.5 * a[3] * invNorm;
+
+  a[0] *= halfDisplacement;
+  a[1] *= halfDisplacement;
+  a[2] *= halfDisplacement;
+  a[3] = 0;
+}; /* eslint-enable no-param-reassign */

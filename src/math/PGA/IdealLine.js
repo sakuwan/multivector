@@ -44,8 +44,10 @@ export class IdealElement {
   }
 }
 
-const IDEAL_BASIS = ['e01', 'e02', 'e03', 'e0123'];
-createPGAElement(IdealElement, formatPGAType(PGATypes.IdealLine), IDEAL_BASIS);
+createPGAElement(IdealElement, {
+  basis: ['e01', 'e02', 'e03', 'e0123'],
+  name: formatPGAType(PGATypes.IdealLine),
+});
 
 /* === IdealLine factory ===
  *

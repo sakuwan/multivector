@@ -15,6 +15,10 @@ import { LineElement } from './Line';
 import { PointElement } from './Point';
 
 import { MotorElement } from './Motor';
+import { RotorElement } from './Rotor';
+import { TranslatorElement } from './Translator';
+
+import { MultivectorElement } from './Multivector';
 
 /* === Implementations === */
 import {
@@ -55,12 +59,10 @@ const createForwardingMap = (impl, operator) => {
       case PGATypes.Point: return (lhs, rhs) => new PointElement(method(lhs, rhs));
 
       case PGATypes.Motor: return (lhs, rhs) => new MotorElement(method(lhs, rhs));
-        /* === TODO: Implement ===
       case PGATypes.Rotor: return (lhs, rhs) => new RotorElement(method(lhs, rhs));
       case PGATypes.Translator: return (lhs, rhs) => new TranslatorElement(method(lhs, rhs));
-        */
 
-      case PGATypes.Multivector: return method;
+      case PGATypes.Multivector: return (lhs, rhs) => new MultivectorElement(method(lhs, rhs));
 
       default: {
         throw new TypeError('Invalid type: Unsupported result type');

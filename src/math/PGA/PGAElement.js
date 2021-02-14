@@ -332,12 +332,22 @@ const createNormMixin = (name) => {
   });
 };
 
-export default function createPGAElement(element, name, basis) {
-  const arithmetic = createArithmeticMixin();
-  const grade = createGradeMixin(basis);
-  const norm = createNormMixin(name);
-  const utility = createUtilityMixin(name, basis);
+export default function createPGAElement(element, options) {
+  const { name, basis } = options;
+  const mergedOptions = {
+    arithmetic: true,
+    grade: true,
+    norm: true,
+    utility: true,
+    ...options,
+  };
+
+  const mixins = [];
+  if (mergedOptions.arithmetic) mixins.push(createArithmeticMixin());
+  if (mergedOptions.grade) mixins.push(createGradeMixin(basis));
+  if (mergedOptions.norm) mixins.push(createNormMixin(name));
+  if (mergedOptions.utility) mixins.push(createUtilityMixin(name, basis));
 
   applyBasisMixins(element, basis);
-  applyMethodMixins(element, arithmetic, grade, norm, utility);
+  applyMethodMixins(element, ...mixins);
 }

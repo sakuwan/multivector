@@ -16,5 +16,9 @@ export { Line } from './Line';
 export { Point } from './Point';
 
 export { Motor } from './Motor';
+export { Rotor } from './Rotor';
+export { Translator } from './Translator';
+
+export { Multivector } from './Multivector';
 
 export { default as PGA } from './PGA';
