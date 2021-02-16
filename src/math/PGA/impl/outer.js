@@ -1,5 +1,9 @@
 /* === PGA (3, 0, 1) outer products (meet) ===
  *
+ * The outer product, or meet, of two elements is the intersection of the
+ * subspaces spanned by the elements, fully annihilating if the elements have
+ * common spans. The outer product, meet and exterior product are synonymous
+ * throughout this library
 */
 
 import { PGATypes } from './types';

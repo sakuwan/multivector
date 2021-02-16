@@ -1,5 +1,9 @@
 /* === PGA (3, 0, 1) geometric products ===
  *
+ * The geometric product is an extension of the outer product with the
+ * inner product, resulting in a vector composed of multiple grades, called a
+ * multivector. This can also be intuited as the outer product with the notion
+ * of weight, provided by the inner product of the elements.
 */
 
 import { PGATypes } from './types';
@@ -368,7 +372,7 @@ export const geometricOriginPoint = (a, b) => {
  * Line * Plane       -> Multivector (e1, e2, e3, e0, e032, e013, e021, e123)
  * Line * Ideal line  -> Ideal line / Translator (e01, e02, e03, e0123)
  * Line * Origin line -> Motor (e01, e02, e03, e0123, e23, e31, e12, s)
- * Line * Line        ->
+ * Line * Line        -> Motor (e01, e02, e03, e0123, e23, e31, e12, s)
  * Line * Point       -> Multivector (e1, e2, e3, e0, e032, e013, e021, e123)
 */
 
@@ -441,7 +445,44 @@ export const geometricLineOrigin = (a, b) => {
 };
 
 /*
- * Origin line * Point -> Multivector (e1, e2, e3, e0, e032, e013, e021, e123)
+ * Line * Line -> Motor (e01, e02, e03, e0123, e23, e31, e12, s)
+ * ℓ * ℓ = ℓ ∙ ℓ + ℓ ∧ ℓ
+ * Produces a motor that, when normalized, moves ℓ₂ -> ℓ₁
+ * This can be further optimized under the assumption of the pseudoscalar
+ * being 0, but for now it will be a full calculation
+ * (a.e03 * b.e31 - a.e02 * b.e12) - (a.e0123 * b.e23 + a.e01 * b.s) +
+ * (a.e12 * b.e02 - a.e31 * b.e03) - (a.e23 * b.e0123 + a.s * b.e01) -> e01
+ * (a.e01 * b.e12 - a.e03 * b.e23) - (a.e0123 * b.e31 + a.e02 * b.s) +
+ * (a.e23 * b.e03 - a.e12 * b.e01) - (a.e31 * b.e0123 + a.s * b.e02) -> e02
+ * (a.e02 * b.e23 - a.e01 * b.e31) - (a.e0123 * b.e12 + a.e03 * b.s) +
+ * (a.e31 * b.e01 - a.e23 * b.e02) - (a.e12 * b.e0123 + a.s * b.e03) -> e03
+ * (a.e01 * b.e23) + (a.e02 * b.e31) + (a.e03 * b.e12) + (a.e0123 * b.s) +
+ * (a.e23 * b.e01) + (a.e31 * b.e02) + (a.e12 * b.e03) + (a.s * b.e0123) -> e0123
+ * (a.e12 * b.e31 - a.e31 * b.e12) + (a.e23 * b.s + a.s * b.e23) -> e23
+ * (a.e23 * b.e12 - a.e12 * b.e23) + (a.e31 * b.s + a.s * b.e31) -> e31
+ * (a.e31 * b.e23 - a.e23 * b.e31) + (a.e12 * b.s + a.s * b.e12) -> e12
+ * (a.s * b.s) - (a.e23 * b.e23) - (a.e31 * b.e31) - (a.e12 * b.e12) -> s
+*/
+export const geometricLineLine = (a, b) => {
+  const e01 = a[2] * b[5] - a[1] * b[6] - a[3] * b[4] + a[0] * b[7]
+            + a[6] * b[1] - a[5] * b[2] - a[4] * b[3] + a[7] * b[0];
+  const e02 = a[0] * b[6] - a[2] * b[4] - a[3] * b[5] + a[1] * b[7]
+            + a[4] * b[2] - a[6] * b[0] - a[5] * b[3] + a[7] * b[1];
+  const e03 = a[1] * b[4] - a[0] * b[5] - a[3] * b[6] + a[2] * b[7]
+            + a[5] * b[0] - a[4] * b[1] - a[6] * b[3] + a[7] * b[2];
+  const e0123 = a[0] * b[4] + a[1] * b[5] + a[2] * b[6] + a[3] * b[7]
+              + a[4] * b[0] + a[5] * b[1] + a[6] * b[2] + a[7] * b[3];
+
+  const e23 = a[6] * b[5] - a[5] * b[6] + a[4] * b[7] + a[7] * b[4];
+  const e31 = a[4] * b[6] - a[6] * b[4] + a[5] * b[7] + a[7] * b[5];
+  const e12 = a[5] * b[4] - a[4] * b[5] + a[6] * b[7] + a[7] * b[6];
+  const s = a[7] * b[7] - a[4] * b[4] - a[5] * b[5] - a[6] * b[6];
+
+  return new Float32Array([e01, e02, e03, e0123, e23, e31, e12, s]);
+};
+
+/*
+ * Line * Point -> Multivector (e1, e2, e3, e0, e032, e013, e021, e123)
  * ℓ * P = ℓ ∙ P + ℓ ∧ P
  * A valid operation that results in a multivector that is the combination
  * of multiple elements, while simply being equivalent to both the inner and
@@ -465,9 +506,9 @@ export const geometricLinePoint = (a, b) => {
 /* === Point geometric products ===
  *
  * Point * Plane       -> Motor (e01, e02, e03, e0123, e23, e31, e12, 0)
- * Point * Ideal line  ->
- * Point * Origin line ->
- * Point * Line        ->
+ * Point * Ideal line  -> Multivector (e0, e032, e013, e021)
+ * Point * Origin line -> Multivector (e1, e2, e3, e0, e032, e013, e021, e123)
+ * Point * Line        -> Multivector (e1, e2, e3, e0, e032, e013, e021, e123)
  * Point * Point       -> Translator (e01, e02, e03, s)
 */
 
@@ -497,6 +538,68 @@ export const geometricPointPlane = (a, b) => {
 };
 
 /*
+ * Point * Ideal line -> Multivector (e0, e032, e013, e021)
+ * P * l∞ = P ∙ l∞ + P ∧ l∞
+ * A valid operation that results in a multivector that is the combination
+ * of multiple elements, the equivalent of a point inversely translated by
+ * the ideal without regard to weight. Due to this, it should not be called and
+ * the point should be translated by an appropriate Translator
+*/
+export const geometricPointIdeal = (a, b) => {
+  const e0 = a[3] * b[3];
+
+  const e032 = a[3] * b[0];
+  const e013 = a[3] * b[1];
+  const e021 = a[3] * b[2];
+
+  return new Float32Array([e0, e032, e013, e021]);
+};
+
+/*
+ * Point * Origin line -> Multivector (e1, e2, e3, e0, e032, e013, e021, e123)
+ * P * lο = P ∙ lο + P ∧ lο
+ * A valid operation that results in a multivector that is the combination
+ * of multiple elements, while simply being equivalent to both the inner and
+ * outer products individually. Due to this, it should not be called and
+ * the particular element should be retreived from either product instead.
+*/
+export const geometricPointOrigin = (a, b) => {
+  const e1 = -(a[3] * b[0]);
+  const e2 = -(a[3] * b[1]);
+  const e3 = -(a[3] * b[2]);
+  const e0 = a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+
+  const e032 = a[2] * b[1] - a[1] * b[2] + a[0] * b[3];
+  const e013 = a[0] * b[2] - a[2] * b[0] + a[1] * b[3];
+  const e021 = a[1] * b[0] - a[0] * b[1] + a[2] * b[3];
+  const e123 = a[3] * b[3];
+
+  return new Float32Array([0, e1, e2, e3, e0, 0, 0, 0, 0, 0, 0, e032, e013, e021, e123, 0]);
+};
+
+/*
+ * Point * Line -> Multivector (e1, e2, e3, e0, e032, e013, e021, e123)
+ * P * ℓ = P ∙ ℓ + P ∧ ℓ
+ * A valid operation that results in a multivector that is the combination
+ * of multiple elements, while simply being equivalent to both the inner and
+ * outer products individually. Due to this, it should not be called and
+ * the particular element should be retreived from either product instead.
+*/
+export const geometricPointLine = (a, b) => {
+  const e1 = -(a[3] * b[4]);
+  const e2 = -(a[3] * b[5]);
+  const e3 = -(a[3] * b[6]);
+  const e0 = a[0] * b[4] + a[1] * b[5] + a[2] * b[6] + a[3] * b[3];
+
+  const e032 = a[2] * b[5] - a[1] * b[6] + a[0] * b[7] + a[3] * b[0];
+  const e013 = a[0] * b[6] - a[2] * b[4] + a[1] * b[7] + a[3] * b[1];
+  const e021 = a[1] * b[4] - a[0] * b[5] + a[2] * b[7] + a[3] * b[2];
+  const e123 = a[3] * b[7];
+
+  return new Float32Array([0, e1, e2, e3, e0, 0, 0, 0, 0, 0, 0, e032, e013, e021, e123, 0]);
+};
+
+/*
  * Point * Point -> Translator (e01, e02, e03, s)
  * P * P = P ∙ P + P ∧ P
  * Produces a translator that, when normalized, moves P₂ -> P₁
@@ -514,6 +617,260 @@ export const geometricPointPoint = (a, b) => {
   return new Float32Array([e01, e02, e03, s]);
 };
 
+/* === Motor geometric products ===
+ *
+ * Motor * Motor      -> Motor (e01, e02, e03, e0123, e23, e31, e12, s)
+ * Motor * Rotor      -> Motor (e01, e02, e03, e0123, e23, e31, e12, s)
+ * Motor * Translator -> Motor (e01, e02, e03, e0123, e23, e31, e12, s)
+*/
+
+/*
+ * Motor * Motor -> Motor (e01, e02, e03, e0123, e23, e31, e12, s)
+ * M * M = M ∙ M + M ∧ M
+ * Produces a motor that is the composition of M₂ -> M₁
+ * (a.e03 * b.e31 - a.e02 * b.e12) - (a.e0123 * b.e23 + a.e01 * b.s) +
+ * (a.e12 * b.e02 - a.e31 * b.e03) - (a.e23 * b.e0123 + a.s * b.e01) -> e01
+ * (a.e01 * b.e12 - a.e03 * b.e23) - (a.e0123 * b.e31 + a.e02 * b.s) +
+ * (a.e23 * b.e03 - a.e12 * b.e01) - (a.e31 * b.e0123 + a.s * b.e02) -> e02
+ * (a.e02 * b.e23 - a.e01 * b.e31) - (a.e0123 * b.e12 + a.e03 * b.s) +
+ * (a.e31 * b.e01 - a.e23 * b.e02) - (a.e12 * b.e0123 + a.s * b.e03) -> e03
+ * (a.e01 * b.e23) + (a.e02 * b.e31) + (a.e03 * b.e12) + (a.e0123 * b.s) +
+ * (a.e23 * b.e01) + (a.e31 * b.e02) + (a.e12 * b.e03) + (a.s * b.e0123) -> e0123
+ * (a.e12 * b.e31 - a.e31 * b.e12) + (a.e23 * b.s + a.s * b.e23) -> e23
+ * (a.e23 * b.e12 - a.e12 * b.e23) + (a.e31 * b.s + a.s * b.e31) -> e31
+ * (a.e31 * b.e23 - a.e23 * b.e31) + (a.e12 * b.s + a.s * b.e12) -> e12
+ * (a.s * b.s) - (a.e23 * b.e23) - (a.e31 * b.e31) - (a.e12 * b.e12) -> s
+*/
+export const geometricMotorMotor = (a, b) => {
+  const e01 = a[2] * b[5] - a[1] * b[6] - a[3] * b[4] + a[0] * b[7]
+            + a[6] * b[1] - a[5] * b[2] - a[4] * b[3] + a[7] * b[0];
+  const e02 = a[0] * b[6] - a[2] * b[4] - a[3] * b[5] + a[1] * b[7]
+            + a[4] * b[2] - a[6] * b[0] - a[5] * b[3] + a[7] * b[1];
+  const e03 = a[1] * b[4] - a[0] * b[5] - a[3] * b[6] + a[2] * b[7]
+            + a[5] * b[0] - a[4] * b[1] - a[6] * b[3] + a[7] * b[2];
+  const e0123 = a[0] * b[4] + a[1] * b[5] + a[2] * b[6] + a[3] * b[7]
+              + a[4] * b[0] + a[5] * b[1] + a[6] * b[2] + a[7] * b[3];
+
+  const e23 = a[6] * b[5] - a[5] * b[6] + a[4] * b[7] + a[7] * b[4];
+  const e31 = a[4] * b[6] - a[6] * b[4] + a[5] * b[7] + a[7] * b[5];
+  const e12 = a[5] * b[4] - a[4] * b[5] + a[6] * b[7] + a[7] * b[6];
+  const s = a[7] * b[7] - a[4] * b[4] - a[5] * b[5] - a[6] * b[6];
+
+  return new Float32Array([e01, e02, e03, e0123, e23, e31, e12, s]);
+};
+
+/*
+ * Motor * Rotor -> Motor (e01, e02, e03, e0123, e23, e31, e12, s)
+ * M * R = M ∙ R + M ∧ R
+ * Produces a motor that is the composition of R -> M
+ * (a.e03 * b.e31 - a.e02 * b.e12) + (a.e0123 * b.e23 + a.e01 * b.s) -> e01
+ * (a.e01 * b.e12 - a.e03 * b.e23) + (a.e0123 * b.e31 + a.e02 * b.s) -> e02
+ * (a.e02 * b.e23 - a.e01 * b.e31) + (a.e0123 * b.e12 + a.e03 * b.s) -> e03
+ * (a.e01 * b.e23) + (a.e02 * b.e31) + (a.e03 * b.e12) + (a.e0123 + b.s) -> e0123
+ * (a.e12 * b.e31 - a.e31 * b.e12) + (a.e23 * b.s + a.s * b.e23) -> e23
+ * (a.e23 * b.e12 - a.e12 * b.e23) + (a.e31 * b.s + a.s * b.e31) -> e31
+ * (a.e31 * b.e23 - a.e23 * b.e31) + (a.e12 * b.s + a.s * b.e12) -> e12
+ * (a.s * b.s) - (a.e23 * b.e23) - (a.e31 * b.e31) - (a.e12 * b.e12) -> s
+*/
+export const geometricMotorRotor = (a, b) => {
+  const e01 = a[2] * b[1] - a[1] * b[2] + a[3] * b[0] + a[0] * b[3];
+  const e02 = a[0] * b[2] - a[2] * b[0] + a[3] * b[1] + a[1] * b[3];
+  const e03 = a[1] * b[0] - a[0] * b[1] + a[3] * b[2] + a[2] * b[3];
+  const e0123 = a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3];
+
+  const e23 = a[6] * b[1] - a[5] * b[2] + a[4] * b[3] + a[7] * b[0];
+  const e31 = a[4] * b[2] - a[6] * b[0] + a[5] * b[3] + a[7] * b[1];
+  const e12 = a[5] * b[0] - a[4] * b[1] + a[6] * b[3] + a[7] * b[2];
+  const s = a[7] * b[3] - a[4] * b[0] - a[5] * b[1] - a[6] * b[2];
+
+  return new Float32Array([e01, e02, e03, e0123, e23, e31, e12, s]);
+};
+
+/*
+ * Motor * Translator -> Motor (e01, e02, e03, e0123, e23, e31, e12, s)
+ * M * T = M ∙ T + M ∧ T
+ * Produces a motor that is the composition of T -> M
+ * (a.e12 * b.e02 - a.e31 * b.e03) + (a.s * b.e01 + a.e01) -> e01
+ * (a.e23 * b.e03 - a.e12 * b.e01) + (a.s * b.e02 + a.e02) -> e02
+ * (a.e31 * b.e01 - a.e23 * b.e02) + (a.s * b.e03 + a.e03) -> e03
+ * (a.e23 * b.e01) + (a.e31 * b.e02) + (a.e12 * b.e03) -> e0123
+ * (a.e23) -> e23
+ * (a.e31) -> e31
+ * (a.e12) -> e12
+ * (a.s) -> s
+*/
+export const geometricMotorTranslator = (a, b) => {
+  const e01 = a[6] * b[1] - a[5] * b[2] + a[7] * b[0] + a[0];
+  const e02 = a[4] * b[2] - a[6] * b[0] + a[7] * b[1] + a[1];
+  const e03 = a[5] * b[0] - a[4] * b[1] + a[7] * b[2] + a[2];
+  const e0123 = a[4] * b[0] + a[5] * b[1] + a[6] * b[2] + a[3];
+
+  const e23 = a[4];
+  const e31 = a[5];
+  const e12 = a[6];
+  const s = a[7];
+
+  return new Float32Array([e01, e02, e03, e0123, e23, e31, e12, s]);
+};
+
+/* === Rotor geometric products ===
+ *
+ * Rotor * Motor      -> Motor (e01, e02, e03, e0123, e23, e31, e12, s)
+ * Rotor * Rotor      -> Rotor (e23, e31, e12, s)
+ * Rotor * Translator -> Motor (e01, e02, e03, e0123, e23, e31, e12, s)
+*/
+
+/*
+ * Rotor * Motor -> Motor (e01, e02, e03, e0123, e23, e31, e12, s)
+ * R * M = R ∙ M + R ∧ M
+ * Produces a motor that is the composition of M -> R
+ * (a.e12 * b.e02 - a.e31 * b.e03) + (a.s * b.e01 + a.e23 * b.e0123) -> e01
+ * (a.e23 * b.e03 - a.e12 * b.e01) + (a.s * b.e02 + a.e31 * b.e0123) -> e02
+ * (a.e31 * b.e01 - a.e23 * b.e02) + (a.s * b.e03 + a.e12 * b.e0123) -> e03
+ * (a.e23 * b.e01) + (a.e31 * b.e02) + (a.e12 * b.e03) + (a.s + b.s) -> e0123
+ * (a.e12 * b.e31 - a.e31 * b.e12) + (a.e23 * b.s + a.s * b.e23) -> e23
+ * (a.e23 * b.e12 - a.e12 * b.e23) + (a.e31 * b.s + a.s * b.e31) -> e31
+ * (a.e31 * b.e23 - a.e23 * b.e31) + (a.e12 * b.s + a.s * b.e12) -> e12
+ * (a.s * b.s) - (a.e23 * b.e23) - (a.e31 * b.e31) - (a.e12 * b.e12) -> s
+*/
+export const geometricRotorMotor = (a, b) => {
+  const e01 = a[2] * b[1] - a[1] * b[2] + a[3] * b[0] + a[0] * b[3];
+  const e02 = a[0] * b[2] - a[2] * b[0] + a[3] * b[1] + a[1] * b[3];
+  const e03 = a[1] * b[0] - a[0] * b[1] + a[3] * b[2] + a[2] * b[3];
+  const e0123 = a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3];
+
+  const e23 = a[2] * b[5] - a[1] * b[6] + a[0] * b[7] + a[3] * b[4];
+  const e31 = a[0] * b[6] - a[2] * b[4] + a[1] * b[7] + a[3] * b[5];
+  const e12 = a[1] * b[4] - a[0] * b[5] + a[2] * b[7] + a[3] * b[6];
+  const s = a[3] * b[7] - a[0] * b[4] - a[1] * b[5] - a[2] * b[6];
+
+  return new Float32Array([e01, e02, e03, e0123, e23, e31, e12, s]);
+};
+
+/*
+ * Rotor * Rotor -> Rotor (e23, e31, e12, s)
+ * R * R = R ∙ R + R ∧ R
+ * Produces a rotor that is the composition of R₂ -> R₁
+ * (a.e12 * b.e31 - a.e31 * b.e12) + (a.e23 * b.s + a.s * b.e23) -> e23
+ * (a.e23 * b.e12 - a.e12 * b.e23) + (a.e31 * b.s + a.s * b.e31) -> e31
+ * (a.e31 * b.e23 - a.e23 * b.e31) + (a.e12 * b.s + a.s * b.e12) -> e12
+ * (a.s * b.s) - (a.e23 * b.e23) - (a.e31 * b.e31) - (a.e12 * b.e12) -> s
+*/
+export const geometricRotorRotor = (a, b) => {
+  const e23 = a[2] * b[1] - a[1] * b[2] + a[0] * b[3] + a[3] * b[0];
+  const e31 = a[0] * b[2] - a[2] * b[0] + a[1] * b[3] + a[3] * b[1];
+  const e12 = a[1] * b[0] - a[0] * b[1] + a[2] * b[3] + a[3] * b[2];
+  const s = a[3] * b[3] - a[0] * b[0] - a[1] * b[1] - a[2] * b[2];
+
+  return new Float32Array([e23, e31, e12, s]);
+};
+
+/*
+ * Rotor * Translator -> Motor (e01, e02, e03, e0123, e23, e31, e12, s)
+ * R * T = R ∙ T + R ∧ T
+ * Produces a motor that is the composition of T -> R
+ * (a.e12 * b.e02 - a.e31 * b.e03) + (a.s * b.e01) -> e01
+ * (a.e23 * b.e03 - a.e12 * b.e01) + (a.s * b.e02) -> e02
+ * (a.e31 * b.e01 - a.e23 * b.e02) + (a.s * b.e03) -> e03
+ * (a.e23 * b.e01) + (a.e31 * b.e02) + (a.e12 * b.e03) -> e0123
+ * (a.e23) -> e23
+ * (a.e31) -> e31
+ * (a.e12) -> e12
+ * (a.s) -> s
+*/
+export const geometricRotorTranslator = (a, b) => {
+  const e01 = a[2] * b[1] - a[1] * b[2] + a[3] * b[0];
+  const e02 = a[0] * b[2] - a[2] * b[0] + a[3] * b[1];
+  const e03 = a[1] * b[0] - a[0] * b[1] + a[3] * b[2];
+  const e0123 = a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+
+  const e23 = a[0];
+  const e31 = a[1];
+  const e12 = a[2];
+  const s = a[3];
+
+  return new Float32Array([e01, e02, e03, e0123, e23, e31, e12, s]);
+};
+
+/* === Translator geometric products ===
+ *
+ * Translator * Motor      -> Motor (e01, e02, e03, e0123, e23, e31, e12, s)
+ * Translator * Rotor      -> Motor (e01, e02, e03, e0123, e23, e31, e12, s)
+ * Translator * Translator -> Translator (e01, e02, e03, e0123)
+*/
+
+/*
+ * Translator * Motor -> Motor (e01, e02, e03, e0123, e23, e31, e12, s)
+ * T * M = T ∙ M + T ∧ M
+ * Produces a motor that is the composition of M -> T
+ * (a.e03 * b.e31 - a.e02 * b.e12) + (a.e01 * b.s + b.e01) -> e01
+ * (a.e01 * b.e12 - a.e03 * b.e23) + (a.e02 * b.s + b.e02) -> e02
+ * (a.e02 * b.e23 - a.e01 * b.e31) + (a.e03 * b.s + b.e03) -> e03
+ * (a.e01 * b.e23) + (a.e02 * b.e31) + (a.e03 * b.e12) + (b.e0123) -> e0123
+ * (b.e23) -> e23
+ * (b.e31) -> e31
+ * (b.e12) -> e12
+ * (b.s) -> s
+*/
+export const geometricTranslatorMotor = (a, b) => {
+  const e01 = a[2] * b[5] - a[1] * b[6] + a[0] * b[7] + b[0];
+  const e02 = a[0] * b[6] - a[2] * b[4] + a[1] * b[7] + b[1];
+  const e03 = a[1] * b[4] - a[0] * b[5] + a[2] * b[7] + b[2];
+  const e0123 = a[0] * b[4] + a[1] * b[5] + a[2] * b[6] + b[3];
+
+  const e23 = b[4];
+  const e31 = b[5];
+  const e12 = b[6];
+  const s = b[7];
+
+  return new Float32Array([e01, e02, e03, e0123, e23, e31, e12, s]);
+};
+
+/*
+ * Translator * Rotor -> Motor (e01, e02, e03, e0123, e23, e31, e12, s)
+ * T * R = T ∙ R + T ∧ R
+ * Produces a motor that is the composition of R -> T
+ * (a.e03 * b.e31 - a.e02 * b.e12) + (a.e01 * b.s) -> e01
+ * (a.e01 * b.e12 - a.e03 * b.e23) + (a.e02 * b.s) -> e02
+ * (a.e02 * b.e23 - a.e01 * b.e31) + (a.e03 * b.s) -> e03
+ * (a.e01 * b.e23) + (a.e02 * b.e31) + (a.e03 * b.e12) -> e0123
+ * (b.e23) -> e23
+ * (b.e31) -> e31
+ * (b.e12) -> e12
+ * (b.s) -> s
+*/
+export const geometricTranslatorRotor = (a, b) => {
+  const e01 = a[2] * b[1] - a[1] * b[2] + a[0] * b[3];
+  const e02 = a[0] * b[2] - a[2] * b[0] + a[1] * b[3];
+  const e03 = a[1] * b[0] - a[0] * b[1] + a[2] * b[3];
+  const e0123 = a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+
+  const e23 = b[0];
+  const e31 = b[1];
+  const e12 = b[2];
+  const s = b[3];
+
+  return new Float32Array([e01, e02, e03, e0123, e23, e31, e12, s]);
+};
+
+/*
+ * Translator * Translator -> Translator (e01, e02, e03, e0123)
+ * T * T = T ∙ T + T ∧ T
+ * Produces a translator that is the composition of T₁ -> T₂ (commutative)
+ * (a.e01 + b.e01) -> e01
+ * (a.e02 + b.e02) -> e02
+ * (a.e03 + b.e03) -> e03
+ * (a.e0123 + b.e0123) -> e0123
+*/
+export const geometricTranslatorTranslator = (a, b) => {
+  const e01 = a[0] + b[0];
+  const e02 = a[1] + b[1];
+  const e03 = a[2] + b[2];
+  const e0123 = a[3] + b[3];
+
+  return new Float32Array([e01, e02, e03, e0123]);
+};
+
 /* === Operation map === *
  *
  * Utility map for delegating elements to their proper geometric products, coupled
@@ -528,5 +885,47 @@ export const geometricProductMap = {
     [PGATypes.OriginLine]: [geometricPlaneOrigin, PGATypes.Multivector],
     [PGATypes.Line]: [geometricPlaneLine, PGATypes.Multivector],
     [PGATypes.Point]: [geometricPlanePoint, PGATypes.Motor],
+  },
+  [PGATypes.IdealLine]: {
+    [PGATypes.Plane]: [geometricIdealPlane, PGATypes.Motor],
+    [PGATypes.OriginLine]: [geometricIdealOrigin, PGATypes.IdealLine],
+    [PGATypes.Line]: [geometricIdealLine, PGATypes.IdealLine],
+    [PGATypes.Point]: [geometricIdealPoint, PGATypes.Multivector],
+  },
+  [PGATypes.OriginLine]: {
+    [PGATypes.Plane]: [geometricOriginPlane, PGATypes.Multivector],
+    [PGATypes.IdealLine]: [geometricOriginIdeal, PGATypes.IdealLine],
+    [PGATypes.OriginLine]: [geometricOriginOrigin, PGATypes.Rotor],
+    [PGATypes.Line]: [geometricOriginLine, PGATypes.Motor],
+    [PGATypes.Point]: [geometricOriginPoint, PGATypes.Multivector],
+  },
+  [PGATypes.Line]: {
+    [PGATypes.Plane]: [geometricLinePlane, PGATypes.Multivector],
+    [PGATypes.IdealLine]: [geometricLineIdeal, PGATypes.IdealLine],
+    [PGATypes.OriginLine]: [geometricLineOrigin, PGATypes.Motor],
+    [PGATypes.Line]: [geometricLineLine, PGATypes.Motor],
+    [PGATypes.Point]: [geometricLinePoint, PGATypes.Multivector],
+  },
+  [PGATypes.Point]: {
+    [PGATypes.Plane]: [geometricPointPlane, PGATypes.Motor],
+    [PGATypes.IdealLine]: [geometricPointIdeal, PGATypes.Multivector],
+    [PGATypes.OriginLine]: [geometricPointOrigin, PGATypes.Multivector],
+    [PGATypes.Line]: [geometricPointLine, PGATypes.Multivector],
+    [PGATypes.Point]: [geometricPointPoint, PGATypes.Translator],
+  },
+  [PGATypes.Motor]: {
+    [PGATypes.Motor]: [geometricMotorMotor, PGATypes.Motor],
+    [PGATypes.Rotor]: [geometricMotorRotor, PGATypes.Motor],
+    [PGATypes.Translator]: [geometricMotorTranslator, PGATypes.Motor],
+  },
+  [PGATypes.Rotor]: {
+    [PGATypes.Motor]: [geometricRotorMotor, PGATypes.Motor],
+    [PGATypes.Rotor]: [geometricRotorRotor, PGATypes.Rotor],
+    [PGATypes.Translator]: [geometricRotorTranslator, PGATypes.Motor],
+  },
+  [PGATypes.Translator]: {
+    [PGATypes.Motor]: [geometricTranslatorMotor, PGATypes.Motor],
+    [PGATypes.Rotor]: [geometricTranslatorRotor, PGATypes.Motor],
+    [PGATypes.Translator]: [geometricTranslatorTranslator, PGATypes.Translator],
   },
 };

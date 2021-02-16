@@ -1,6 +1,12 @@
 /* === PGA (3, 0, 1) inner products ===
  *
- * Commutativity matters, the following assumes a ∙ b
+ * The symmetric inner product of two elements results in the contraction of
+ * the lower graded element to the higher graded element. This is called a
+ * contraction due to the annihilation of the common subspaces, and if there
+ * are no common spans between the lower and higher graded elements, the
+ * result is fully annihilated
+ *
+ * Commutativity matters, the following assumes a ∙ b = -b ∙ a
 */
 
 import { PGATypes } from './types';

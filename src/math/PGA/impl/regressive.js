@@ -1,5 +1,10 @@
 /* === PGA (3, 0, 1) regressive products (join) ===
  *
+ * The regressive product, or join, of two elements is the union of the
+ * subspaces spanned by the elements, or viewed as the complement to the meet,
+ * as the meet of the duals of the elements. While the meet will find the
+ * intersection of planes to form a line, the join will find the union of two
+ * points to form a line
 */
 
 import { PGATypes } from './types';
