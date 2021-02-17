@@ -75,21 +75,17 @@ const applyBasisMixins = (obj, basis) => {
   Object.defineProperties(objPrototype, basis.reduce(makeAccessorDescriptors, {}));
 };
 
-/* === Element arithmetic ===
+/* === Math operations ===
  *
- * add: Add a scalar uniformly or an equivalently typed element across the
- * calling element
+ * add: Uniform addition with a scalar or an element of the same type
+ * sub: Uniform subtraction with a scalar or an element of the same type
+ * mul: Uniform scaling with a scalar or an element of the same type
+ * div: Uniform inverse scaling with a scalar or an element of the same type
  *
- * sub: Subtract a scalar uniformly or an equivalently typed element across the
- * calling element
- *
- * mul: Scale a scalar uniformly or an equivalently typed element across the
- * calling element
- *
- * div: Inverse scale a scalar uniformly, or an equivalently typed element
- * across the calling element
+ * eq: Strict equality between elements of the same type
+ * approxEq: Approximate equality between elements of the same type
 */
-const createArithmeticMixin = () => ({
+const createMathMixin = () => ({
   add(v) {
     if ((v instanceof Object) && (v.type() === this.elementType)) {
       const { buffer } = this;
@@ -167,6 +163,34 @@ const createArithmeticMixin = () => ({
 
     return this;
   },
+
+  eq(v) {
+    if (!(v instanceof Object) || (v.type() !== this.elementType)) {
+      throw TypeError('Invalid arguments: eq expects both elements to be of the same type');
+    }
+
+    const { buffer } = this;
+    const { buffer: other } = v;
+    for (let i = 0; i < buffer.length; i += 1) {
+      if (buffer[i] !== other[i]) return false;
+    }
+
+    return true;
+  },
+
+  approxEq(v, epsilon = 0.000001) {
+    if (!(v instanceof Object) || (v.type() !== this.elementType)) {
+      throw TypeError('Invalid arguments: approxEq expects both elements to be of the same type');
+    }
+
+    const { buffer } = this;
+    const { buffer: other } = v;
+    for (let i = 0; i < buffer.length; i += 1) {
+      if (Math.abs(buffer[i] - other[i]) > epsilon) return false;
+    }
+
+    return true;
+  },
 });
 
 /* === Element-related utility ===
@@ -212,17 +236,18 @@ const createUtilityMixin = (name, basis) => ({
 });
 
 /* === Grade antiautomorphisms ===
-  * Antiautomorphisms flip the signs of k-vectors depending on their grade
-  * Involute  -> Flip the signs of grades 1 and 3
-  * Reverse   -> Flip the signs of grades 2 and 3
-  * Conjugate -> Flip the signs of grades 1 and 2
-  * Negate    -> Flip the signs of all grades
-  *
-  * Example for Plane (e1, e2, e3, e0):
-  * involute:  [e1, e2, e3, e0] = [-e1, -e2, -e3, -e0]
-  * reverse:   [e1, e2, e3, e0] = [e1, e2, e3, e0]
-  * conjugate: [e1, e2, e3, e0] = [-e1, -e2, -e3, -e0]
-  * negate:    [e1, e2, e3, e0] = [-e1, -e2, -e3, -e0]
+ *
+ * Antiautomorphisms flip the signs of k-vectors depending on their grade
+ * Involute  -> Flip the signs of grades 1 and 3
+ * Reverse   -> Flip the signs of grades 2 and 3
+ * Conjugate -> Flip the signs of grades 1 and 2
+ * Negate    -> Flip the signs of all grades
+ *
+ * Example for Plane (e1, e2, e3, e0):
+ * involute:  [e1, e2, e3, e0] = [-e1, -e2, -e3, -e0]
+ * reverse:   [e1, e2, e3, e0] = [e1, e2, e3, e0]
+ * conjugate: [e1, e2, e3, e0] = [-e1, -e2, -e3, -e0]
+ * negate:    [e1, e2, e3, e0] = [-e1, -e2, -e3, -e0]
 */
 const createGradeMixin = (basis) => {
   const getVectorGrade = (vector) => {
@@ -335,7 +360,7 @@ const createNormMixin = (name) => {
 export default function createPGAElement(element, options) {
   const { name, basis } = options;
   const mergedOptions = {
-    arithmetic: true,
+    math: true,
     grade: true,
     norm: true,
     utility: true,
@@ -343,7 +368,7 @@ export default function createPGAElement(element, options) {
   };
 
   const mixins = [];
-  if (mergedOptions.arithmetic) mixins.push(createArithmeticMixin());
+  if (mergedOptions.math) mixins.push(createMathMixin());
   if (mergedOptions.grade) mixins.push(createGradeMixin(basis));
   if (mergedOptions.norm) mixins.push(createNormMixin(name));
   if (mergedOptions.utility) mixins.push(createUtilityMixin(name, basis));

@@ -52,7 +52,7 @@ createPGAElement(MultivectorElement, {
   ],
   name: formatPGAType(PGATypes.Multivector),
 
-  arithmetic: false,
+  math: false,
   grade: false,
   norm: false,
 });
