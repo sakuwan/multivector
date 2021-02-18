@@ -1,12 +1,9 @@
 /* === Base PGA element creation ===
  *
  * The createPGAElement function constructs a base for the provided element
- * class, extending the provided element with its basis vectors, norm and
- * other general methods
+ * class, extending the provided element with its basis vectors and other
+ * general methods
 */
-
-/* === Norm === */
-import * as PGANorm from './impl/norm';
 
 /* === Helper functions & class composition ===
  *
@@ -300,69 +297,11 @@ const createGradeMixin = (basis) => {
   };
 };
 
-/* === Norm operations ===
- *
- * Norm operations are automatically inferred from their implementations in
- * './impl/norm', based on the provided element name, and the norms are renamed
- * to length due to familiarity and standard libraries
- *
- * length: PGA norm
- * lengthSq: Squared PGA norm, faster for comparisons
- *
- * infinityLength: PGA infinity / ideal norm
- * infinityLengthSq: Squared PGA infinity / ideal norm, faster for comparisons
- *
- * euclideanLength: Euclidean / L2 norm
- * euclideanLengthSq: Squared Euclidean length, faster for comparisons
- *
- * normalize: Normalize the element, usually meaning x∙x = +-1
- * invert: Invert an element, usually meaning x∙x⁻¹ = +-1
-*/
-const createNormMixin = (name) => {
-  const normRegex = /(Norm)+(?=$|[A-Z])/;
-  const prefixRegex = new RegExp(`^(${name.toLowerCase()})`);
-
-  const renameNormMethod = (x) => {
-    const [first, ...rest] = x.replace(prefixRegex, '').replace(normRegex, 'Length');
-    return first.toLowerCase() + rest.join('');
-  };
-
-  const fetchNormMethods = (a, c) => {
-    const isNormMethod = normRegex.test(c);
-    const methodName = renameNormMethod(c);
-
-    return Object.assign(a, isNormMethod ? {
-      [methodName]() {
-        return PGANorm[c](this.buffer);
-      },
-    } : {
-      [methodName]() {
-        PGANorm[c](this.buffer);
-        return this;
-      },
-    });
-  };
-
-  const isValidMethod = (x) => prefixRegex.test(x);
-  const methodList = Object.keys(PGANorm).filter(isValidMethod);
-
-  return methodList.reduce(fetchNormMethods, {
-    euclideanLength() {
-      return PGANorm.euclideanNorm(this.buffer);
-    },
-
-    euclideanLengthSq() {
-      return PGANorm.euclideanNormSq(this.buffer);
-    },
-  });
-};
-
 export default function createPGAElement(element, options) {
   const { name, basis } = options;
   const mergedOptions = {
     math: true,
     grade: true,
-    norm: true,
     utility: true,
     ...options,
   };
@@ -370,7 +309,6 @@ export default function createPGAElement(element, options) {
   const mixins = [];
   if (mergedOptions.math) mixins.push(createMathMixin());
   if (mergedOptions.grade) mixins.push(createGradeMixin(basis));
-  if (mergedOptions.norm) mixins.push(createNormMixin(name));
   if (mergedOptions.utility) mixins.push(createUtilityMixin(name, basis));
 
   applyBasisMixins(element, basis);

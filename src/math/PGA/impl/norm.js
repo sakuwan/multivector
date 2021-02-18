@@ -4,19 +4,6 @@
  * space, and to normalization / inversion, due to their reliance on the norm
 */
 
-/* === Shared norm operations ===
- *
- * The standard L2 norm, Euclidean length
-*/
-
-export const euclideanNorm = (a) => (
-  (a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]) ** 0.5
-);
-
-export const euclideanNormSq = (a) => (
-  a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]
-);
-
 /* === Plane norm operations ===
  *
  * Plane k-vectors: [e1, e2, e3, e0]
@@ -64,48 +51,6 @@ export const planeInvert = (a) => { /* eslint-disable no-param-reassign */
   a[0] *= invNorm;
   a[1] *= invNorm;
   a[2] *= invNorm;
-  a[3] *= invNorm;
-}; /* eslint-enable no-param-reassign */
-
-/* === Ideal line norm operations ===
- *
- * Ideal line k-vectors: [e01, e02, e03, e0123]
- * Ideal line metric: [0, 0, 0, 0]
- *
- * norm: e0 squares to zero and all components vanish
- * infinity norm: ||l∞||∞ = ||lο||
- *
- * normalize: assuming l∞ / ||l∞||∞, l∞∙l∞ = -1
- * invert: assuming l∞ / ||l∞||∞, l∞∙l∞⁻¹ = 1
-*/
-
-export const idealNorm = () => 0;
-
-export const idealNormSq = () => 0;
-
-export const idealInfinityNorm = (a) => (
-  (a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]) ** 0.5
-);
-
-export const idealInfinityNormSq = (a) => (
-  a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]
-);
-
-export const idealNormalize = (a) => { /* eslint-disable no-param-reassign */
-  const invNorm = (1.0 / (a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3])) ** 0.5;
-
-  a[0] *= invNorm;
-  a[1] *= invNorm;
-  a[2] *= invNorm;
-  a[3] *= invNorm;
-}; /* eslint-enable no-param-reassign */
-
-export const idealInvert = (a) => { /* eslint-disable no-param-reassign */
-  const invNorm = (1.0 / (a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3]));
-
-  a[0] *= -invNorm;
-  a[1] *= -invNorm;
-  a[2] *= -invNorm;
   a[3] *= invNorm;
 }; /* eslint-enable no-param-reassign */
 

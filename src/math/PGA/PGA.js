@@ -8,17 +8,17 @@
 */
 
 /* === Elements === */
-import { PlaneElement } from './Plane';
-import { IdealElement } from './IdealLine';
-import { OriginElement } from './OriginLine';
-import { LineElement } from './Line';
-import { PointElement } from './Point';
+import { PlaneElement } from './elements/Plane';
+import { IdealElement } from './elements/IdealLine';
+import { OriginElement } from './elements/OriginLine';
+import { LineElement } from './elements/Line';
+import { PointElement } from './elements/Point';
 
-import { MotorElement } from './Motor';
-import { RotorElement } from './Rotor';
-import { TranslatorElement } from './Translator';
+import { MotorElement } from './elements/Motor';
+import { RotorElement } from './elements/Rotor';
+import { TranslatorElement } from './elements/Translator';
 
-import { MultivectorElement } from './Multivector';
+import { MultivectorElement } from './elements/Multivector';
 
 /* === Implementations === */
 import {

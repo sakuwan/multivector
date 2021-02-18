@@ -9,16 +9,16 @@
 
 export { PGATypes } from './impl/types';
 
-export { Plane } from './Plane';
-export { IdealLine } from './IdealLine';
-export { OriginLine } from './OriginLine';
-export { Line } from './Line';
-export { Point } from './Point';
+export { Plane } from './elements/Plane';
+export { IdealLine } from './elements/IdealLine';
+export { OriginLine } from './elements/OriginLine';
+export { Line } from './elements/Line';
+export { Point } from './elements/Point';
 
-export { Motor } from './Motor';
-export { Rotor } from './Rotor';
-export { Translator } from './Translator';
+export { Motor } from './elements/Motor';
+export { Rotor } from './elements/Rotor';
+export { Translator } from './elements/Translator';
 
-export { Multivector } from './Multivector';
+export { Multivector } from './elements/Multivector';
 
 export { default as PGA } from './PGA';

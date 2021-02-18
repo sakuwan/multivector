@@ -1,7 +1,7 @@
 import {
   PGATypes,
   formatPGAType,
-} from './impl/types';
+} from '../impl/types';
 
 import createPGAElement from './PGAElement';
 
@@ -24,7 +24,6 @@ import createPGAElement from './PGAElement';
  * === Norm operations ===
  *
  * length, lengthSq
- * infinityLength, infinityLengthSq (Vanishes completely to 0)
  * euclideanLength, euclideanLengthSq
  *
  * normalize: Normalization satisfies lο∙lο = -1

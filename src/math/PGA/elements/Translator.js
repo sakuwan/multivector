@@ -1,7 +1,7 @@
 import {
   PGATypes,
   formatPGAType,
-} from './impl/types';
+} from '../impl/types';
 
 import createPGAElement from './PGAElement';
 
@@ -24,8 +24,7 @@ import createPGAElement from './PGAElement';
  *
  * === Norm operations ===
  *
- * length, lengthSq (Vanishes completely to 0)
- * infinityLength, infinityLengthSq
+ * length, lengthSq
  * euclideanLength, euclideanLengthSq
  *
  * normalize: Normalization satisfies -sqrt(||R||) = d/2
@@ -42,6 +41,15 @@ export class TranslatorElement {
   constructor(buffer) {
     this.buffer = buffer;
     this.elementType = PGATypes.Translator;
+  }
+
+  sqrt() {
+    const { buffer } = this;
+    for (let i = 0; i < 3; i += 1) {
+      buffer[i] *= 0.5;
+    }
+
+    return this;
   }
 }
 

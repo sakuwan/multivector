@@ -14,11 +14,4 @@ module.exports = {
 
   extends: ['airbnb-base'],
   plugins: ['import'],
-
-  /*
-   * I don't particularly want to do this, so per-file it is.
-  rules: {
-    'no-param-reassign': [2, { props: false }],
-  },
-  */
 };

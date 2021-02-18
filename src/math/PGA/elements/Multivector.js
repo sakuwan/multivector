@@ -1,7 +1,7 @@
 import {
   PGATypes,
   formatPGAType,
-} from './impl/types';
+} from '../impl/types';
 
 import createPGAElement from './PGAElement';
 

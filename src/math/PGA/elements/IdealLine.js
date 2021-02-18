@@ -1,7 +1,7 @@
 import {
   PGATypes,
   formatPGAType,
-} from './impl/types';
+} from '../impl/types';
 
 import createPGAElement from './PGAElement';
 
@@ -21,14 +21,16 @@ import createPGAElement from './PGAElement';
  * get / set e03:   k-vector component access (2 / z)
  * get / set e0123: k-vector component access (3 / w)
  *
- * === Norm operations ===
+ * === Norm / Normalization ===
  *
- * length, lengthSq (Vanishes completely to 0)
- * infinityLength, infinityLengthSq
- * euclideanLength, euclideanLengthSq
+ * Ideal line k-vectors: [e01, e02, e03, e0123]
+ * Ideal line metric: [0, 0, 0, 0]
  *
- * normalize: Normalization satisfies l∞ / ||l∞||∞, l∞∙l∞ = -1
- * invert: Inversion satisfies l∞ / ||l∞||∞, l∞∙l∞⁻¹ = 1
+ * norm: e0 squares to 0, all components vanish
+ * infinity norm: ||l∞||∞ = ||lο||
+ *
+ * normalize: assuming l∞ / ||l∞||∞, l∞∙l∞ = -1
+ * invert: assuming l∞ / ||l∞||∞, l∞∙l∞⁻¹ = 1
  *
  * === Antiautomorphisms ===
  *
@@ -41,6 +43,45 @@ export class IdealElement {
   constructor(buffer) {
     this.buffer = buffer;
     this.elementType = PGATypes.IdealLine;
+  }
+
+  /* eslint-disable class-methods-use-this, lines-between-class-members */
+  length() { return 0; }
+  lengthSq() { return 0; }
+  /* eslint-enable */
+
+  infinityLength() {
+    const { buffer: v } = this;
+    return (v[0] * v[0] + v[1] * v[1] + v[2] * v[2] + v[3] * v[3]) ** 0.5;
+  }
+
+  infinityLengthSq() {
+    const { buffer: v } = this;
+    return (v[0] * v[0] + v[1] * v[1] + v[2] * v[2] + v[3] * v[3]);
+  }
+
+  normalize() {
+    const { buffer: v } = this;
+    const invNorm = (1.0 / (v[0] * v[0] + v[1] * v[1] + v[2] * v[2] + v[3] * v[3])) ** 0.5;
+
+    v[0] *= invNorm;
+    v[1] *= invNorm;
+    v[2] *= invNorm;
+    v[3] *= invNorm;
+
+    return this;
+  }
+
+  invert() {
+    const { buffer: v } = this;
+    const invNorm = (1.0 / (v[0] * v[0] + v[1] * v[1] + v[2] * v[2] + v[3] * v[3]));
+
+    v[0] *= -invNorm;
+    v[1] *= -invNorm;
+    v[2] *= -invNorm;
+    v[3] *= invNorm;
+
+    return this;
   }
 }
 
