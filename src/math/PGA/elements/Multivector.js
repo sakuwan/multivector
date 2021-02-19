@@ -54,7 +54,6 @@ createPGAElement(MultivectorElement, {
 
   math: false,
   grade: false,
-  norm: false,
 });
 
 /* === Multivector factory ===

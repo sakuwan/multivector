@@ -26,14 +26,29 @@ import createPGAElement from './PGAElement';
  * get / set e12:   k-vector component access (6 / dz)
  * get / set s:     k-vector component access (7 / s)
  *
- * === Norm operations ===
+ * === Norm / Normalization ===
  *
- * length, lengthSq
- * infinityLength, infinityLengthSq
- * euclideanLength, euclideanLengthSq
+ * Motor k-vectors: [e01, e02, e03, e0123, e23, e31, e12, s]
+ * Motor metric: [0, 0, 0, 0, -1, -1, -1, 1]
  *
- * normalize: Normalization satisfies m * ∼m = 1
- * invert: Inversion satisfies m * m⁻¹ = 1
+ * norm: ||R||
+ * infinity norm: ||T||∞ == ||T∞||∞
+ *
+ * normalize: m * ∼m = 1
+ * invert: m * m⁻¹ = 1
+ *
+ * === Complex Bivector normalization & inversion ===
+ *
+ * Based on the papers from SIGGRAPH 2019 by Charles G. Gunn
+ * "Geometric Algebra for Computer Graphics"
+ *
+ * The concept is based on the square root of dual numbers,
+ * where sqrt(s + pI) = sqrt(s) + (p / 2 sqrt(s))I
+ * ||Θ|| = u + vI = sqrt(-(Θ∙Θ + Θ∧Θ))
+ *
+ * The process of decomposing complex bivectors into their components is
+ * useful for normalization, inversion, and exponentiation, which is also
+ * used in motors
  *
  * === Antiautomorphisms ===
  *
@@ -53,6 +68,70 @@ export class MotorElement {
   constructor(buffer) {
     this.buffer = buffer;
     this.elementType = PGATypes.Motor;
+  }
+
+  length() {
+    const { buffer: v } = this;
+    return (v[4] * v[4] + v[5] * v[5] + v[6] * v[6] + v[7] * v[7]) ** 0.5;
+  }
+
+  lengthSq() {
+    const { buffer: v } = this;
+    return (v[4] * v[4] + v[5] * v[5] + v[6] * v[6] + v[7] * v[7]);
+  }
+
+  infinityLength() {
+    const { buffer: v } = this;
+    return (v[0] * v[0] + v[1] * v[1] + v[2] * v[2] + v[3] * v[3]) ** 0.5;
+  }
+
+  infinityLengthSq() {
+    const { buffer: v } = this;
+    return (v[0] * v[0] + v[1] * v[1] + v[2] * v[2] + v[3] * v[3]);
+  }
+
+  normalize() {
+    const { buffer: v } = this;
+
+    const u2 = (v[4] * v[4] + v[5] * v[5] + v[6] * v[6] + v[7] * v[7]);
+    const uv = (v[0] * v[4] + v[1] * v[5] + v[2] * v[6] - v[3] * v[7]);
+
+    const s = (1.0 / u2) ** 0.5;
+    const p = (1.0 / u2) * uv * s;
+
+    v[0] = (v[0] * s) - (v[4] * p);
+    v[1] = (v[1] * s) - (v[5] * p);
+    v[2] = (v[2] * s) - (v[6] * p);
+    v[3] = (v[3] * s) + (v[7] * p);
+
+    v[4] *= s;
+    v[5] *= s;
+    v[6] *= s;
+    v[7] *= s;
+
+    return this;
+  }
+
+  invert() {
+    const { buffer: v } = this;
+
+    const u2 = (v[4] * v[4] + v[5] * v[5] + v[6] * v[6] + v[7] * v[7]);
+    const uv = (v[0] * v[4] + v[1] * v[5] + v[2] * v[6] - v[3] * v[7]);
+
+    const invSq = (1.0 / u2);
+    const sp = 2 * invSq * invSq * uv;
+
+    v[0] = -((v[0] * invSq) - v[4] * sp);
+    v[1] = -((v[1] * invSq) - v[5] * sp);
+    v[2] = -((v[2] * invSq) - v[6] * sp);
+    v[3] = (v[3] * invSq) + v[7] * sp;
+
+    v[4] *= -invSq;
+    v[5] *= -invSq;
+    v[6] *= -invSq;
+    v[7] *= invSq;
+
+    return this;
   }
 }
 

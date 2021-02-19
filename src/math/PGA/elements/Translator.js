@@ -22,13 +22,16 @@ import createPGAElement from './PGAElement';
  * get / set e03:   k-vector component access (2 / z)
  * get / set s: k-vector component access (3 / w)
  *
- * === Norm operations ===
+ * === Norm / Normalization ===
  *
- * length, lengthSq
- * euclideanLength, euclideanLengthSq
+ * Translator k-vectors: [e01, e02, e03, e0123]
+ * Translator metric: [0, 0, 0, 0]
  *
- * normalize: Normalization satisfies -sqrt(||R||) = d/2
- * invert: Inversion satisfies -sqrt(||R||) = -d/2
+ * norm: e0 squares to zero and all components vanish
+ * infinity norm: ||T∞||∞ = ||R||
+ *
+ * normalize: -sqrt(||R||) = d/2
+ * invert: -sqrt(||R||) = -d/2
  *
  * === Antiautomorphisms ===
  *
@@ -41,6 +44,61 @@ export class TranslatorElement {
   constructor(buffer) {
     this.buffer = buffer;
     this.elementType = PGATypes.Translator;
+  }
+
+  from(x, y, z, s = 1) {
+    const { buffer: v } = this;
+    const distance = -0.5 * s * (1.0 / (x * x + y * y + z * z)) ** 0.5;
+
+    v[0] = x * distance;
+    v[1] = y * distance;
+    v[2] = z * distance;
+    v[3] = 0;
+
+    return this;
+  }
+
+  /* eslint-disable class-methods-use-this, lines-between-class-members */
+  length() { return 0; }
+  lengthSq() { return 0; }
+  /* eslint-enable class-methods-use-this, lines-between-class-members */
+
+  infinityLength() {
+    const { buffer: v } = this;
+    return (v[0] * v[0] + v[1] * v[1] + v[2] * v[2] + v[3] * v[3]) ** 0.5;
+  }
+
+  infinityLengthSq() {
+    const { buffer: v } = this;
+    return (v[0] * v[0] + v[1] * v[1] + v[2] * v[2] + v[3] * v[3]);
+  }
+
+  normalize() {
+    const { buffer: v } = this;
+
+    const invNorm = (1.0 / (v[0] * v[0] + v[1] * v[1] + v[2] * v[2])) ** 0.5;
+    const distance = -0.5 * v[3] * invNorm;
+
+    v[0] *= distance;
+    v[1] *= distance;
+    v[2] *= distance;
+    v[3] = 0;
+
+    return this;
+  }
+
+  invert() {
+    const { buffer: v } = this;
+
+    const invNorm = (1.0 / (v[0] * v[0] + v[1] * v[1] + v[2] * v[2])) ** 0.5;
+    const distance = 0.5 * v[3] * invNorm;
+
+    v[0] *= distance;
+    v[1] *= distance;
+    v[2] *= distance;
+    v[3] = 0;
+
+    return this;
   }
 
   sqrt() {
@@ -61,7 +119,9 @@ createPGAElement(TranslatorElement, {
 /* === Translator factory ===
  *
  * (x, y, z, s) -> Translator((x * e01), (y * e02), (z * e03), (s * s))
+ * Construct a normalized translator along the provided xyz axis, scaled by s
 */
-export const Translator = (x = 0, y = 0, z = 0, s = 0) => (
-  new TranslatorElement(new Float32Array([x, y, z, s]))
-);
+export const Translator = (x = 0, y = 0, z = 0, s = 1) => {
+  const d = -0.5 * s * (1.0 / (x * x + y * y + z * z)) ** 0.5;
+  return new TranslatorElement(new Float32Array([x * d, y * d, z * d, 0]));
+};

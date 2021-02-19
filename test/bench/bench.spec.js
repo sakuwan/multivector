@@ -62,7 +62,7 @@ describe('benchmark', () => {
     .run({ async: false });
   });
 
-  it('Vector component swizzling', () =>{
+  it('Vector component swizzling', () => {
     const v1 = cvec4(1, 2, 3, 4);
     const buf = new Float32Array([1, 2, 3, 4]);
 
@@ -106,7 +106,7 @@ describe('benchmark', () => {
     .run({ async: false });
   });
 
-  it('Proxy property access', () =>{
+  it('Proxy property access', () => {
     const v1 = cvec4(1, 2, 3, 4);
     const fl1 = new Float32Array([1, 2, 3, 4]);
 

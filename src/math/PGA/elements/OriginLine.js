@@ -21,13 +21,16 @@ import createPGAElement from './PGAElement';
  * get / set e12: k-vector component access (2 / z)
  * get / set s:   k-vector component access (3 / w)
  *
- * === Norm operations ===
+ * === Norm / Normalization ===
  *
- * length, lengthSq
- * euclideanLength, euclideanLengthSq
+ * Origin line k-vectors: [e23, e31, e12, s]
+ * Origin line metric: [-1, -1, -1, 1]
  *
- * normalize: Normalization satisfies lο∙lο = -1
- * invert: Inversion satisfies lο∙lο⁻¹ = 1
+ * norm: No components vanish
+ * infinity norm: ||lο||∞ = ||l∞|| (All components vanish)
+ *
+ * normalize: lο∙lο = -1
+ * invert: lο∙lο⁻¹ = 1
  *
  * === Antiautomorphisms ===
  *
@@ -40,6 +43,45 @@ export class OriginElement {
   constructor(buffer) {
     this.buffer = buffer;
     this.elementType = PGATypes.OriginLine;
+  }
+
+  length() {
+    const { buffer: v } = this;
+    return (v[0] * v[0] + v[1] * v[1] + v[2] * v[2] + v[3] * v[3]) ** 0.5;
+  }
+
+  lengthSq() {
+    const { buffer: v } = this;
+    return (v[0] * v[0] + v[1] * v[1] + v[2] * v[2] + v[3] * v[3]);
+  }
+
+  /* eslint-disable class-methods-use-this, lines-between-class-members */
+  infinityLength() { return 0; }
+  infinityLengthSq() { return 0; }
+  /* eslint-enable class-methods-use-this, lines-between-class-members */
+
+  normalize() {
+    const { buffer: v } = this;
+    const invNorm = (1.0 / (v[0] * v[0] + v[1] * v[1] + v[2] * v[2] + v[3] * v[3])) ** 0.5;
+
+    v[0] *= invNorm;
+    v[1] *= invNorm;
+    v[2] *= invNorm;
+    v[3] *= invNorm;
+
+    return this;
+  }
+
+  invert() {
+    const { buffer: v } = this;
+    const invNorm = (1.0 / (v[0] * v[0] + v[1] * v[1] + v[2] * v[2] + v[3] * v[3]));
+
+    v[0] *= -invNorm;
+    v[1] *= -invNorm;
+    v[2] *= -invNorm;
+    v[3] *= invNorm;
+
+    return this;
   }
 }
 

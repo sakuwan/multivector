@@ -144,8 +144,8 @@ describe('PGA element - Point', () => {
     const metricLength = farPoint.length();
     expect(metricLength).toBe(5);
 
-    const euclideanLength = farPoint.euclideanLength();
-    expect(euclideanLength).toBeCloseTo(18.0277);
+    const infinityLength = farPoint.infinityLength();
+    expect(infinityLength).toBeCloseTo(17.3205);
   });
 
   it('Performs core element operations: Normalization', () => {

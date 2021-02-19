@@ -48,7 +48,7 @@ export class IdealElement {
   /* eslint-disable class-methods-use-this, lines-between-class-members */
   length() { return 0; }
   lengthSq() { return 0; }
-  /* eslint-enable */
+  /* eslint-enable class-methods-use-this, lines-between-class-members */
 
   infinityLength() {
     const { buffer: v } = this;

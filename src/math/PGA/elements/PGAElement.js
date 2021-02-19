@@ -195,6 +195,7 @@ const createMathMixin = () => ({
  * mv: Alias for accessing buffer property
  * type: Return a specific Symbol instance, used for typechecking
  *
+ * set: Set the internal buffer to an array of values
  * clone: Create a new element instance initialized with the same multivector
  *
  * format: Return a formatted string of the element instance
@@ -211,6 +212,11 @@ const createUtilityMixin = (name, basis) => ({
 
   clone() {
     return new this.constructor(new Float32Array(this.buffer));
+  },
+
+  set(...values) {
+    this.buffer.set(values);
+    return this;
   },
 
   format() {
