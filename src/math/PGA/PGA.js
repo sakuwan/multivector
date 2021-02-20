@@ -10,7 +10,7 @@
 /* === Elements === */
 import { PlaneElement } from './elements/Plane';
 import { IdealElement } from './elements/IdealLine';
-import { OriginElement } from './elements/OriginLine';
+import { OriginElement, OriginLine } from './elements/OriginLine';
 import { LineElement } from './elements/Line';
 import { PointElement } from './elements/Point';
 
@@ -44,9 +44,7 @@ const createForwardingMap = (impl, operator) => {
     const errorMessage = `Invalid arguments: ${currentOp} is a vanishing or invalid operation`;
 
     const [method, result] = impl?.[a]?.[b] ?? [];
-    if (!method) {
-      return () => { throw new TypeError(errorMessage); };
-    }
+    if (!method) { return () => { throw new TypeError(errorMessage); }; }
 
     switch (result) {
       case PGATypes.Scalar: return method;
@@ -135,7 +133,136 @@ export default class PGA {
       case PGATypes.Line: return new LineElement(Duality.dualLine(a));
       case PGATypes.Point: return new PlaneElement(Duality.dualPoint(a));
 
-      default: throw new TypeError('[PGA.dual] Invalid argument: Unsupported element type');
+      default: throw new TypeError('Invalid argument: Unsupported element type');
+    }
+  }
+
+  static exp(a) {
+    const { elementType } = a;
+
+    switch (elementType) {
+      case PGATypes.IdealLine: {
+        const translatorBuffer = new Float32Array([
+          a.e01, a.e02, a.e03, 1,
+        ]);
+
+        return new TranslatorElement(translatorBuffer);
+      }
+
+      case PGATypes.OriginLine: {
+        const theta = (a.e23 * a.e23 + a.e31 * a.e31 + a.e12 * a.e12) ** 0.5;
+        const cosTheta = Math.cos(theta);
+        const sinTheta = Math.sin(theta) / theta;
+
+        const rotorBuffer = new Float32Array([
+          a.e23 * sinTheta,
+          a.e31 * sinTheta,
+          a.e12 * sinTheta,
+          a.s * sinTheta + cosTheta,
+        ]);
+
+        return new RotorElement(rotorBuffer);
+      }
+
+      case PGATypes.Line: {
+        const u2 = a.e23 * a.e23 + a.e31 * a.e31 + a.e12 * a.e12;
+        const uv = a.e23 * a.e01 + a.e31 * a.e02 + a.e12 * a.e03;
+
+        const invSq = (1.0 / u2) ** 0.5;
+        const p = (1.0 / u2) * invSq * uv;
+
+        const cosTheta = Math.cos(u2 * invSq);
+        const sinTheta = Math.sin(u2 * invSq);
+
+        const e01 = (a.e01 * invSq) - (a.e23 * p);
+        const e02 = (a.e02 * invSq) - (a.e31 * p);
+        const e03 = (a.e03 * invSq) - (a.e12 * p);
+        const e0123 = (a.e0123 * invSq) - (a.s * p);
+
+        const motorBuffer = new Float32Array([
+          (e01 * sinTheta) + (a.e23 * invSq * cosTheta * uv * invSq),
+          (e02 * sinTheta) + (a.e31 * invSq * cosTheta * uv * invSq),
+          (e03 * sinTheta) + (a.e12 * invSq * cosTheta * uv * invSq),
+          (e0123 * sinTheta) + (sinTheta * uv * invSq),
+          a.e23 * invSq * sinTheta,
+          a.e31 * invSq * sinTheta,
+          a.e12 * invSq * sinTheta,
+          a.s * invSq * sinTheta + cosTheta,
+        ]);
+
+        return new MotorElement(motorBuffer);
+      }
+
+      default: throw new TypeError('Invalid argument: Unsupported element type');
+    }
+  }
+
+  static log(a) {
+    const { elementType } = a;
+
+    switch (elementType) {
+      case PGATypes.Motor: {
+        return a;
+      }
+
+      case PGATypes.Rotor: {
+        const theta = Math.acos(a.s);
+        const invTheta = (1.0 / Math.sin(theta));
+
+        const originBuffer = new Float32Array([
+          a.e23 * invTheta * theta,
+          a.e31 * invTheta * theta,
+          a.e12 * invTheta * theta,
+          0,
+        ]);
+
+        return new OriginElement(originBuffer);
+      }
+
+      case PGATypes.Translator: {
+        const idealBuffer = new Float32Array([
+          a.e01, a.e02, a.e03, 0,
+        ]);
+
+        return new IdealElement(idealBuffer);
+      }
+
+      default: throw new TypeError('Invalid argument: Unsupported element type');
+    }
+  }
+
+  static sqrt(a) {
+    const { elementType } = a;
+
+    switch (elementType) {
+      case PGATypes.Motor: {
+        const motorBuffer = new Float32Array([
+          a.e01, a.e02, a.e03, a.e0123,
+          a.e23, a.e31, a.e12, (a.s + 1),
+        ]);
+
+        return new MotorElement(motorBuffer).normalize();
+      }
+
+      case PGATypes.IdealLine:
+      case PGATypes.Translator: {
+        const translatorBuffer = new Float32Array([
+          a.e01, a.e02, a.e03, 1,
+        ]);
+
+        return new TranslatorElement(translatorBuffer).normalize();
+      }
+
+      case PGATypes.OriginLine:
+      case PGATypes.Rotor: {
+        const rotorBuffer = new Float32Array([
+          a.e23, a.e31, a.e12, (a.s + 1),
+        ]);
+
+        return new RotorElement(rotorBuffer).normalize();
+      }
+
+      default: throw new TypeError('Invalid argument: Unsupported element type');
     }
   }
 }

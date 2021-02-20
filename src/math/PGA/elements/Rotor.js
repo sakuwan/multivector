@@ -106,7 +106,7 @@ createPGAElement(RotorElement, {
 /* === Rotor factory ===
  *
  * (x, y, z, s) -> Rotor((x * e23), (y * e31), (z * e12), (s * s))
- * Construct a normalized rotor, rotated by s along the normalized xyz axis
+ * Construct a normalized rotor along the provided axis, rotated by s
 */
 export const Rotor = (x = 0, y = 0, z = 0, s = 0) => {
   const cosTheta = Math.cos(0.5 * s);

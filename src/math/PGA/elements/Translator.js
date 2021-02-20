@@ -100,15 +100,6 @@ export class TranslatorElement {
 
     return this;
   }
-
-  sqrt() {
-    const { buffer } = this;
-    for (let i = 0; i < 3; i += 1) {
-      buffer[i] *= 0.5;
-    }
-
-    return this;
-  }
 }
 
 createPGAElement(TranslatorElement, {
@@ -119,7 +110,7 @@ createPGAElement(TranslatorElement, {
 /* === Translator factory ===
  *
  * (x, y, z, s) -> Translator((x * e01), (y * e02), (z * e03), (s * s))
- * Construct a normalized translator along the provided xyz axis, scaled by s
+ * Construct a normalized translator along the provided axis, scaled by s
 */
 export const Translator = (x = 0, y = 0, z = 0, s = 1) => {
   const d = -0.5 * s * (1.0 / (x * x + y * y + z * z)) ** 0.5;

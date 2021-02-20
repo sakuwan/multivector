@@ -886,12 +886,14 @@ export const geometricProductMap = {
     [PGATypes.Line]: [geometricPlaneLine, PGATypes.Multivector],
     [PGATypes.Point]: [geometricPlanePoint, PGATypes.Motor],
   },
+
   [PGATypes.IdealLine]: {
     [PGATypes.Plane]: [geometricIdealPlane, PGATypes.Motor],
     [PGATypes.OriginLine]: [geometricIdealOrigin, PGATypes.IdealLine],
     [PGATypes.Line]: [geometricIdealLine, PGATypes.IdealLine],
     [PGATypes.Point]: [geometricIdealPoint, PGATypes.Multivector],
   },
+
   [PGATypes.OriginLine]: {
     [PGATypes.Plane]: [geometricOriginPlane, PGATypes.Multivector],
     [PGATypes.IdealLine]: [geometricOriginIdeal, PGATypes.IdealLine],
@@ -899,6 +901,7 @@ export const geometricProductMap = {
     [PGATypes.Line]: [geometricOriginLine, PGATypes.Motor],
     [PGATypes.Point]: [geometricOriginPoint, PGATypes.Multivector],
   },
+
   [PGATypes.Line]: {
     [PGATypes.Plane]: [geometricLinePlane, PGATypes.Multivector],
     [PGATypes.IdealLine]: [geometricLineIdeal, PGATypes.IdealLine],
@@ -906,6 +909,7 @@ export const geometricProductMap = {
     [PGATypes.Line]: [geometricLineLine, PGATypes.Motor],
     [PGATypes.Point]: [geometricLinePoint, PGATypes.Multivector],
   },
+
   [PGATypes.Point]: {
     [PGATypes.Plane]: [geometricPointPlane, PGATypes.Motor],
     [PGATypes.IdealLine]: [geometricPointIdeal, PGATypes.Multivector],
@@ -913,16 +917,19 @@ export const geometricProductMap = {
     [PGATypes.Line]: [geometricPointLine, PGATypes.Multivector],
     [PGATypes.Point]: [geometricPointPoint, PGATypes.Translator],
   },
+
   [PGATypes.Motor]: {
     [PGATypes.Motor]: [geometricMotorMotor, PGATypes.Motor],
     [PGATypes.Rotor]: [geometricMotorRotor, PGATypes.Motor],
     [PGATypes.Translator]: [geometricMotorTranslator, PGATypes.Motor],
   },
+
   [PGATypes.Rotor]: {
     [PGATypes.Motor]: [geometricRotorMotor, PGATypes.Motor],
     [PGATypes.Rotor]: [geometricRotorRotor, PGATypes.Rotor],
     [PGATypes.Translator]: [geometricRotorTranslator, PGATypes.Motor],
   },
+
   [PGATypes.Translator]: {
     [PGATypes.Motor]: [geometricTranslatorMotor, PGATypes.Motor],
     [PGATypes.Rotor]: [geometricTranslatorRotor, PGATypes.Motor],
