@@ -175,7 +175,7 @@ const createMathMixin = () => ({
     return true;
   },
 
-  approxEq(v, epsilon = 0.000001) {
+  approxEq(v, epsilon = 1e-6) {
     if (!(v instanceof Object) || (v.type() !== this.elementType)) {
       throw TypeError('Invalid arguments: approxEq expects both elements to be of the same type');
     }

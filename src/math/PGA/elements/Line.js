@@ -7,11 +7,11 @@ import createPGAElement from './PGAElement';
 
 /* === Line (e01, e02, e03, e0123, e23, e31, e12, s) ===
  *
- * The combination element and representation of general lines is v 6-bivector
+ * The combination element and representation of general lines is a 6-bivector
  * coordinate multivector, lines are Plücker coordinates that happen to arise
  * naturally in PGA. Both e0123 and s are assumed to be 0 throughout.
  *
- * The LineElement class represents v line, and its provided methods
+ * The LineElement class represents a line, and its provided methods
  * are unary, and focused on the element itself, rather than the vector space
  *
  * === Component access ===
@@ -95,14 +95,15 @@ export class LineElement {
 
     const u2 = (v[4] * v[4] + v[5] * v[5] + v[6] * v[6]);
     const uv = (v[0] * v[4] + v[1] * v[5] + v[2] * v[6]);
+    if (u2 === 0) { v.fill(0); return this; }
 
     const s = (1.0 / u2) ** 0.5;
     const p = (1.0 / u2) * uv * s;
 
-    v[0] = (v[0] * s) - (v[4] * p);
-    v[1] = (v[1] * s) - (v[5] * p);
-    v[2] = (v[2] * s) - (v[6] * p);
-    v[3] = (v[3] * s) - (v[7] * p);
+    v[0] = v[0] * s - v[4] * p;
+    v[1] = v[1] * s - v[5] * p;
+    v[2] = v[2] * s - v[6] * p;
+    v[3] = v[3] * s - v[7] * p;
 
     v[4] *= s;
     v[5] *= s;
@@ -117,19 +118,20 @@ export class LineElement {
 
     const u2 = (v[4] * v[4] + v[5] * v[5] + v[6] * v[6]);
     const uv = (v[0] * v[4] + v[1] * v[5] + v[2] * v[6]);
+    if (u2 === 0) { v.fill(0); return this; }
 
-    const invSq = (1.0 / u2);
-    const sp = 2 * invSq * invSq * uv;
+    const s = (1.0 / u2);
+    const p = 2 * s * s * uv;
 
-    v[0] = -((v[0] * invSq) - v[4] * sp);
-    v[1] = -((v[1] * invSq) - v[5] * sp);
-    v[2] = -((v[2] * invSq) - v[6] * sp);
-    v[3] = (v[3] * invSq) - v[7] * sp;
+    v[0] = -(v[0] * s - v[4] * p);
+    v[1] = -(v[1] * s - v[5] * p);
+    v[2] = -(v[2] * s - v[6] * p);
+    v[3] = v[3] * s - v[7] * p;
 
-    v[4] *= -invSq;
-    v[5] *= -invSq;
-    v[6] *= -invSq;
-    v[7] *= invSq;
+    v[4] *= -s;
+    v[5] *= -s;
+    v[6] *= -s;
+    v[7] *= s;
 
     return this;
   }
@@ -142,11 +144,11 @@ createPGAElement(LineElement, {
 
 /* === Line factory ===
  *
- * (v, b, c, 0, d, f, g, 0) -> Line(
- *   (v * e01), (b * e02), (c * e03), (0 * e0123)),
+ * (a, b, c, 0, d, f, g, 0) -> Line(
+ *   (a * e01), (b * e02), (c * e03), (0 * e0123)),
  *   (d * e23), (f * e31), (g * e12), (0 * s)),
  * )
 */
-export const Line = (v = 0, b = 0, c = 0, d = 0, f = 0, g = 0) => (
-  new LineElement(new Float32Array([v, b, c, 0, d, f, g, 0]))
+export const Line = (a = 0, b = 0, c = 0, d = 0, f = 0, g = 0) => (
+  new LineElement(new Float32Array([a, b, c, 0, d, f, g, 0]))
 );

@@ -34,11 +34,9 @@ describe('PGA element - Plane', () => {
     const defaultPlane = Plane();
 
     {
-      const ptA = Point(-1, 0, 1);
-      const ptB = Point(3, 4, 5);
-
-      const ol = PGA.join(ptA, ptB);
-      console.log(PGA.exp(ol));
+      const ol = Line(-2, 6, 20, 2, 3, 4).normalize();
+      const m = PGA.exp(ol);
+      console.log(ol, PGA.log(m));
     }
 
     const planeType = defaultPlane.type();
