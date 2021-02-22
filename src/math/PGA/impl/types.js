@@ -26,7 +26,7 @@ export const PGATypes = {
   /* === e23 + e31 + e12 + s === */
   Rotor: Symbol('Rotor'),
 
-  /* === e01 + e02 + e03 + s === */
+  /* === e01 + e02 + e03 + e0123 === */
   Translator: Symbol('Translator'),
 
   /* === Multivector ===

@@ -164,8 +164,7 @@ export default class PGA {
         ]));
       }
 
-      /*
-       * === Complex Bivector exponentiation ===
+      /* === Complex bivector exponentiation ===
        *
        * Based on the following papers and projects:
        * "Geometric Algebra for Computer Graphics" - Charles G. Gunn
@@ -183,26 +182,33 @@ export default class PGA {
       case PGATypes.Line: {
         const [e01, e02, e03, e0123, e23, e31, e12, s] = el.buffer;
 
-        const idealSq = (e23 * e01 + e31 * e02 + e12 * e03);
-        const originSq = (e23 * e23 + e31 * e31 + e12 * e12);
-        if (originSq === 0) return new MotorElement(new Float32Array(8));
+        const ab = (e23 * e01 + e31 * e02 + e12 * e03);
+        const aa = (e23 * e23 + e31 * e31 + e12 * e12);
+        if (aa === 0) return new MotorElement(new Float32Array(8));
 
-        const invSq = (1.0 / originSq);
-        const u = invSq ** 0.5;
-        const v = u * invSq * idealSq;
+        const invRcp = (1.0 / aa);
+        const invSqrt = invRcp ** 0.5;
 
-        const cosu = Math.cos(originSq * u);
-        const sinu = Math.sin(originSq * u);
+        const u = aa * invSqrt;
+        const v = ab * invSqrt;
+
+        const cosu = Math.cos(u);
+        const sinu = Math.sin(u);
+
+        const e23n = e23 * invSqrt;
+        const e31n = e31 * invSqrt;
+        const e12n = e12 * invSqrt;
+        const infinityNorm = v * invRcp;
 
         return new MotorElement(new Float32Array([
-          (e01 * u - e23 * v) * sinu + (e23 * cosu * invSq * idealSq),
-          (e02 * u - e31 * v) * sinu + (e31 * cosu * invSq * idealSq),
-          (e03 * u - e12 * v) * sinu + (e12 * cosu * invSq * idealSq),
-          (e0123 * u - s * v) * sinu + (sinu * u * idealSq),
-          e23 * u * sinu,
-          e31 * u * sinu,
-          e12 * u * sinu,
-          s * u * sinu + cosu,
+          (e01 * invSqrt - e23 * infinityNorm) * sinu + e23n * v * cosu,
+          (e02 * invSqrt - e31 * infinityNorm) * sinu + e31n * v * cosu,
+          (e03 * invSqrt - e12 * infinityNorm) * sinu + e12n * v * cosu,
+          (e0123 * invSqrt - s * infinityNorm) * sinu + v * sinu,
+          e23n * sinu,
+          e31n * sinu,
+          e12n * sinu,
+          s * invSqrt * sinu + cosu,
         ]));
       }
 
@@ -214,33 +220,57 @@ export default class PGA {
     const { elementType } = el;
 
     switch (elementType) {
+      /* === Complex bivector logarithm ===
+       *
+       * Based on the following paper:
+       * "Geometric Algebra for Computer Graphics" - Charles G. Gunn
+       *
+       * Following the derived exponentiation, we can work backwards to reduce
+       * this overdetermined system to the normalized u and v values
+       * if s ≈ 0:
+       *
+       * u = tan⁻¹(s⁻¹, s)
+       * v = p⁻¹ / s
+       *
+       * otherwise:
+       *
+       * u = tan⁻¹(-p, p⁻¹)
+       * v = -p / s⁻¹
+      */
       case PGATypes.Motor: {
         const [e01, e02, e03, e0123, e23, e31, e12, s] = el.buffer;
 
-        const idealSq = (e23 * e01 + e31 * e02 + e12 * e03);
-        const originSq = (e23 * e23 + e31 * e31 + e12 * e12);
-        if (originSq === 0) {
+        const ab = (e23 * e01 + e31 * e02 + e12 * e03);
+        const aa = (e23 * e23 + e31 * e31 + e12 * e12);
+        if (aa === 0) {
           return new LineElement(new Float32Array([
             e01, e02, e03, e0123, 0, 0, 0, 0,
           ]));
         }
 
-        const invSq = (1.0 / originSq) ** 0.5;
-        const u = originSq * invSq;
-        const v = -(idealSq * invSq);
+        const invRcp = (1.0 / aa);
+        const invSqrt = invRcp ** 0.5;
 
-        const flip = Math.abs(s) < 1e-6;
-        const us = flip ? Math.atan2(-e0123, v) : Math.atan2(u, s);
-        const up = flip ? -e0123 / u : v / s;
+        const invScalar = aa * invSqrt;
+        const invPseudo = -(ab * invSqrt);
+
+        const closeToZero = Math.abs(s) < 1e-6;
+        const u = closeToZero ? Math.atan2(-e0123, invPseudo) : Math.atan2(invScalar, s);
+        const v = closeToZero ? -e0123 / invScalar : invPseudo / s;
+
+        const e23n = e23 * invSqrt;
+        const e31n = e31 * invSqrt;
+        const e12n = e12 * invSqrt;
+        const infinityNorm = ab * invRcp * invSqrt;
 
         return new LineElement(new Float32Array([
-          (e01 * invSq - e23 * v) * us - (e23 * invSq * up),
-          (e02 * invSq - e31 * v) * us - (e31 * invSq * up),
-          (e03 * invSq - e12 * v) * us - (e12 * invSq * up),
+          (e01 * invSqrt - e23 * infinityNorm) * u - e23n * v,
+          (e02 * invSqrt - e31 * infinityNorm) * u - e31n * v,
+          (e03 * invSqrt - e12 * infinityNorm) * u - e12n * v,
           0,
-          e23 * us * invSq,
-          e31 * us * invSq,
-          e12 * us * invSq,
+          e23n * u,
+          e31n * u,
+          e12n * u,
           0,
         ]));
       }

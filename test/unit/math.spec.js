@@ -4,7 +4,6 @@ import {
 
   Plane,
   Point,
-  Line,
 } from '../../src/math/PGA';
 
 describe('PGA element - Plane', () => {
@@ -32,12 +31,6 @@ describe('PGA element - Plane', () => {
   it('Has the proper type identifier', () => {
     // Make sure the instance has the proper type
     const defaultPlane = Plane();
-
-    {
-      const ol = Line(-2, 6, 20, 2, 3, 4).normalize();
-      const m = PGA.exp(ol);
-      console.log(ol, PGA.log(m));
-    }
 
     const planeType = defaultPlane.type();
     expect(planeType).toBe(PGATypes.Plane);

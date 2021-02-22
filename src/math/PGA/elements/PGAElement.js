@@ -163,7 +163,7 @@ const createMathMixin = () => ({
 
   eq(v) {
     if (!(v instanceof Object) || (v.type() !== this.elementType)) {
-      throw TypeError('Invalid arguments: eq expects both elements to be of the same type');
+      throw TypeError('Invalid arguments: eq expects both elements to be of the same grades');
     }
 
     const { buffer } = this;
@@ -177,7 +177,7 @@ const createMathMixin = () => ({
 
   approxEq(v, epsilon = 1e-6) {
     if (!(v instanceof Object) || (v.type() !== this.elementType)) {
-      throw TypeError('Invalid arguments: approxEq expects both elements to be of the same type');
+      throw TypeError('Invalid arguments: approxEq expects both elements to be of the same grades');
     }
 
     const { buffer } = this;

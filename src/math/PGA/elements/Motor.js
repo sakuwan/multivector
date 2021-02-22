@@ -93,12 +93,12 @@ export class MotorElement {
   normalize() {
     const { buffer: v } = this;
 
-    const u2 = (v[4] * v[4] + v[5] * v[5] + v[6] * v[6] + v[7] * v[7]);
-    const uv = (v[0] * v[4] + v[1] * v[5] + v[2] * v[6] - v[3] * v[7]);
-    if (u2 === 0) { v.fill(0); return this; }
+    const ab = (v[0] * v[4] + v[1] * v[5] + v[2] * v[6] - v[3] * v[7]);
+    const aa = (v[4] * v[4] + v[5] * v[5] + v[6] * v[6] + v[7] * v[7]);
+    if (aa === 0) { v.fill(0); return this; }
 
-    const s = (1.0 / u2) ** 0.5;
-    const p = (1.0 / u2) * uv * s;
+    const s = (1.0 / aa) ** 0.5;
+    const p = (1.0 / aa) * ab * s;
 
     v[0] = v[0] * s - v[4] * p;
     v[1] = v[1] * s - v[5] * p;
@@ -116,12 +116,12 @@ export class MotorElement {
   invert() {
     const { buffer: v } = this;
 
-    const u2 = (v[4] * v[4] + v[5] * v[5] + v[6] * v[6] + v[7] * v[7]);
-    const uv = (v[0] * v[4] + v[1] * v[5] + v[2] * v[6] - v[3] * v[7]);
-    if (u2 === 0) { v.fill(0); return this; }
+    const ab = (v[0] * v[4] + v[1] * v[5] + v[2] * v[6] - v[3] * v[7]);
+    const aa = (v[4] * v[4] + v[5] * v[5] + v[6] * v[6] + v[7] * v[7]);
+    if (aa === 0) { v.fill(0); return this; }
 
-    const s = (1.0 / u2);
-    const p = 2 * s * s * uv;
+    const s = (1.0 / aa);
+    const p = 2 * s * s * ab;
 
     v[0] = -(v[0] * s - v[4] * p);
     v[1] = -(v[1] * s - v[5] * p);

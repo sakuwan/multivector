@@ -37,7 +37,7 @@ import createPGAElement from './PGAElement';
  * normalize: ℓ∙ℓ = -1
  * invert: ℓ∙ℓ⁻¹ = 1
  *
- * === Complex Bivector normalization & inversion ===
+ * === Complex bivector normalization & inversion ===
  *
  * Based on the papers from SIGGRAPH 2019 by Charles G. Gunn
  * "Geometric Algebra for Computer Graphics"
@@ -93,12 +93,12 @@ export class LineElement {
   normalize() {
     const { buffer: v } = this;
 
-    const u2 = (v[4] * v[4] + v[5] * v[5] + v[6] * v[6]);
-    const uv = (v[0] * v[4] + v[1] * v[5] + v[2] * v[6]);
-    if (u2 === 0) { v.fill(0); return this; }
+    const ab = (v[0] * v[4] + v[1] * v[5] + v[2] * v[6]);
+    const aa = (v[4] * v[4] + v[5] * v[5] + v[6] * v[6]);
+    if (aa === 0) { v.fill(0); return this; }
 
-    const s = (1.0 / u2) ** 0.5;
-    const p = (1.0 / u2) * uv * s;
+    const s = (1.0 / aa) ** 0.5;
+    const p = (1.0 / aa) * ab * s;
 
     v[0] = v[0] * s - v[4] * p;
     v[1] = v[1] * s - v[5] * p;
@@ -116,12 +116,12 @@ export class LineElement {
   invert() {
     const { buffer: v } = this;
 
-    const u2 = (v[4] * v[4] + v[5] * v[5] + v[6] * v[6]);
-    const uv = (v[0] * v[4] + v[1] * v[5] + v[2] * v[6]);
-    if (u2 === 0) { v.fill(0); return this; }
+    const ab = (v[0] * v[4] + v[1] * v[5] + v[2] * v[6]);
+    const aa = (v[4] * v[4] + v[5] * v[5] + v[6] * v[6]);
+    if (aa === 0) { v.fill(0); return this; }
 
-    const s = (1.0 / u2);
-    const p = 2 * s * s * uv;
+    const s = (1.0 / aa);
+    const p = 2 * s * s * ab;
 
     v[0] = -(v[0] * s - v[4] * p);
     v[1] = -(v[1] * s - v[5] * p);
