@@ -4,6 +4,7 @@ import {
 
   Plane,
   Point,
+  Motor,
 } from '../../src/math/PGA';
 
 describe('PGA element - Plane', () => {
@@ -31,6 +32,11 @@ describe('PGA element - Plane', () => {
   it('Has the proper type identifier', () => {
     // Make sure the instance has the proper type
     const defaultPlane = Plane();
+
+    {
+      const m = Motor(-2, 6, 20, 5, 2, 3, 4, -5).invert();
+      console.log(m);
+    }
 
     const planeType = defaultPlane.type();
     expect(planeType).toBe(PGATypes.Plane);

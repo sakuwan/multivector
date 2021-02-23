@@ -84,7 +84,7 @@ const applyBasisMixins = (obj, basis) => {
 */
 const createMathMixin = () => ({
   add(v) {
-    if ((v instanceof Object) && (v.type() === this.elementType)) {
+    if ((v instanceof Object) && (v.elementType === this.elementType)) {
       const { buffer } = this;
       const { buffer: other } = v;
       for (let i = 0; i < buffer.length; i += 1) {
@@ -103,7 +103,7 @@ const createMathMixin = () => ({
   },
 
   sub(v) {
-    if ((v instanceof Object) && (v.type() === this.elementType)) {
+    if ((v instanceof Object) && (v.elementType === this.elementType)) {
       const { buffer } = this;
       const { buffer: other } = v;
       for (let i = 0; i < buffer.length; i += 1) {
@@ -122,7 +122,7 @@ const createMathMixin = () => ({
   },
 
   mul(v) {
-    if ((v instanceof Object) && (v.type() === this.elementType)) {
+    if ((v instanceof Object) && (v.elementType === this.elementType)) {
       const { buffer } = this;
       const { buffer: other } = v;
       for (let i = 0; i < buffer.length; i += 1) {
@@ -141,7 +141,7 @@ const createMathMixin = () => ({
   },
 
   div(v) {
-    if ((v instanceof Object) && (v.type() === this.elementType)) {
+    if ((v instanceof Object) && (v.elementType === this.elementType)) {
       const { buffer } = this;
       const { buffer: other } = v;
       for (let i = 0; i < buffer.length; i += 1) {
@@ -162,8 +162,8 @@ const createMathMixin = () => ({
   },
 
   eq(v) {
-    if (!(v instanceof Object) || (v.type() !== this.elementType)) {
-      throw TypeError('Invalid arguments: eq expects both elements to be of the same grades');
+    if (!(v instanceof Object) || (v.elementType !== this.elementType)) {
+      throw TypeError('Invalid arguments: eq expects both elements to be of the same type');
     }
 
     const { buffer } = this;
@@ -176,8 +176,8 @@ const createMathMixin = () => ({
   },
 
   approxEq(v, epsilon = 1e-6) {
-    if (!(v instanceof Object) || (v.type() !== this.elementType)) {
-      throw TypeError('Invalid arguments: approxEq expects both elements to be of the same grades');
+    if (!(v instanceof Object) || (v.elementType !== this.elementType)) {
+      throw TypeError('Invalid arguments: approxEq expects both elements to be of the same type');
     }
 
     const { buffer } = this;
@@ -274,6 +274,11 @@ const createGradeMixin = (basis) => {
       return this;
     },
 
+    involuted() {
+      const flipSigns = (x, i) => x * involuteMap[basisGrades[i]];
+      return new this.constructor(this.buffer.map(flipSigns));
+    },
+
     reverse() {
       const { buffer } = this;
       for (let i = 0; i < buffer.length; i += 1) {
@@ -281,6 +286,11 @@ const createGradeMixin = (basis) => {
       }
 
       return this;
+    },
+
+    reversed() {
+      const flipSigns = (x, i) => x * reverseMap[basisGrades[i]];
+      return new this.constructor(this.buffer.map(flipSigns));
     },
 
     conjugate() {
@@ -292,6 +302,11 @@ const createGradeMixin = (basis) => {
       return this;
     },
 
+    conjugated() {
+      const flipSigns = (x, i) => x * conjugateMap[basisGrades[i]];
+      return new this.constructor(this.buffer.map(flipSigns));
+    },
+
     negate() {
       const { buffer } = this;
       for (let i = 0; i < buffer.length; i += 1) {
@@ -299,6 +314,11 @@ const createGradeMixin = (basis) => {
       }
 
       return this;
+    },
+
+    negated() {
+      const flipSigns = (x) => -x;
+      return new this.constructor(this.buffer.map(flipSigns));
     },
   };
 };

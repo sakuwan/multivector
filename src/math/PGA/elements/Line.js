@@ -93,22 +93,25 @@ export class LineElement {
   normalize() {
     const { buffer: v } = this;
 
-    const ab = (v[0] * v[4] + v[1] * v[5] + v[2] * v[6]);
+    const ab = (v[4] * v[0] + v[5] * v[1] + v[6] * v[2]);
     const aa = (v[4] * v[4] + v[5] * v[5] + v[6] * v[6]);
     if (aa === 0) { v.fill(0); return this; }
 
-    const s = (1.0 / aa) ** 0.5;
-    const p = (1.0 / aa) * ab * s;
+    const invRcp = (1.0 / aa);
+    const invScalar = invRcp ** 0.5;
+    const invPseudo = ab * invRcp * invScalar;
 
-    v[0] = v[0] * s - v[4] * p;
-    v[1] = v[1] * s - v[5] * p;
-    v[2] = v[2] * s - v[6] * p;
-    v[3] = v[3] * s - v[7] * p;
+    // Ideal
+    v[0] = v[0] * invScalar - v[4] * invPseudo;
+    v[1] = v[1] * invScalar - v[5] * invPseudo;
+    v[2] = v[2] * invScalar - v[6] * invPseudo;
+    v[3] = v[3] * invScalar - v[7] * invPseudo;
 
-    v[4] *= s;
-    v[5] *= s;
-    v[6] *= s;
-    v[7] *= s;
+    // Origin
+    v[4] *= invScalar;
+    v[5] *= invScalar;
+    v[6] *= invScalar;
+    v[7] *= invScalar;
 
     return this;
   }
@@ -116,22 +119,30 @@ export class LineElement {
   invert() {
     const { buffer: v } = this;
 
-    const ab = (v[0] * v[4] + v[1] * v[5] + v[2] * v[6]);
+    const ab = (v[4] * v[0] + v[5] * v[1] + v[6] * v[2]);
     const aa = (v[4] * v[4] + v[5] * v[5] + v[6] * v[6]);
     if (aa === 0) { v.fill(0); return this; }
 
-    const s = (1.0 / aa);
-    const p = 2 * s * s * ab;
+    const invRcp = (1.0 / aa);
+    const invScalar = invRcp ** 0.5;
+    const invPseudo = ab * invRcp * invScalar;
 
-    v[0] = -(v[0] * s - v[4] * p);
-    v[1] = -(v[1] * s - v[5] * p);
-    v[2] = -(v[2] * s - v[6] * p);
-    v[3] = v[3] * s - v[7] * p;
+    const e23n = 2 * (v[4] * invScalar * invPseudo);
+    const e31n = 2 * (v[5] * invScalar * invPseudo);
+    const e12n = 2 * (v[6] * invScalar * invPseudo);
+    const sn = 2 * (v[7] * invScalar * invPseudo);
 
-    v[4] *= -s;
-    v[5] *= -s;
-    v[6] *= -s;
-    v[7] *= s;
+    // Ideal
+    v[0] = -(v[0] * invRcp - e23n);
+    v[1] = -(v[1] * invRcp - e31n);
+    v[2] = -(v[2] * invRcp - e12n);
+    v[3] = v[3] * invRcp - sn;
+
+    // Origin
+    v[4] *= -invRcp;
+    v[5] *= -invRcp;
+    v[6] *= -invRcp;
+    v[7] *= invRcp;
 
     return this;
   }

@@ -91,58 +91,67 @@ export default class PGA {
   static innerMap = createForwardingMap(innerProductMap, '∙');
 
   static dot(a, b) {
-    const lhsType = a.type();
-    const rhsType = b.type();
+    const lhsType = a.elementType;
+    const rhsType = b.elementType;
 
-    return PGA.innerMap[lhsType][rhsType](a.buffer, b.buffer);
+    const dotFn = PGA.innerMap?.[lhsType]?.[rhsType];
+    if (!dotFn) throw new TypeError('Invalid arguments: Arguments are not graded PGA elements');
+
+    return dotFn(a.buffer, b.buffer);
   }
 
   static outerMap = createForwardingMap(outerProductMap, '∧');
 
   static meet(a, b) {
-    const lhsType = a.type();
-    const rhsType = b.type();
+    const lhsType = a.elementType;
+    const rhsType = b.elementType;
 
-    return PGA.outerMap[lhsType][rhsType](a.buffer, b.buffer);
+    const meetFn = PGA.outerMap?.[lhsType]?.[rhsType];
+    if (!meetFn) throw new TypeError('Invalid arguments: Arguments are not graded PGA elements');
+
+    return meetFn(a.buffer, b.buffer);
   }
 
   static regressiveMap = createForwardingMap(regressiveProductMap, '∨');
 
   static join(a, b) {
-    const lhsType = a.type();
-    const rhsType = b.type();
+    const lhsType = a.elementType;
+    const rhsType = b.elementType;
 
-    return PGA.regressiveMap[lhsType][rhsType](a.buffer, b.buffer);
+    const joinFn = PGA.regressiveMap?.[lhsType]?.[rhsType];
+    if (!joinFn) throw new TypeError('Invalid arguments: Arguments are not graded PGA elements');
+
+    return joinFn(a.buffer, b.buffer);
   }
 
   static geometricMap = createForwardingMap(geometricProductMap, '*');
 
   static mul(a, b) {
-    const lhsType = a.type();
-    const rhsType = b.type();
+    const lhsType = a.elementType;
+    const rhsType = b.elementType;
 
-    return PGA.geometricMap[lhsType][rhsType](a.buffer, b.buffer);
+    const mulFn = PGA.geometricMap?.[lhsType]?.[rhsType];
+    if (!mulFn) throw new TypeError('Invalid arguments: Arguments are not graded PGA elements');
+
+    return mulFn(a.buffer, b.buffer);
   }
 
-  static dual(el) {
-    const { elementType } = el;
+  static dual({ buffer, elementType }) {
     switch (elementType) {
-      case PGATypes.Plane: return new PointElement(Duality.dualPlane(el));
-      case PGATypes.IdealLine: return new OriginElement(Duality.dualIdeal(el));
-      case PGATypes.OriginLine: return new IdealElement(Duality.dualOrigin(el));
-      case PGATypes.Line: return new LineElement(Duality.dualLine(el));
-      case PGATypes.Point: return new PlaneElement(Duality.dualPoint(el));
+      case PGATypes.Plane: return new PointElement(Duality.dualPlane(buffer));
+      case PGATypes.IdealLine: return new OriginElement(Duality.dualIdeal(buffer));
+      case PGATypes.OriginLine: return new IdealElement(Duality.dualOrigin(buffer));
+      case PGATypes.Line: return new LineElement(Duality.dualLine(buffer));
+      case PGATypes.Point: return new PlaneElement(Duality.dualPoint(buffer));
 
       default: throw new TypeError('Invalid argument: Unsupported element type');
     }
   }
 
-  static exp(el) {
-    const { elementType } = el;
-
+  static exp({ buffer, elementType }) {
     switch (elementType) {
       case PGATypes.IdealLine: {
-        const [e01, e02, e03] = el.buffer;
+        const [e01, e02, e03] = buffer;
 
         return new TranslatorElement(new Float32Array([
           e01, e02, e03, 1,
@@ -150,7 +159,7 @@ export default class PGA {
       }
 
       case PGATypes.OriginLine: {
-        const [e23, e31, e12, s] = el.buffer;
+        const [e23, e31, e12, s] = buffer;
 
         const theta = (e23 * e23 + e31 * e31 + e12 * e12) ** 0.5;
         const cosTheta = Math.cos(theta);
@@ -180,7 +189,7 @@ export default class PGA {
        * (cos u + sin u n) + vn cos u - v sin u
       */
       case PGATypes.Line: {
-        const [e01, e02, e03, e0123, e23, e31, e12, s] = el.buffer;
+        const [e01, e02, e03, e0123, e23, e31, e12, s] = buffer;
 
         const ab = (e23 * e01 + e31 * e02 + e12 * e03);
         const aa = (e23 * e23 + e31 * e31 + e12 * e12);
@@ -216,9 +225,7 @@ export default class PGA {
     }
   }
 
-  static log(el) {
-    const { elementType } = el;
-
+  static log({ buffer, elementType }) {
     switch (elementType) {
       /* === Complex bivector logarithm ===
        *
@@ -238,7 +245,7 @@ export default class PGA {
        * v = -p / s⁻¹
       */
       case PGATypes.Motor: {
-        const [e01, e02, e03, e0123, e23, e31, e12, s] = el.buffer;
+        const [e01, e02, e03, e0123, e23, e31, e12, s] = buffer;
 
         const ab = (e23 * e01 + e31 * e02 + e12 * e03);
         const aa = (e23 * e23 + e31 * e31 + e12 * e12);
@@ -276,7 +283,7 @@ export default class PGA {
       }
 
       case PGATypes.Rotor: {
-        const [e23, e31, e12, s] = el.buffer;
+        const [e23, e31, e12, s] = buffer;
 
         const theta = Math.acos(s);
         const invTheta = (1.0 / Math.sin(theta)) * theta;
@@ -290,7 +297,7 @@ export default class PGA {
       }
 
       case PGATypes.Translator: {
-        const [e01, e02, e03] = el.buffer;
+        const [e01, e02, e03] = buffer;
 
         return new IdealElement(new Float32Array([
           e01, e02, e03, 0,
@@ -301,12 +308,10 @@ export default class PGA {
     }
   }
 
-  static sqrt(el) {
-    const { elementType } = el;
-
+  static sqrt({ buffer, elementType }) {
     switch (elementType) {
       case PGATypes.Motor: {
-        const [e01, e02, e03, e0123, e23, e31, e12, s] = el.buffer;
+        const [e01, e02, e03, e0123, e23, e31, e12, s] = buffer;
 
         return new MotorElement(new Float32Array([
           e01, e02, e03, e0123,
@@ -316,7 +321,7 @@ export default class PGA {
 
       case PGATypes.IdealLine:
       case PGATypes.Translator: {
-        const [e01, e02, e03] = el.buffer;
+        const [e01, e02, e03] = buffer;
 
         return new TranslatorElement(new Float32Array([
           e01, e02, e03, 1,
@@ -325,7 +330,7 @@ export default class PGA {
 
       case PGATypes.OriginLine:
       case PGATypes.Rotor: {
-        const [e23, e31, e12, s] = el.buffer;
+        const [e23, e31, e12, s] = buffer;
 
         return new RotorElement(new Float32Array([
           e23, e31, e12, s + 1,
