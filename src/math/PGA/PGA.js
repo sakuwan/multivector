@@ -32,6 +32,7 @@ import { regressiveProductMap } from './impl/regressive';
 import { geometricProductMap } from './impl/geometric';
 
 import * as Duality from './impl/dual';
+import * as Sandwich from './impl/sandwich';
 
 /* === Element type delegation maps ===
  *
@@ -145,6 +146,31 @@ export default class PGA {
       case PGATypes.Point: return new PlaneElement(Duality.dualPoint(buffer));
 
       default: throw new TypeError('Invalid argument: Unsupported element type');
+    }
+  }
+
+  static reflect(a, b) {
+    const lhsType = a.elementType;
+    const rhsType = b.elementType;
+
+    if (rhsType !== PGATypes.Plane) {
+      throw new TypeError('Invalid arguments: Reflection must be through a PGA plane');
+    }
+
+    switch (lhsType) {
+      case PGATypes.Plane: {
+        return new PlaneElement(Sandwich.sandwichPlanePlane(a.buffer, b.buffer));
+      }
+
+      case PGATypes.Line: {
+        return new LineElement(Sandwich.sandwichLinePlane(a.buffer, b.buffer));
+      }
+
+      case PGATypes.Point: {
+        return new PointElement(Sandwich.sandwichPointPlane(a.buffer, b.buffer));
+      }
+
+      default: throw new TypeError('Invalid arguments: Unsupported element type');
     }
   }
 
