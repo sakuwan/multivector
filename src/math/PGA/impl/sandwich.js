@@ -7,6 +7,8 @@
  * operators, such as reflecting through planes and applying all versors
 */
 
+import { PGATypes } from './types';
+
 /* === Plane reflections ===
  *
  * p₁p₂p₁ -> Reflect plane p₁ through plane p₂ -> p₂ * p₁ * p₂
@@ -80,6 +82,71 @@ export const sandwichPointPlane = (a, b) => {
   return new Float32Array([e032, e013, e021, e123]);
 };
 
+/* === Rotor sandwich operators ===
+ *
+ * R p R -> Apply rotor R to plane p -> R * p * ∼R
+ * R ℓ R -> Apply rotor R to line ℓ  -> R * ℓ * ∼R
+ * R P R -> Apply rotor R to point P -> R * P * ∼R
+*/
+
+export const sandwichPlaneRotor = (a, b) => {
+  const b0b1 = b[0] * b[1]; // b.e23 * b.e31
+  const b0b2 = b[0] * b[2]; // b.e23 * b.e12
+  const b0b3 = b[0] * b[3]; // b.e23 * b.s
+  const b1b2 = b[1] * b[2]; // b.e31 * b.e12
+  const b1b3 = b[1] * b[3]; // b.e31 * b.s
+  const b2b3 = b[2] * b[3]; // b.e12 * b.s
+
+  const b0sq = b[0] * b[0]; // b.e23 * b.e23
+  const b1sq = b[1] * b[1]; // b.e31 * b.e31
+  const b2sq = b[2] * b[2]; // b.e12 * b.e12
+  const b3sq = b[3] * b[3]; // b.s * b.s
+
+  const e1 = 2 * a[1] * (b0b1 + b2b3)
+           + 2 * a[2] * (b0b2 - b1b3) + a[0] * (b3sq + b0sq - b2sq - b1sq);
+
+  const e2 = 2 * a[2] * (b0b3 + b1b2)
+           + 2 * a[0] * (b0b1 - b2b3) + a[1] * (b3sq + b1sq - b0sq - b2sq);
+
+  const e3 = 2 * a[0] * (b1b3 + b0b2)
+           + 2 * a[1] * (b1b2 - b0b3) + a[2] * (b3sq + b2sq - b1sq - b0sq);
+
+  const e0 = a[3] * (b0sq + b1sq + b2sq + b3sq);
+
+  return new Float32Array([e1, e2, e3, e0]);
+};
+
+export const sandwichLineRotor = (a, b) => {
+
+};
+
+export const sandwichPointRotor = (a, b) => {
+  const b0b1 = b[0] * b[1]; // b.e23 * b.e31
+  const b0b2 = b[0] * b[2]; // b.e23 * b.e12
+  const b0b3 = b[0] * b[3]; // b.e23 * b.s
+  const b1b2 = b[1] * b[2]; // b.e31 * b.e12
+  const b1b3 = b[1] * b[3]; // b.e31 * b.s
+  const b2b3 = b[2] * b[3]; // b.e12 * b.s
+
+  const b0sq = b[0] * b[0]; // b.e23 * b.e23
+  const b1sq = b[1] * b[1]; // b.e31 * b.e31
+  const b2sq = b[2] * b[2]; // b.e12 * b.e12
+  const b3sq = b[3] * b[3]; // b.s * b.s
+
+  const e1 = 2 * a[1] * (b0b1 + b2b3)
+           + 2 * a[2] * (b0b2 - b1b3) + a[0] * (b3sq + b0sq - b2sq - b1sq);
+
+  const e2 = 2 * a[2] * (b0b3 + b1b2)
+           + 2 * a[0] * (b0b1 - b2b3) + a[1] * (b3sq + b1sq - b0sq - b2sq);
+
+  const e3 = 2 * a[0] * (b1b3 + b0b2)
+           + 2 * a[1] * (b1b2 - b0b3) + a[2] * (b3sq + b2sq - b1sq - b0sq);
+
+  const e0 = a[3] * (b0sq + b1sq + b2sq + b3sq);
+
+  return new Float32Array([e1, e2, e3, e0]);
+};
+
 /* === Translator sandwich operators ===
  *
  * T p T -> Apply translator T to plane p -> T * p * ∼T
@@ -117,4 +184,23 @@ export const sandwichPointTranslator = (a, b) => {
   const e123 = a[3];
 
   return new Float32Array([e032, e013, e021, e123]);
+};
+
+export const sandwichProductMap = {
+  [PGATypes.Plane]: {
+    [PGATypes.Plane]: [sandwichPlanePlane, PGATypes.Plane],
+    [PGATypes.Rotor]: [sandwichPlaneRotor, PGATypes.Plane],
+    [PGATypes.Translator]: [sandwichPlaneTranslator, PGATypes.Plane],
+  },
+
+  [PGATypes.Line]: {
+    [PGATypes.Plane]: [sandwichLinePlane, PGATypes.Line],
+    [PGATypes.Translator]: [sandwichLineTranslator, PGATypes.Line],
+  },
+
+  [PGATypes.Point]: {
+    [PGATypes.Plane]: [sandwichPointPlane, PGATypes.Point],
+    [PGATypes.Rotor]: [sandwichPointRotor, PGATypes.Point],
+    [PGATypes.Translator]: [sandwichPointTranslator, PGATypes.Point],
+  },
 };

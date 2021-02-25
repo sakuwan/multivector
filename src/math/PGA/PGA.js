@@ -30,9 +30,9 @@ import { innerProductMap } from './impl/inner';
 import { outerProductMap } from './impl/outer';
 import { regressiveProductMap } from './impl/regressive';
 import { geometricProductMap } from './impl/geometric';
+import { sandwichProductMap } from './impl/sandwich';
 
 import * as Duality from './impl/dual';
-import * as Sandwich from './impl/sandwich';
 
 /* === Element type delegation maps ===
  *
@@ -149,29 +149,16 @@ export default class PGA {
     }
   }
 
-  static reflect(a, b) {
+  static sandwichMap = createForwardingMap(sandwichProductMap, '≡');
+
+  static sw(a, b) {
     const lhsType = a.elementType;
     const rhsType = b.elementType;
 
-    if (rhsType !== PGATypes.Plane) {
-      throw new TypeError('Invalid arguments: Reflection must be through a PGA plane');
-    }
+    const swFn = PGA.sandwichMap?.[lhsType]?.[rhsType];
+    if (!swFn) throw new TypeError('Invalid arguments: Arguments are not graded PGA elements');
 
-    switch (lhsType) {
-      case PGATypes.Plane: {
-        return new PlaneElement(Sandwich.sandwichPlanePlane(a.buffer, b.buffer));
-      }
-
-      case PGATypes.Line: {
-        return new LineElement(Sandwich.sandwichLinePlane(a.buffer, b.buffer));
-      }
-
-      case PGATypes.Point: {
-        return new PointElement(Sandwich.sandwichPointPlane(a.buffer, b.buffer));
-      }
-
-      default: throw new TypeError('Invalid arguments: Unsupported element type');
-    }
+    return swFn(a.buffer, b.buffer);
   }
 
   static exp({ buffer, elementType }) {
