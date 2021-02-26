@@ -9,7 +9,7 @@ import createPGAElement from './PGAElement';
  *
  * Normalized, even grade elements of PGA are called motors, and are
  * generally represented as the products of rotors and translators. Motors
- * represent kinematic motion in PGA, and satisfy m * ∼m = 1
+ * represent kinematic motion in PGA, and satisfy M * ∼M = 1
  *
  * The MotorElement class represents a motor, and its provided methods
  * are unary, and focused on the element itself, rather than the vector space
@@ -34,8 +34,8 @@ import createPGAElement from './PGAElement';
  * norm: ||R||
  * infinity norm: ||T||∞ == ||T∞||∞
  *
- * normalize: m * ∼m = 1
- * invert: m * m⁻¹ = 1
+ * normalize: M * ∼M = 1
+ * invert: M * M⁻¹ = 1
  *
  * === Complex Bivector normalization & inversion ===
  *

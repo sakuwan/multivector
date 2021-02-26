@@ -27,7 +27,7 @@ import createPGAElement from './PGAElement';
  * Ideal line metric: [0, 0, 0, 0]
  *
  * norm: e0 squares to 0, all components vanish
- * infinity norm: ||l∞||∞ = ||lο||
+ * infinity norm: ||l∞||∞ = ||lₒ||
  *
  * normalize: assuming l∞ / ||l∞||∞, l∞∙l∞ = -1
  * invert: assuming l∞ / ||l∞||∞, l∞∙l∞⁻¹ = 1

@@ -7,6 +7,7 @@ import {
   Point,
   Rotor,
   Translator,
+  OriginLine,
 } from '../../src/math/PGA';
 
 describe('PGA element - Plane', () => {
@@ -36,10 +37,14 @@ describe('PGA element - Plane', () => {
     const defaultPlane = Plane();
 
     {
-      const planeA = Plane(-1, 1, 5, 2).normalize();
-      const rotorA = Rotor(-1, 1, 1, Math.PI);
+      const lineA = Line(0, 1, 2, 0, 1, 1).normalize();
 
-      console.log(PGA.sw(planeA, rotorA));
+      const rotorA = Rotor(0, 1, 1, Math.PI);
+      const translatorA = Translator(1, 5, 1, 2);
+
+      const motorA = PGA.mul(translatorA, rotorA).normalize();
+
+      console.log(PGA.sw(lineA, motorA));
     }
 
     const planeType = defaultPlane.type();

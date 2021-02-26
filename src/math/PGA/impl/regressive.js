@@ -41,7 +41,7 @@ export const regressivePlanePoint = (a, b) => (
 
 /*
  * Ideal line ∨ Origin line -> Scalar
- * Equivalent to J(J(l∞) ∧ J(lο)) or (l∞* ∧ lο*)*
+ * Equivalent to J(J(l∞) ∧ J(lₒ)) or (l∞* ∧ lₒ*)*
  * The meet of origin and ideal lines where the resulting pseudo-scalar is dualized
  *
  * Refer to 'outerOriginIdeal' for the reasoning of the meet
@@ -89,7 +89,7 @@ export const regressiveIdealPoint = (a, b) => {
 
 /*
  * Origin line ∨ Ideal line -> Scalar
- * Equivalent to J(J(lο) ∧ J(l∞)) or (lο* ∧ l∞*)*
+ * Equivalent to J(J(lₒ) ∧ J(l∞)) or (lₒ* ∧ l∞*)*
  * The meet of ideal and origin lines where the resulting pseudo-scalar is dualized
  *
  * Refer to 'outerIdealOrigin' for the reasoning of the meet
@@ -100,7 +100,7 @@ export const regressiveOriginIdeal = (a, b) => (
 
 /*
  * Origin line ∨ Line -> Scalar
- * Equivalent to J(J(lο) ∧ J(ℓ)) or (lο* ∧ ℓ*)*
+ * Equivalent to J(J(lₒ) ∧ J(ℓ)) or (lₒ* ∧ ℓ*)*
  * The meet of ideal and full lines where the resulting pseudo-scalar is dualized
  *
  * Refer to 'outerIdealLine' for the reasoning of the meet, the indices of
@@ -112,7 +112,7 @@ export const regressiveOriginLine = (a, b) => (
 
 /*
  * Origin line ∨ Point -> Plane(e1, e2, e3, 0)
- * Equivalent to J(J(lο) ∧ J(P)) or (lο* ∧ P*)*
+ * Equivalent to J(J(lₒ) ∧ J(P)) or (lₒ* ∧ P*)*
  * The meet of an ideal line and plane where the resulting point is dualized
  *
  * Refer to 'outerIdealPlane' for the reasoning of the meet
@@ -148,7 +148,7 @@ export const regressiveLineIdeal = (a, b) => (
 
 /*
  * Line ∨ Origin line -> Scalar
- * Equivalent to J(J(ℓ) ∧ J(lο)) or (ℓ* ∧ lο*)*
+ * Equivalent to J(J(ℓ) ∧ J(lₒ)) or (ℓ* ∧ lₒ*)*
  * The meet of a line and ideal line where the resulting pseudo-scalar is dualized
  *
  * Refer to 'outerLineIdeal' for the reasoning of the meet, the indices of
@@ -225,7 +225,7 @@ export const regressivePointIdeal = (a, b) => {
 
 /*
  * Point ∨ Origin line -> Plane (e1, e2, e3, 0)
- * Equivalent to J(J(P) ∧ J(lο)) or (P* ∧ lο*)*
+ * Equivalent to J(J(P) ∧ J(lₒ)) or (P* ∧ lₒ*)*
  * The meet of a plane and ideal line where the resulting point is dualized
  *
  * Refer to 'outerPlaneIdeal' for the reasoning of the meet

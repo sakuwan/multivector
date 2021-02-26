@@ -27,10 +27,10 @@ import createPGAElement from './PGAElement';
  * Origin line metric: [-1, -1, -1, 1]
  *
  * norm: No components vanish
- * infinity norm: ||lο||∞ = ||l∞|| (All components vanish)
+ * infinity norm: ||lₒ||∞ = ||l∞|| (All components vanish)
  *
- * normalize: lο∙lο = -1
- * invert: lο∙lο⁻¹ = 1
+ * normalize: lₒ∙lₒ = -1
+ * invert: lₒ∙lₒ⁻¹ = 1
  *
  * === Antiautomorphisms ===
  *

@@ -31,7 +31,7 @@ import createPGAElement from './PGAElement';
  * Line k-vectors: [e01, e02, e03, e0123, e23, e31, e12, s]
  * Line metric: [0, 0, 0, 0, -1, -1, -1, 1]
  *
- * norm: ℓ∙ℓ = -1 (||ℓ|| = ||lο||)
+ * norm: ℓ∙ℓ = -1 (||ℓ|| = ||lₒ||)
  * infinity norm: ||ℓ||∞ == ||l∞||∞
  *
  * normalize: ℓ∙ℓ = -1

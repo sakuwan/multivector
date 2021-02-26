@@ -5,7 +5,7 @@
  *
  * Plane       -> (<G> - <p>)  -> (4 - 1) -> Point
  * Ideal line  -> (<G> - <l∞>) -> (4 - 2) -> Origin line
- * Origin line -> (<G> - <lο>) -> (4 - 2) -> Ideal line
+ * Origin line -> (<G> - <lₒ>) -> (4 - 2) -> Ideal line
  * Line        -> (<G> - <ℓ>)  -> (4 - 2) -> Line (Ideal line and Origin line swapped)
  * Point       -> (<G> - <P>)  -> (4 - 3) -> Plane
  *

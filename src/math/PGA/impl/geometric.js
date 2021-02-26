@@ -39,7 +39,7 @@ export const geometricPlanePlaneT = (a, b) => {
  * Plane * Plane -> Rotor (e23, e31, e12, s)
  * p * p = p ∙ p + p ∧ p
  * Extract the rotor portion of the motor, identical to
- * p ∧ p -> p ∙ p + lο and simplifies to:
+ * p ∧ p -> p ∙ p + lₒ and simplifies to:
  *
  * (a.e2 * b.e3 - a.e3 * b.e2) -> e23
  * (a.e3 * b.e1 - a.e1 * b.e3) -> e31
@@ -100,7 +100,7 @@ export const geometricPlaneIdeal = (a, b) => {
 
 /*
  * Plane * Origin line -> Multivector (e1, e2, e3, e0, e032, e013, e021, e123)
- * p * lο = p ∙ lο + p ∧ lο
+ * p * lₒ = p ∙ lₒ + p ∧ lₒ
  * A valid operation that results in a multivector that is the combination
  * of multiple elements, while simply being equivalent to both the inner and
  * outer products individually. Due to this, it should not be called and
@@ -196,7 +196,7 @@ export const geometricIdealPlane = (a, b) => {
 
 /*
  * Ideal line * Origin line -> Ideal line / Translator (e01, e02, e03, e0123)
- * l∞ * lο = l∞ ∙ lο + l∞ ∧ lο
+ * l∞ * lₒ = l∞ ∙ lₒ + l∞ ∧ lₒ
  * Composes the rotation and translation components of an ideal and origin
  * line, with weighting from both the scalar and pseudoscalar components
  * (a.e03 * b.e31 - a.e02 * b.e12) - (a.e0123 * b.e23 + a.e01 * b.s) -> e01
@@ -261,7 +261,7 @@ export const geometricIdealPoint = (a, b) => {
 
 /*
  * Origin line * Plane -> Multivector (e1, e2, e3, e0, e032, e013, e021, e123)
- * lο * p = lο ∙ p + lο ∧ p
+ * lₒ * p = lₒ ∙ p + lₒ ∧ p
  * A valid operation that results in a multivector that is the combination
  * of multiple elements, while simply being equivalent to both the inner and
  * outer products individually. Due to this, it should not be called and
@@ -283,7 +283,7 @@ export const geometricOriginPlane = (a, b) => {
 
 /*
  * Origin line * Ideal line -> Ideal line / Translator (e01, e02, e03, e0123)
- * lο * l∞ = lο ∙ l∞ + lο ∧ l∞
+ * lₒ * l∞ = lₒ ∙ l∞ + lₒ ∧ l∞
  * Composes the rotation and translation components of an origin and ideal
  * line, with weighting from both the scalar and pseudoscalar components
  * (a.e12 * b.e02 - a.e31 * b.e03) - (a.s * b.e01 + a.e23 * b.e0123) -> e01
@@ -302,8 +302,8 @@ export const geometricOriginIdeal = (a, b) => {
 
 /*
  * Origin line * Origin line -> Rotor (e23, e31, e12, s)
- * lο * lο = lο ∙ lο + lο ∧ lο
- * Produces a rotor that, when normalized, moves lο₂ -> lο₁
+ * lₒ * lₒ = lₒ ∙ lₒ + lₒ ∧ lₒ
+ * Produces a rotor that, when normalized, moves lₒ₂ -> lₒ₁
  * (a.e12 * b.e31 - a.e31 * b.e12) + (a.e23 * b.s + a.s * b.e23) -> e23
  * (a.e23 * b.e12 - a.e12 * b.e23) + (a.e31 * b.s + a.s * b.e31) -> e31
  * (a.e31 * b.e23 - a.e23 * b.e31) + (a.e12 * b.s + a.s * b.e12) -> e12
@@ -320,8 +320,8 @@ export const geometricOriginOrigin = (a, b) => {
 
 /*
  * Origin line * Line -> Motor (e01, e02, e03, e0123, e23, e31, e12, s)
- * lο * ℓ = lο ∙ ℓ + lο ∧ ℓ
- * Produces a motor that, when normalized, moves ℓ -> lο
+ * lₒ * ℓ = lₒ ∙ ℓ + lₒ ∧ ℓ
+ * Produces a motor that, when normalized, moves ℓ -> lₒ
  * (a.e12 * b.e02 - a.e31 * b.e03) - (a.s * b.e01 + a.e23 * b.e0123) -> e01
  * (a.e23 * b.e03 - a.e12 * b.e01) - (a.s * b.e02 + a.e31 * b.e0123) -> e02
  * (a.e31 * b.e01 - a.e23 * b.e02) - (a.s * b.e03 + a.e12 * b.e0123) -> e03
@@ -347,7 +347,7 @@ export const geometricOriginLine = (a, b) => {
 
 /*
  * Origin line * Point -> Multivector (e1, e2, e3, e0, e032, e013, e021, e123)
- * lο * P = lο ∙ P + lο ∧ P
+ * lₒ * P = lₒ ∙ P + lₒ ∧ P
  * A valid operation that results in a multivector that is the combination
  * of multiple elements, while simply being equivalent to both the inner and
  * outer products individually. Due to this, it should not be called and
@@ -419,8 +419,8 @@ export const geometricLineIdeal = (a, b) => {
 
 /*
  * Line * Origin line -> Motor (e01, e02, e03, e0123, e23, e31, e12, s)
- * ℓ * lο = ℓ ∙ lο + ℓ ∧ lο
- * Produces a motor that, when normalized, moves lο -> ℓ
+ * ℓ * lₒ = ℓ ∙ lₒ + ℓ ∧ lₒ
+ * Produces a motor that, when normalized, moves lₒ -> ℓ
  * (a.e03 * b.e31 - a.e02 * b.e12) - (a.e0123 * b.e23 + a.e01 * b.s) -> e01
  * (a.e01 * b.e12 - a.e03 * b.e23) - (a.e0123 * b.e31 + a.e02 * b.s) -> e02
  * (a.e02 * b.e23 - a.e01 * b.e31) - (a.e0123 * b.e12 + a.e03 * b.s) -> e03
@@ -560,7 +560,7 @@ export const geometricPointIdeal = (a, b) => {
 
 /*
  * Point * Origin line -> Multivector (e1, e2, e3, e0, e032, e013, e021, e123)
- * P * lο = P ∙ lο + P ∧ lο
+ * P * lₒ = P ∙ lₒ + P ∧ lₒ
  * A valid operation that results in a multivector that is the combination
  * of multiple elements, while simply being equivalent to both the inner and
  * outer products individually. Due to this, it should not be called and

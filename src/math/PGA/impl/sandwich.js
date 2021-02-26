@@ -82,69 +82,165 @@ export const sandwichPointPlane = (a, b) => {
   return new Float32Array([e032, e013, e021, e123]);
 };
 
+/* === Motor sandwich operators ===
+ *
+ * M p M -> Apply motor M to plane p -> M * p * ∼M
+ * M ℓ M -> Apply motor M to line ℓ  -> M * ℓ * ∼M
+ * M P M -> Apply motor M to point P -> M * P * ∼M
+*/
+
+export const sandwichPlaneMotor = (a, b) => {
+  const xAxisY = 2 * (b[4] * b[5] + b[6] * b[7]);
+  const xAxisZ = 2 * (b[6] * b[4] - b[5] * b[7]);
+
+  const yAxisZ = 2 * (b[5] * b[6] + b[4] * b[7]);
+  const yAxisX = 2 * (b[4] * b[5] - b[6] * b[7]);
+
+  const zAxisX = 2 * (b[6] * b[4] + b[5] * b[7]);
+  const zAxisY = 2 * (b[5] * b[6] - b[4] * b[7]);
+
+  const wAxisX = 2 * (b[7] * b[0] + b[5] * b[2] + b[4] * b[3] - b[6] * b[1]);
+  const wAxisY = 2 * (b[7] * b[1] + b[6] * b[0] + b[5] * b[3] - b[4] * b[2]);
+  const wAxisZ = 2 * (b[7] * b[2] + b[4] * b[1] + b[6] * b[3] - b[5] * b[0]);
+
+  const xScalar = b[7] * b[7] + b[4] * b[4] - b[6] * b[6] - b[5] * b[5];
+  const yScalar = b[7] * b[7] + b[5] * b[5] - b[4] * b[4] - b[6] * b[6];
+  const zScalar = b[7] * b[7] + b[6] * b[6] - b[5] * b[5] - b[4] * b[4];
+  const wScalar = b[4] * b[4] + b[5] * b[5] + b[6] * b[6] + b[7] * b[7];
+
+  const e1 = a[1] * xAxisY + a[2] * xAxisZ + a[0] * xScalar;
+  const e2 = a[2] * yAxisZ + a[0] * yAxisX + a[1] * yScalar;
+  const e3 = a[0] * zAxisX + a[1] * zAxisY + a[2] * zScalar;
+  const e0 = a[0] * wAxisX + a[1] * wAxisY + a[2] * wAxisZ + a[3] * wScalar;
+
+  return new Float32Array([e1, e2, e3, e0]);
+};
+
+export const sandwichLineMotor = (a, b) => {
+  const xAxisY = 2 * (b[4] * b[5] + b[6] * b[7]);
+  const xAxisZ = 2 * (b[6] * b[4] - b[5] * b[7]);
+  const yAxisZ = 2 * (b[5] * b[6] + b[4] * b[7]);
+  const yAxisX = 2 * (b[4] * b[5] - b[6] * b[7]);
+  const zAxisX = 2 * (b[6] * b[4] + b[5] * b[7]);
+  const zAxisY = 2 * (b[5] * b[6] - b[4] * b[7]);
+
+  const xScalar = b[7] * b[7] + b[4] * b[4] - b[6] * b[6] - b[5] * b[5];
+  const yScalar = b[7] * b[7] + b[5] * b[5] - b[4] * b[4] - b[6] * b[6];
+  const zScalar = b[7] * b[7] + b[6] * b[6] - b[5] * b[5] - b[4] * b[4];
+  const wScalar = b[4] * b[4] + b[5] * b[5] + b[6] * b[6] + b[7] * b[7];
+
+  const xDisplaceX = 2 * (b[4] * b[0] - b[7] * b[3] - b[6] * b[2] - b[5] * b[1]);
+  const xDisplaceY = 2 * (b[4] * b[1] + b[7] * b[2] + b[5] * b[0] - b[6] * b[3]);
+  const xDisplaceZ = 2 * (b[4] * b[2] + b[5] * b[3] + b[6] * b[0] - b[7] * b[1]);
+
+  const yDisplaceX = 2 * (b[5] * b[0] + b[6] * b[3] + b[5] * b[1] - b[7] * b[2]);
+  const yDisplaceY = 2 * (b[5] * b[1] - b[7] * b[3] - b[6] * b[2] - b[4] * b[0]);
+  const yDisplaceZ = 2 * (b[5] * b[2] + b[7] * b[0] + b[6] * b[1] - b[4] * b[3]);
+
+  const zDisplaceX = 2 * (b[6] * b[0] + b[7] * b[1] + b[4] * b[2] - b[5] * b[3]);
+  const zDisplaceY = 2 * (b[6] * b[1] + b[4] * b[3] + b[5] * b[2] - b[7] * b[0]);
+  const zDisplaceZ = 2 * (b[6] * b[2] - b[7] * b[3] - b[4] * b[0] - b[5] * b[1]);
+
+  const wDisplaceW = 2 * (b[7] * b[3] - b[6] * b[2] - b[5] * b[1] - b[4] * b[0]);
+
+  const e01 = a[4] * xDisplaceX + a[5] * xDisplaceY + a[6] * xDisplaceZ
+            + a[1] * xAxisY + a[2] * xAxisZ + a[0] * xScalar;
+
+  const e02 = a[4] * yDisplaceX + a[5] * yDisplaceY + a[6] * yDisplaceZ
+            + a[2] * yAxisZ + a[0] * yAxisX + a[1] * yScalar;
+
+  const e03 = a[4] * zDisplaceX + a[5] * zDisplaceY + a[6] * zDisplaceZ
+            + a[0] * zAxisX + a[1] * zAxisY + a[2] * zScalar;
+
+  const e0123 = a[7] * wDisplaceW + a[3] * wScalar;
+
+  const e23 = a[5] * xAxisY + a[6] * xAxisZ + a[4] * xScalar;
+  const e31 = a[6] * yAxisZ + a[4] * yAxisX + a[5] * yScalar;
+  const e12 = a[4] * zAxisX + a[5] * zAxisY + a[6] * zScalar;
+  const s = a[7] * wScalar;
+
+  return new Float32Array([e01, e02, e03, e0123, e23, e31, e12, s]);
+};
+
+export const sandwichPointMotor = (a, b) => {
+  const xAxisY = 2 * (b[4] * b[5] + b[6] * b[7]);
+  const xAxisZ = 2 * (b[6] * b[4] - b[5] * b[7]);
+  const xAxisW = 2 * (b[5] * b[2] - b[7] * b[0] - b[6] * b[1] - b[4] * b[3]);
+
+  const yAxisZ = 2 * (b[5] * b[6] + b[4] * b[7]);
+  const yAxisX = 2 * (b[4] * b[5] - b[6] * b[7]);
+  const yAxisW = 2 * (b[6] * b[0] - b[7] * b[1] - b[4] * b[2] - b[5] * b[3]);
+
+  const zAxisX = 2 * (b[6] * b[4] + b[5] * b[7]);
+  const zAxisY = 2 * (b[5] * b[6] - b[4] * b[7]);
+  const zAxisW = 2 * (b[4] * b[1] - b[7] * b[2] - b[5] * b[0] - b[6] * b[3]);
+
+  const xScalar = b[7] * b[7] + b[4] * b[4] - b[6] * b[6] - b[5] * b[5];
+  const yScalar = b[7] * b[7] + b[5] * b[5] - b[4] * b[4] - b[6] * b[6];
+  const zScalar = b[7] * b[7] + b[6] * b[6] - b[5] * b[5] - b[4] * b[4];
+  const wScalar = b[4] * b[4] + b[5] * b[5] + b[6] * b[6] + b[7] * b[7];
+
+  const e032 = a[3] * xAxisW + a[1] * xAxisY + a[2] * xAxisZ + a[0] * xScalar;
+  const e013 = a[3] * yAxisW + a[2] * yAxisZ + a[0] * yAxisX + a[1] * yScalar;
+  const e021 = a[3] * zAxisW + a[0] * zAxisX + a[1] * zAxisY + a[2] * zScalar;
+  const e123 = a[3] * wScalar;
+
+  return new Float32Array([e032, e013, e021, e123]);
+};
+
 /* === Rotor sandwich operators ===
  *
  * R p R -> Apply rotor R to plane p -> R * p * ∼R
+ * R ℓₒ R -> Apply rotor R to origin line ℓₒ  -> R * ℓₒ * ∼R
  * R ℓ R -> Apply rotor R to line ℓ  -> R * ℓ * ∼R
  * R P R -> Apply rotor R to point P -> R * P * ∼R
 */
 
-export const sandwichPlaneRotor = (a, b) => {
-  const b0b1 = b[0] * b[1]; // b.e23 * b.e31
-  const b0b2 = b[0] * b[2]; // b.e23 * b.e12
-  const b0b3 = b[0] * b[3]; // b.e23 * b.s
-  const b1b2 = b[1] * b[2]; // b.e31 * b.e12
-  const b1b3 = b[1] * b[3]; // b.e31 * b.s
-  const b2b3 = b[2] * b[3]; // b.e12 * b.s
+export const sandwichSimpleRotor = (a, b) => {
+  const xAxisY = 2 * (b[0] * b[1] + b[2] * b[3]);
+  const xAxisZ = 2 * (b[2] * b[0] - b[1] * b[3]);
+  const yAxisZ = 2 * (b[1] * b[2] + b[0] * b[3]);
+  const yAxisX = 2 * (b[0] * b[1] - b[2] * b[3]);
+  const zAxisX = 2 * (b[2] * b[0] + b[1] * b[3]);
+  const zAxisY = 2 * (b[1] * b[2] - b[0] * b[3]);
 
-  const b0sq = b[0] * b[0]; // b.e23 * b.e23
-  const b1sq = b[1] * b[1]; // b.e31 * b.e31
-  const b2sq = b[2] * b[2]; // b.e12 * b.e12
-  const b3sq = b[3] * b[3]; // b.s * b.s
+  const xScalar = b[3] * b[3] + b[0] * b[0] - b[2] * b[2] - b[1] * b[1];
+  const yScalar = b[3] * b[3] + b[1] * b[1] - b[0] * b[0] - b[2] * b[2];
+  const zScalar = b[3] * b[3] + b[2] * b[2] - b[1] * b[1] - b[0] * b[0];
+  const wScalar = b[0] * b[0] + b[1] * b[1] + b[2] * b[2] + b[3] * b[3];
 
-  const e1 = 2 * a[1] * (b0b1 + b2b3)
-           + 2 * a[2] * (b0b2 - b1b3) + a[0] * (b3sq + b0sq - b2sq - b1sq);
+  const x = a[1] * xAxisY + a[2] * xAxisZ + a[0] * xScalar;
+  const y = a[2] * yAxisZ + a[0] * yAxisX + a[1] * yScalar;
+  const z = a[0] * zAxisX + a[1] * zAxisY + a[2] * zScalar;
+  const w = a[3] * wScalar;
 
-  const e2 = 2 * a[2] * (b0b3 + b1b2)
-           + 2 * a[0] * (b0b1 - b2b3) + a[1] * (b3sq + b1sq - b0sq - b2sq);
-
-  const e3 = 2 * a[0] * (b1b3 + b0b2)
-           + 2 * a[1] * (b1b2 - b0b3) + a[2] * (b3sq + b2sq - b1sq - b0sq);
-
-  const e0 = a[3] * (b0sq + b1sq + b2sq + b3sq);
-
-  return new Float32Array([e1, e2, e3, e0]);
+  return new Float32Array([x, y, z, w]);
 };
 
 export const sandwichLineRotor = (a, b) => {
+  const xAxisY = 2 * (b[0] * b[1] + b[2] * b[3]);
+  const xAxisZ = 2 * (b[2] * b[0] - b[1] * b[3]);
+  const yAxisZ = 2 * (b[1] * b[2] + b[0] * b[3]);
+  const yAxisX = 2 * (b[0] * b[1] - b[2] * b[3]);
+  const zAxisX = 2 * (b[2] * b[0] + b[1] * b[3]);
+  const zAxisY = 2 * (b[1] * b[2] - b[0] * b[3]);
 
-};
+  const xScalar = b[3] * b[3] + b[0] * b[0] - b[2] * b[2] - b[1] * b[1];
+  const yScalar = b[3] * b[3] + b[1] * b[1] - b[0] * b[0] - b[2] * b[2];
+  const zScalar = b[3] * b[3] + b[2] * b[2] - b[1] * b[1] - b[0] * b[0];
+  const wScalar = b[0] * b[0] + b[1] * b[1] + b[2] * b[2] + b[3] * b[3];
 
-export const sandwichPointRotor = (a, b) => {
-  const b0b1 = b[0] * b[1]; // b.e23 * b.e31
-  const b0b2 = b[0] * b[2]; // b.e23 * b.e12
-  const b0b3 = b[0] * b[3]; // b.e23 * b.s
-  const b1b2 = b[1] * b[2]; // b.e31 * b.e12
-  const b1b3 = b[1] * b[3]; // b.e31 * b.s
-  const b2b3 = b[2] * b[3]; // b.e12 * b.s
+  const e01 = a[1] * xAxisY + a[2] * xAxisZ + a[0] * xScalar;
+  const e02 = a[2] * yAxisZ + a[0] * yAxisX + a[1] * yScalar;
+  const e03 = a[0] * zAxisX + a[1] * zAxisY + a[2] * zScalar;
+  const e0123 = a[3] * wScalar;
 
-  const b0sq = b[0] * b[0]; // b.e23 * b.e23
-  const b1sq = b[1] * b[1]; // b.e31 * b.e31
-  const b2sq = b[2] * b[2]; // b.e12 * b.e12
-  const b3sq = b[3] * b[3]; // b.s * b.s
+  const e23 = a[5] * xAxisY + a[6] * xAxisZ + a[4] * xScalar;
+  const e31 = a[6] * yAxisZ + a[4] * yAxisX + a[5] * yScalar;
+  const e12 = a[4] * zAxisX + a[5] * zAxisY + a[6] * zScalar;
+  const s = a[7] * wScalar;
 
-  const e1 = 2 * a[1] * (b0b1 + b2b3)
-           + 2 * a[2] * (b0b2 - b1b3) + a[0] * (b3sq + b0sq - b2sq - b1sq);
-
-  const e2 = 2 * a[2] * (b0b3 + b1b2)
-           + 2 * a[0] * (b0b1 - b2b3) + a[1] * (b3sq + b1sq - b0sq - b2sq);
-
-  const e3 = 2 * a[0] * (b1b3 + b0b2)
-           + 2 * a[1] * (b1b2 - b0b3) + a[2] * (b3sq + b2sq - b1sq - b0sq);
-
-  const e0 = a[3] * (b0sq + b1sq + b2sq + b3sq);
-
-  return new Float32Array([e1, e2, e3, e0]);
+  return new Float32Array([e01, e02, e03, e0123, e23, e31, e12, s]);
 };
 
 /* === Translator sandwich operators ===
@@ -189,18 +285,26 @@ export const sandwichPointTranslator = (a, b) => {
 export const sandwichProductMap = {
   [PGATypes.Plane]: {
     [PGATypes.Plane]: [sandwichPlanePlane, PGATypes.Plane],
-    [PGATypes.Rotor]: [sandwichPlaneRotor, PGATypes.Plane],
+    [PGATypes.Motor]: [sandwichPlaneMotor, PGATypes.Plane],
+    [PGATypes.Rotor]: [sandwichSimpleRotor, PGATypes.Plane],
     [PGATypes.Translator]: [sandwichPlaneTranslator, PGATypes.Plane],
+  },
+
+  [PGATypes.OriginLine]: {
+    [PGATypes.Rotor]: [sandwichSimpleRotor, PGATypes.OriginLine],
   },
 
   [PGATypes.Line]: {
     [PGATypes.Plane]: [sandwichLinePlane, PGATypes.Line],
+    [PGATypes.Motor]: [sandwichLineMotor, PGATypes.Line],
+    [PGATypes.Rotor]: [sandwichLineRotor, PGATypes.Line],
     [PGATypes.Translator]: [sandwichLineTranslator, PGATypes.Line],
   },
 
   [PGATypes.Point]: {
     [PGATypes.Plane]: [sandwichPointPlane, PGATypes.Point],
-    [PGATypes.Rotor]: [sandwichPointRotor, PGATypes.Point],
+    [PGATypes.Motor]: [sandwichPointMotor, PGATypes.Point],
+    [PGATypes.Rotor]: [sandwichSimpleRotor, PGATypes.Point],
     [PGATypes.Translator]: [sandwichPointTranslator, PGATypes.Point],
   },
 };
