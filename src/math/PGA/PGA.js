@@ -137,18 +137,6 @@ export default class PGA {
     return mulFn(a.buffer, b.buffer);
   }
 
-  static dual({ buffer, elementType }) {
-    switch (elementType) {
-      case PGATypes.Plane: return new PointElement(Duality.dualPlane(buffer));
-      case PGATypes.IdealLine: return new OriginElement(Duality.dualIdeal(buffer));
-      case PGATypes.OriginLine: return new IdealElement(Duality.dualOrigin(buffer));
-      case PGATypes.Line: return new LineElement(Duality.dualLine(buffer));
-      case PGATypes.Point: return new PlaneElement(Duality.dualPoint(buffer));
-
-      default: throw new TypeError('Invalid argument: Unsupported element type');
-    }
-  }
-
   static sandwichMap = createForwardingMap(sandwichProductMap, '≡');
 
   static sw(a, b) {
@@ -159,6 +147,18 @@ export default class PGA {
     if (!swFn) throw new TypeError('Invalid arguments: Arguments are not graded PGA elements');
 
     return swFn(a.buffer, b.buffer);
+  }
+
+  static dual({ buffer, elementType }) {
+    switch (elementType) {
+      case PGATypes.Plane: return new PointElement(Duality.dualPlane(buffer));
+      case PGATypes.IdealLine: return new OriginElement(Duality.dualIdeal(buffer));
+      case PGATypes.OriginLine: return new IdealElement(Duality.dualOrigin(buffer));
+      case PGATypes.Line: return new LineElement(Duality.dualLine(buffer));
+      case PGATypes.Point: return new PlaneElement(Duality.dualPoint(buffer));
+
+      default: throw new TypeError('Invalid argument: Unsupported element type');
+    }
   }
 
   static exp({ buffer, elementType }) {
