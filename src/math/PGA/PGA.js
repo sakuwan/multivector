@@ -88,7 +88,34 @@ const createForwardingMap = (impl, operator) => {
   return validElements.reduce(makeLhsElements, {});
 };
 
+/* === PGA operations ===
+ *
+ * mul:  Geometric product  - a * b -> <a * b>
+ * dot:  Inner product      - a ∙ b -> <a * b> grade(|s-t|)
+ * meet: Outer product      - a ∧ b -> <a * b> grade(s+t)
+ * join: Regressive product - a ∨ b -> !<!a * !b>
+ * sw:   Sandwich product   - b a b -> <b * a * ∼b>
+ *
+ * dual: Dual operator  - !a
+ * exp:  Exponentiation - e^x
+ * log:  Logarithm      - log x
+ * sqrt: Square root    - sqrt x
+ *
+ * distance: Metric distance - d(x, y)
+*/
 export default class PGA {
+  static geometricMap = createForwardingMap(geometricProductMap, '*');
+
+  static mul(a, b) {
+    const lhsType = a.elementType;
+    const rhsType = b.elementType;
+
+    const mulFn = PGA.geometricMap?.[lhsType]?.[rhsType];
+    if (!mulFn) throw new TypeError('Invalid arguments: Arguments are not graded PGA elements');
+
+    return mulFn(a.buffer, b.buffer);
+  }
+
   static innerMap = createForwardingMap(innerProductMap, '∙');
 
   static dot(a, b) {
@@ -123,18 +150,6 @@ export default class PGA {
     if (!joinFn) throw new TypeError('Invalid arguments: Arguments are not graded PGA elements');
 
     return joinFn(a.buffer, b.buffer);
-  }
-
-  static geometricMap = createForwardingMap(geometricProductMap, '*');
-
-  static mul(a, b) {
-    const lhsType = a.elementType;
-    const rhsType = b.elementType;
-
-    const mulFn = PGA.geometricMap?.[lhsType]?.[rhsType];
-    if (!mulFn) throw new TypeError('Invalid arguments: Arguments are not graded PGA elements');
-
-    return mulFn(a.buffer, b.buffer);
   }
 
   static sandwichMap = createForwardingMap(sandwichProductMap, '≡');
@@ -352,5 +367,15 @@ export default class PGA {
 
       default: throw new TypeError('Invalid argument: Unsupported element type');
     }
+  }
+
+  static distance(a, b) {
+    const lhsType = a.elementType;
+    const rhsType = b.elementType;
+
+    // TODO: distances
+    // d(p₁, p₂) -> meet(p₁, p₂) -> infinity norm
+    // d(p, l)  -> mul(p1, l) -> grade(3) norm
+    // d(p, P)  -> meet(p, P) -> infinity norm
   }
 }

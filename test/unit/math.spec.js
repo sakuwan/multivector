@@ -37,14 +37,10 @@ describe('PGA element - Plane', () => {
     const defaultPlane = Plane();
 
     {
-      const lineA = Line(0, 1, 2, 0, 1, 1).normalize();
+      const pointA = Point(0, 0, 0);
+      const pointB = Point(2, 0, 0);
 
-      const rotorA = Rotor(0, 1, 1, Math.PI);
-      const translatorA = Translator(1, 5, 1, 2);
-
-      const motorA = PGA.mul(translatorA, rotorA).normalize();
-
-      console.log(PGA.sw(lineA, motorA));
+      console.log(PGA.join(pointB, pointA).length());
     }
 
     const planeType = defaultPlane.type();
