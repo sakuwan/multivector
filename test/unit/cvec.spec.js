@@ -1,4 +1,4 @@
-import { cvec2, cvec3, cvec4 } from '../../src/vector';
+import { cvec2, cvec3, cvec4 } from '../../src';
 
 describe('ComponentVector', () => {
   it('Properly initializes from provided values', () => {

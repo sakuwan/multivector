@@ -1,5 +1,4 @@
-import { unique } from './util';
-import ComponentVector from './math/ComponentVector';
+import ComponentVector from './ComponentVector';
 import createSwizzleProxyHandler from './swizzle';
 
 /*
@@ -38,7 +37,7 @@ const createComponentVector = (values, length) => (
 export const createVectorGenerators = (mask) => {
   const proxyGenerators = Object.create(null);
 
-  const comps = unique(mask);
+  const comps = [...new Set(mask)];
   const proxyHandler = createSwizzleProxyHandler(comps, proxyGenerators);
 
   const makeProxy = (size) => ({

@@ -1,4 +1,14 @@
-import { isArray, set } from './util';
+/*
+ * isArray shortcut
+*/
+const { isArray } = Array;
+
+/* eslint-disable no-return-assign, no-param-reassign, no-sequences */
+/*
+ * Single prop set & self return, for mutating in-place
+*/
+const set = (key, v, xs) => (xs[key] = v, xs);
+/* eslint-enable no-return-assign, no-param-reassign, no-sequences */
 
 /*
  * Method map for forwarding proxied getters to their respective %TypedArray%

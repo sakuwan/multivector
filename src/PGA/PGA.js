@@ -375,7 +375,15 @@ export default class PGA {
 
     // TODO: distances
     // d(p₁, p₂) -> meet(p₁, p₂) -> infinity norm
-    // d(p, l)  -> mul(p1, l) -> grade(3) norm
-    // d(p, P)  -> meet(p, P) -> infinity norm
+    // d(p, l) -> mul(p1, l) -> grade(3) norm
+    // d(p, P) -> meet(p, P) -> infinity norm
+
+    // d(l, p) -> meet(l, p1) -> grade(3) norm
+    // d(l₁, l₂) -> mul(l₁, l₂) -> norm
+    // d(l, P) -> join(l, P) -> norm
+
+    // d(P, p) -> meet(P, p) -> infinity norm
+    // d(P, l) -> join(P, l) -> norm
+    // d(P₁, P₂) -> (P₁ - P₂) -> infinity norm
   }
 }

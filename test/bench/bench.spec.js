@@ -5,7 +5,7 @@
 /* eslint-disable */
 
 import { Benchmark } from 'benchmark';
-import { cvec4 } from '../../src/vector';
+import { cvec4 } from '../../src';
 
 describe('benchmark', () => {
   let tableCollection = [];

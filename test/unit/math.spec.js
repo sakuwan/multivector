@@ -8,7 +8,7 @@ import {
   Rotor,
   Translator,
   OriginLine,
-} from '../../src/math/PGA';
+} from '../../src';
 
 describe('PGA element - Plane', () => {
   it('Initializes a proper element', () => {
