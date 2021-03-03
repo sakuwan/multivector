@@ -16,7 +16,7 @@
     "clean": "rimraf ./dist",
     "build:dev": "rollup -c --environment NODE_ENV:development",
     "build:prod": "rollup -c --environment NODE_ENV:production",
-    "test:unit": "jest --projects test/unit",
+    "test:unit": "node --expose-gc ./node_modules/jest/bin/jest --runInBand --logHeapUsage --detectOpenHandles --projects test/unit",
     "test:benchmark": "jest --projects test/bench"
   },
   "devDependencies": {

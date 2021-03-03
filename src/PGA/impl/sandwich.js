@@ -7,8 +7,6 @@
  * operators, such as reflecting through planes and applying all versors
 */
 
-import { PGATypes } from './types';
-
 /* === Plane reflections ===
  *
  * p₁p₂p₁ -> Reflect plane p₁ through plane p₂ -> p₂ * p₁ * p₂
@@ -280,31 +278,4 @@ export const sandwichPointTranslator = (a, b) => {
   const e123 = a[3];
 
   return new Float32Array([e032, e013, e021, e123]);
-};
-
-export const sandwichProductMap = {
-  [PGATypes.Plane]: {
-    [PGATypes.Plane]: [sandwichPlanePlane, PGATypes.Plane],
-    [PGATypes.Motor]: [sandwichPlaneMotor, PGATypes.Plane],
-    [PGATypes.Rotor]: [sandwichSimpleRotor, PGATypes.Plane],
-    [PGATypes.Translator]: [sandwichPlaneTranslator, PGATypes.Plane],
-  },
-
-  [PGATypes.OriginLine]: {
-    [PGATypes.Rotor]: [sandwichSimpleRotor, PGATypes.OriginLine],
-  },
-
-  [PGATypes.Line]: {
-    [PGATypes.Plane]: [sandwichLinePlane, PGATypes.Line],
-    [PGATypes.Motor]: [sandwichLineMotor, PGATypes.Line],
-    [PGATypes.Rotor]: [sandwichLineRotor, PGATypes.Line],
-    [PGATypes.Translator]: [sandwichLineTranslator, PGATypes.Line],
-  },
-
-  [PGATypes.Point]: {
-    [PGATypes.Plane]: [sandwichPointPlane, PGATypes.Point],
-    [PGATypes.Motor]: [sandwichPointMotor, PGATypes.Point],
-    [PGATypes.Rotor]: [sandwichSimpleRotor, PGATypes.Point],
-    [PGATypes.Translator]: [sandwichPointTranslator, PGATypes.Point],
-  },
 };

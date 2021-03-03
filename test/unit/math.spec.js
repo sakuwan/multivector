@@ -8,6 +8,7 @@ import {
   Rotor,
   Translator,
   OriginLine,
+  IdealLine,
 } from '../../src';
 
 describe('PGA element - Plane', () => {
@@ -37,10 +38,15 @@ describe('PGA element - Plane', () => {
     const defaultPlane = Plane();
 
     {
-      const pointA = Point(0, 0, 0);
-      const pointB = Point(2, 0, 0);
+      const translatorA = Translator(1, 1, 1, 1);
+      for (let i = 0; i < 1000000; i += 1) {
+        const pointA = Point(Math.random(), Math.random(), Math.random());
+        const pointB = Point(Math.random(), Math.random(), Math.random());
 
-      console.log(PGA.join(pointB, pointA).length());
+        translatorA.add(PGA.mul(pointA, pointB));
+      }
+
+      console.log(translatorA);
     }
 
     const planeType = defaultPlane.type();

@@ -18,75 +18,20 @@ import { MotorElement } from './elements/Motor';
 import { RotorElement } from './elements/Rotor';
 import { TranslatorElement } from './elements/Translator';
 
-import { MultivectorElement } from './elements/Multivector';
-
 /* === Implementations === */
 import {
   PGATypes,
-  formatPGAType,
 } from './impl/types';
-
-import { innerProductMap } from './impl/inner';
-import { outerProductMap } from './impl/outer';
-import { regressiveProductMap } from './impl/regressive';
-import { geometricProductMap } from './impl/geometric';
-import { sandwichProductMap } from './impl/sandwich';
 
 import * as Duality from './impl/dual';
 
-/* === Element type delegation maps ===
- *
- * Using the provided implementation map, create a wrapper that will result
- * in the proper element of the operation
-*/
-const createForwardingMap = (impl, operator) => {
-  const wrapMethods = (a, b) => {
-    const currentOp = `[${formatPGAType(a)}${operator}${formatPGAType(b)}]`;
-    const errorMessage = `Invalid arguments: ${currentOp} is a vanishing or invalid operation`;
-
-    const [method, result] = impl?.[a]?.[b] ?? [];
-    if (!method) { return () => { throw new TypeError(errorMessage); }; }
-
-    switch (result) {
-      case PGATypes.Scalar: return method;
-      case PGATypes.Pseudoscalar: return method;
-
-      case PGATypes.Plane: return (lhs, rhs) => new PlaneElement(method(lhs, rhs));
-      case PGATypes.IdealLine: return (lhs, rhs) => new IdealElement(method(lhs, rhs));
-      case PGATypes.OriginLine: return (lhs, rhs) => new OriginElement(method(lhs, rhs));
-      case PGATypes.Line: return (lhs, rhs) => new LineElement(method(lhs, rhs));
-      case PGATypes.Point: return (lhs, rhs) => new PointElement(method(lhs, rhs));
-
-      case PGATypes.Motor: return (lhs, rhs) => new MotorElement(method(lhs, rhs));
-      case PGATypes.Rotor: return (lhs, rhs) => new RotorElement(method(lhs, rhs));
-      case PGATypes.Translator: return (lhs, rhs) => new TranslatorElement(method(lhs, rhs));
-
-      case PGATypes.Multivector: return (lhs, rhs) => new MultivectorElement(method(lhs, rhs));
-
-      default: {
-        throw new TypeError('Invalid type: Unsupported result type');
-      }
-    }
-  };
-
-  const makeRhsElements = (lhs) => (a, rhs) => Object.assign(
-    a, { [rhs]: wrapMethods(lhs, rhs) },
-  );
-
-  const makeLhsElements = (a, lhs, _, arr) => Object.assign(
-    a, { [lhs]: arr.reduce(makeRhsElements(lhs), {}) },
-  );
-
-  const validElements = [
-    PGATypes.Plane,
-    PGATypes.IdealLine, PGATypes.OriginLine, PGATypes.Line,
-    PGATypes.Point,
-    PGATypes.Motor, PGATypes.Rotor, PGATypes.Translator,
-    PGATypes.Multivector,
-  ];
-
-  return validElements.reduce(makeLhsElements, {});
-};
+import {
+  geometricMultimethod,
+  innerMultimethod,
+  outerMultimethod,
+  regressiveMultimethod,
+  sandwichMultimethod,
+} from './PGAMethods';
 
 /* === PGA operations ===
  *
@@ -104,65 +49,15 @@ const createForwardingMap = (impl, operator) => {
  * distance: Metric distance - d(x, y)
 */
 export default class PGA {
-  static geometricMap = createForwardingMap(geometricProductMap, '*');
+  static mul(a, b) { return geometricMultimethod(a, b); }
 
-  static mul(a, b) {
-    const lhsType = a.elementType;
-    const rhsType = b.elementType;
+  static dot(a, b) { return innerMultimethod(a, b); }
 
-    const mulFn = PGA.geometricMap?.[lhsType]?.[rhsType];
-    if (!mulFn) throw new TypeError('Invalid arguments: Arguments are not graded PGA elements');
+  static meet(a, b) { return outerMultimethod(a, b); }
 
-    return mulFn(a.buffer, b.buffer);
-  }
+  static join(a, b) { return regressiveMultimethod(a, b); }
 
-  static innerMap = createForwardingMap(innerProductMap, '∙');
-
-  static dot(a, b) {
-    const lhsType = a.elementType;
-    const rhsType = b.elementType;
-
-    const dotFn = PGA.innerMap?.[lhsType]?.[rhsType];
-    if (!dotFn) throw new TypeError('Invalid arguments: Arguments are not graded PGA elements');
-
-    return dotFn(a.buffer, b.buffer);
-  }
-
-  static outerMap = createForwardingMap(outerProductMap, '∧');
-
-  static meet(a, b) {
-    const lhsType = a.elementType;
-    const rhsType = b.elementType;
-
-    const meetFn = PGA.outerMap?.[lhsType]?.[rhsType];
-    if (!meetFn) throw new TypeError('Invalid arguments: Arguments are not graded PGA elements');
-
-    return meetFn(a.buffer, b.buffer);
-  }
-
-  static regressiveMap = createForwardingMap(regressiveProductMap, '∨');
-
-  static join(a, b) {
-    const lhsType = a.elementType;
-    const rhsType = b.elementType;
-
-    const joinFn = PGA.regressiveMap?.[lhsType]?.[rhsType];
-    if (!joinFn) throw new TypeError('Invalid arguments: Arguments are not graded PGA elements');
-
-    return joinFn(a.buffer, b.buffer);
-  }
-
-  static sandwichMap = createForwardingMap(sandwichProductMap, '≡');
-
-  static sw(a, b) {
-    const lhsType = a.elementType;
-    const rhsType = b.elementType;
-
-    const swFn = PGA.sandwichMap?.[lhsType]?.[rhsType];
-    if (!swFn) throw new TypeError('Invalid arguments: Arguments are not graded PGA elements');
-
-    return swFn(a.buffer, b.buffer);
-  }
+  static sw(a, b) { return sandwichMultimethod(a, b); }
 
   static dual({ buffer, elementType }) {
     switch (elementType) {

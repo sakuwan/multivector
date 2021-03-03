@@ -6,8 +6,6 @@
  * of weight, provided by the inner product of the elements.
 */
 
-import { PGATypes } from './types';
-
 /* === Plane geometric products ===
  *
  * Plane * Plane       -> Motor (e01, e02, e03, 0, e23, e31, e12, s)
@@ -875,70 +873,4 @@ export const geometricTranslatorTranslator = (a, b) => {
   const e0123 = a[3] + b[3];
 
   return new Float32Array([e01, e02, e03, e0123]);
-};
-
-/* === Operation map === *
- *
- * Utility map for delegating elements to their proper geometric products, coupled
- * with the result element type, intended for use in '../PGA.js'
- *
- * { [Lhs]: [Rhs] -> [Operation, Result] }
-*/
-export const geometricProductMap = {
-  [PGATypes.Plane]: {
-    [PGATypes.Plane]: [geometricPlanePlane, PGATypes.Motor],
-    [PGATypes.IdealLine]: [geometricPlaneIdeal, PGATypes.Multivector],
-    [PGATypes.OriginLine]: [geometricPlaneOrigin, PGATypes.Multivector],
-    [PGATypes.Line]: [geometricPlaneLine, PGATypes.Multivector],
-    [PGATypes.Point]: [geometricPlanePoint, PGATypes.Motor],
-  },
-
-  [PGATypes.IdealLine]: {
-    [PGATypes.Plane]: [geometricIdealPlane, PGATypes.Motor],
-    [PGATypes.OriginLine]: [geometricIdealOrigin, PGATypes.IdealLine],
-    [PGATypes.Line]: [geometricIdealLine, PGATypes.IdealLine],
-    [PGATypes.Point]: [geometricIdealPoint, PGATypes.Multivector],
-  },
-
-  [PGATypes.OriginLine]: {
-    [PGATypes.Plane]: [geometricOriginPlane, PGATypes.Multivector],
-    [PGATypes.IdealLine]: [geometricOriginIdeal, PGATypes.IdealLine],
-    [PGATypes.OriginLine]: [geometricOriginOrigin, PGATypes.Rotor],
-    [PGATypes.Line]: [geometricOriginLine, PGATypes.Motor],
-    [PGATypes.Point]: [geometricOriginPoint, PGATypes.Multivector],
-  },
-
-  [PGATypes.Line]: {
-    [PGATypes.Plane]: [geometricLinePlane, PGATypes.Multivector],
-    [PGATypes.IdealLine]: [geometricLineIdeal, PGATypes.IdealLine],
-    [PGATypes.OriginLine]: [geometricLineOrigin, PGATypes.Motor],
-    [PGATypes.Line]: [geometricLineLine, PGATypes.Motor],
-    [PGATypes.Point]: [geometricLinePoint, PGATypes.Multivector],
-  },
-
-  [PGATypes.Point]: {
-    [PGATypes.Plane]: [geometricPointPlane, PGATypes.Motor],
-    [PGATypes.IdealLine]: [geometricPointIdeal, PGATypes.Multivector],
-    [PGATypes.OriginLine]: [geometricPointOrigin, PGATypes.Multivector],
-    [PGATypes.Line]: [geometricPointLine, PGATypes.Multivector],
-    [PGATypes.Point]: [geometricPointPoint, PGATypes.Translator],
-  },
-
-  [PGATypes.Motor]: {
-    [PGATypes.Motor]: [geometricMotorMotor, PGATypes.Motor],
-    [PGATypes.Rotor]: [geometricMotorRotor, PGATypes.Motor],
-    [PGATypes.Translator]: [geometricMotorTranslator, PGATypes.Motor],
-  },
-
-  [PGATypes.Rotor]: {
-    [PGATypes.Motor]: [geometricRotorMotor, PGATypes.Motor],
-    [PGATypes.Rotor]: [geometricRotorRotor, PGATypes.Rotor],
-    [PGATypes.Translator]: [geometricRotorTranslator, PGATypes.Motor],
-  },
-
-  [PGATypes.Translator]: {
-    [PGATypes.Motor]: [geometricTranslatorMotor, PGATypes.Motor],
-    [PGATypes.Rotor]: [geometricTranslatorRotor, PGATypes.Motor],
-    [PGATypes.Translator]: [geometricTranslatorTranslator, PGATypes.Translator],
-  },
 };

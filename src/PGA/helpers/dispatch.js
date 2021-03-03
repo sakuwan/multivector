@@ -1,34 +1,35 @@
+import extendProps from './object';
+import UnsupportedError from './error/UnsupportedError';
+
 export const entry = (...args) => {
-  const [arg0] = args;
-  const entryCount = args.length;
-  if (entryCount <= 1 && typeof arg0 !== 'function') {
-    throw new TypeError('Single argument entries must be default functions');
+  const entryCount = args.length - 1;
+  if (entryCount < 1 || typeof args[entryCount] !== 'function') {
+    throw new TypeError('Entries must have at least one argument and a single method');
   }
 
-  if (entryCount === 1 && typeof arg0 === 'function') return { fn: arg0 };
-
-  return {
-    args: args.slice(0, entryCount - 1),
-    fn: args[entryCount - 1],
-  };
+  return args;
 };
 
-export const dispatch = (handler, ...entries) => {
-  if (typeof handler !== 'function') throw new TypeError('dispatch handler must be a function');
+export const dispatch = (singleArgument, defaultFn, ...entries) => {
+  if (!entries.length) throw new TypeError('dispatch requires at least a single entry');
 
-  const entryCount = entries.length;
-  if (!entryCount) throw new TypeError('dispatch requires at least a single entry');
-
-  const expandKeys = (a, c) => {
-
-  };
-
-  const makeDispatchMap = (a, c) => {
-    const { args, fn } = c;
-    if (!args && fn) Object.defineProperty(a, '__default', { value: fn });
-
-    return Object.assign(a, args.reduce(expandKeys, Object.create(null)));
-  };
-
+  const makeDispatchMap = (a, c) => extendProps(c, a);
   const dispatchMap = entries.reduce(makeDispatchMap, Object.create(null));
+  return singleArgument
+    ? ({ buffer, elementType }) => {
+      if (elementType === undefined) throw new UnsupportedError();
+
+      return (elementType in dispatchMap)
+        ? dispatchMap[elementType](buffer)
+        : defaultFn(elementType);
+    }
+    : (a, b) => {
+      const lhsType = a.elementType;
+      const rhsType = b.elementType;
+      if (lhsType === undefined || rhsType === undefined) throw new UnsupportedError();
+
+      return (lhsType in dispatchMap && rhsType in dispatchMap[lhsType])
+        ? dispatchMap[lhsType][rhsType](a.buffer, b.buffer)
+        : defaultFn(lhsType, rhsType);
+    };
 };
