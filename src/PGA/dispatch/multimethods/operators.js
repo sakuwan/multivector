@@ -1,35 +1,45 @@
 /* === Elements === */
-import { PlaneElement } from './elements/Plane';
-import { IdealElement } from './elements/IdealLine';
-import { OriginElement } from './elements/OriginLine';
-import { LineElement } from './elements/Line';
-import { PointElement } from './elements/Point';
-import { MotorElement } from './elements/Motor';
-import { RotorElement } from './elements/Rotor';
-import { TranslatorElement } from './elements/Translator';
-import { MultivectorElement } from './elements/Multivector';
+import { PlaneElement } from '../../elements/Plane';
+import { IdealElement } from '../../elements/IdealLine';
+import { OriginElement } from '../../elements/OriginLine';
+import { LineElement } from '../../elements/Line';
+import { PointElement } from '../../elements/Point';
+import { MotorElement } from '../../elements/Motor';
+import { RotorElement } from '../../elements/Rotor';
+import { TranslatorElement } from '../../elements/Translator';
+import { MultivectorElement } from '../../elements/Multivector';
 
 /* === Implementations === */
 import {
   PGATypes,
   formatPGAType,
-} from './impl/types';
+} from '../../types';
 
-import * as IP from './impl/inner';
-import * as OP from './impl/outer';
-import * as RP from './impl/regressive';
-import * as GP from './impl/geometric';
-import * as SP from './impl/sandwich';
+import * as GP from '../../math/geometric';
+import * as IP from '../../math/inner';
+import * as OP from '../../math/outer';
+import * as RP from '../../math/regressive';
+import * as SP from '../../math/sandwich';
+
+import * as Duality from '../../math/dual';
+import * as Exp from '../../math/exp';
+import * as Log from '../../math/log';
 
 /* === Helpers === */
 import {
   entry,
   dispatch,
-} from './helpers/dispatch';
+} from '../dispatch';
 
-import VanishingError from './helpers/error/VanishingError';
+import VanishingError from '../../utils/error/VanishingError';
+import UnsupportedError from '../../utils/error/UnsupportedError';
 
-/* === Shortened PGA element types === */
+/* === Shortened PGA element types ===
+ *
+ * Since the multiple dispatch maps are quite verbose, it's easier to shorten
+ * the amount of PGATypes.X calls into single letter representations and
+ * cross reference the mapped dispatch against the implementation for clarity
+*/
 const {
   Plane: p,
   IdealLine: I,
@@ -47,7 +57,11 @@ const {
  * input types, using the multiple dispatch logic from './helpers/dispatch.js'
 */
 
-/* === Geometric product multiple dispatch === */
+/* === Geometric product multiple dispatch ===
+ *
+ * Refer to 'math/geometric.js' for implementation details
+ * Throws a VanishingError on fully vanishing or potentially invalid operations
+*/
 export const geometricMultimethod = dispatch(
   false,
   (a, b) => { throw new VanishingError(`[${formatPGAType(a)}*${formatPGAType(b)}]`); },
@@ -102,7 +116,11 @@ export const geometricMultimethod = dispatch(
   entry(T, T, (a, b) => new TranslatorElement(GP.geometricTranslatorTranslator(a, b))),
 );
 
-/* === Inner product multiple dispatch === */
+/* === Inner product multiple dispatch ===
+ *
+ * Refer to 'math/inner.js' for implementation details
+ * Throws a VanishingError on fully vanishing or potentially invalid operations
+*/
 export const innerMultimethod = dispatch(
   false,
   (a, b) => { throw new VanishingError(`[${formatPGAType(a)}∙${formatPGAType(b)}]`); },
@@ -136,7 +154,11 @@ export const innerMultimethod = dispatch(
   entry(P, P, (a, b) => IP.innerPointPoint(a, b)),
 );
 
-/* === Outer product multiple dispatch === */
+/* === Outer product multiple dispatch ===
+ *
+ * Refer to 'math/outer.js' for implementation details
+ * Throws a VanishingError on fully vanishing or potentially invalid operations
+*/
 export const outerMultimethod = dispatch(
   false,
   (a, b) => { throw new VanishingError(`[${formatPGAType(a)}∧${formatPGAType(b)}]`); },
@@ -168,7 +190,11 @@ export const outerMultimethod = dispatch(
   entry(P, p, (a, b) => OP.outerPointPlane(a, b)),
 );
 
-/* === Regressive product multiple dispatch === */
+/* === Regressive product multiple dispatch ===
+ *
+ * Refer to 'math/regressive.js' for implementation details
+ * Throws a VanishingError on fully vanishing or potentially invalid operations
+*/
 export const regressiveMultimethod = dispatch(
   false,
   (a, b) => { throw new VanishingError(`[${formatPGAType(a)}∨${formatPGAType(b)}]`); },
@@ -200,7 +226,11 @@ export const regressiveMultimethod = dispatch(
   entry(P, P, (a, b) => new LineElement(RP.regressivePointPoint(a, b))),
 );
 
-/* === Sandwich product multiple dispatch === */
+/* === Sandwich product multiple dispatch ===
+ *
+ * Refer to 'math/sandwich.js' for implementation details
+ * Throws a VanishingError on fully vanishing or potentially invalid operations
+*/
 export const sandwichMultimethod = dispatch(
   false,
   (a, b) => { throw new VanishingError(`[${formatPGAType(a)}≡${formatPGAType(b)}]`); },
@@ -225,4 +255,48 @@ export const sandwichMultimethod = dispatch(
   entry(P, M, (a, b) => new PointElement(SP.sandwichPointMotor(a, b))),
   entry(P, R, (a, b) => new PointElement(SP.sandwichSimpleRotor(a, b))),
   entry(P, T, (a, b) => new PointElement(SP.sandwichPointTranslator(a, b))),
+);
+
+/* === Poincare duality map multiple dispatch ===
+ *
+ * Refer to 'math/dual.js' for implementation details
+ * Throws an UnsupportedError on invalid operations
+*/
+export const dualMultimethod = dispatch(
+  true,
+  () => { throw new UnsupportedError(); },
+
+  entry(p, (a) => new PointElement(Duality.dualPlane(a))),
+  entry(I, (a) => new OriginElement(Duality.dualIdeal(a))),
+  entry(O, (a) => new IdealElement(Duality.dualOrigin(a))),
+  entry(L, (a) => new LineElement(Duality.dualLine(a))),
+  entry(P, (a) => new PlaneElement(Duality.dualPoint(a))),
+);
+
+/* === Exponentiation multiple dispatch ===
+ *
+ * Refer to 'math/exp.js' for implementation details
+ * Throws an UnsupportedError on invalid operations
+*/
+export const expMultimethod = dispatch(
+  true,
+  () => { throw new UnsupportedError(); },
+
+  entry(I, (a) => new TranslatorElement(Exp.expIdeal(a))),
+  entry(O, (a) => new RotorElement(Exp.expOrigin(a))),
+  entry(L, (a) => new MotorElement(Exp.expLine(a))),
+);
+
+/* === Logarithm multiple dispatch ===
+ *
+ * Refer to 'math/log.js' for implementation details
+ * Throws an UnsupportedError on invalid operations
+*/
+export const logMultimethod = dispatch(
+  true,
+  () => { throw new UnsupportedError(); },
+
+  entry(M, (a) => new LineElement(Log.logMotor(a))),
+  entry(R, (a) => new OriginElement(Log.logRotor(a))),
+  entry(T, (a) => new IdealElement(Log.logTranslator(a))),
 );

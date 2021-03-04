@@ -13,7 +13,7 @@
  * Elements: Valid entities of the PGA vector space
  * PGA: Operations involving elements in their respective vector space
 */
-export { PGATypes } from './PGA/impl/types';
+export { PGATypes } from './PGA/types';
 
 export { Plane } from './PGA/elements/Plane';
 export { IdealLine } from './PGA/elements/IdealLine';

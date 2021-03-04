@@ -3,12 +3,7 @@ import {
   PGATypes,
 
   Plane,
-  Line,
   Point,
-  Rotor,
-  Translator,
-  OriginLine,
-  IdealLine,
 } from '../../src';
 
 describe('PGA element - Plane', () => {
@@ -36,18 +31,6 @@ describe('PGA element - Plane', () => {
   it('Has the proper type identifier', () => {
     // Make sure the instance has the proper type
     const defaultPlane = Plane();
-
-    {
-      const translatorA = Translator(1, 1, 1, 1);
-      for (let i = 0; i < 1000000; i += 1) {
-        const pointA = Point(Math.random(), Math.random(), Math.random());
-        const pointB = Point(Math.random(), Math.random(), Math.random());
-
-        translatorA.add(PGA.mul(pointA, pointB));
-      }
-
-      console.log(translatorA);
-    }
 
     const planeType = defaultPlane.type();
     expect(planeType).toBe(PGATypes.Plane);

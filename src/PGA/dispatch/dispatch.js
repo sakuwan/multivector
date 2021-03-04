@@ -1,5 +1,5 @@
-import extendProps from './object';
-import UnsupportedError from './error/UnsupportedError';
+import extendProps from '../utils/object';
+import UnsupportedError from '../utils/error/UnsupportedError';
 
 export const entry = (...args) => {
   const entryCount = args.length - 1;
