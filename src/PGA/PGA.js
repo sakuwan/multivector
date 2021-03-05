@@ -3,19 +3,9 @@
  * The PGA class provides the actual vector space operations and interactions
  * between elements, such as the inner, outer and regressive products.
  *
- * Specific products may be called, though generics are provided to properly
- * delegate elements to their respective implementations
+ * Specific products may be called, though methods are provided to properly
+ * dispatch elements to their respective implementations
 */
-
-/* === Elements === */
-import { MotorElement } from './elements/Motor';
-import { RotorElement } from './elements/Rotor';
-import { TranslatorElement } from './elements/Translator';
-
-/* === Implementations === */
-import {
-  PGATypes,
-} from './types';
 
 import {
   geometricMultimethod,
@@ -27,9 +17,12 @@ import {
   dualMultimethod,
   expMultimethod,
   logMultimethod,
+  sqrtMultimethod,
 } from './dispatch/multimethods/operators';
 
 /* === PGA operations ===
+ *
+ * === Core ===
  *
  * mul:  Geometric product  - a * b
  * dot:  Inner product      - a ∙ b
@@ -37,58 +30,34 @@ import {
  * join: Regressive product - a ∨ b
  * sw:   Sandwich product   - b a b
  *
- * dual: Dual operator  - !a / *a
- * exp:  Exponentiation - e^x
- * log:  Logarithm      - log x
- * sqrt: Square root    - sqrt x
+ * === Functional ===
  *
- * distance: Metric distance - d(x, y)
+ * dual: Dual operator  - !a / *a
+ * exp:  Exponentiation - e^a
+ * log:  Logarithm      - log a
+ * sqrt: Square root    - sqrt a
+ *
+ * === Geometry ===
+ *
+ * distance: Metric distance - d(a, b)
 */
 export default class PGA {
   /* eslint-disable lines-between-class-members */
+
+  /* === Core operations === */
   static mul(a, b) { return geometricMultimethod(a, b); }
   static dot(a, b) { return innerMultimethod(a, b); }
   static meet(a, b) { return outerMultimethod(a, b); }
   static join(a, b) { return regressiveMultimethod(a, b); }
   static sw(a, b) { return sandwichMultimethod(a, b); }
 
+  /* === Functional operations === */
   static dual(a) { return dualMultimethod(a); }
   static exp(a) { return expMultimethod(a); }
   static log(a) { return logMultimethod(a); }
+  static sqrt(a) { return sqrtMultimethod(a); }
+
   /* eslint-enable lines-between-class-members */
-
-  static sqrt({ buffer, elementType }) {
-    switch (elementType) {
-      case PGATypes.Motor: {
-        const [e01, e02, e03, e0123, e23, e31, e12, s] = buffer;
-
-        return new MotorElement(new Float32Array([
-          e01, e02, e03, e0123,
-          e23, e31, e12, s + 1,
-        ])).normalize();
-      }
-
-      case PGATypes.IdealLine:
-      case PGATypes.Translator: {
-        const [e01, e02, e03] = buffer;
-
-        return new TranslatorElement(new Float32Array([
-          e01, e02, e03, 1,
-        ])).normalize();
-      }
-
-      case PGATypes.OriginLine:
-      case PGATypes.Rotor: {
-        const [e23, e31, e12, s] = buffer;
-
-        return new RotorElement(new Float32Array([
-          e23, e31, e12, s + 1,
-        ])).normalize();
-      }
-
-      default: throw new TypeError('Invalid argument: Unsupported element type');
-    }
-  }
 
   /*
   static distance(a, b) {

@@ -24,6 +24,7 @@ import * as SP from '../../math/sandwich';
 import * as Duality from '../../math/dual';
 import * as Exp from '../../math/exp';
 import * as Log from '../../math/log';
+import * as Sqrt from '../../math/sqrt';
 
 /* === Helpers === */
 import {
@@ -299,4 +300,21 @@ export const logMultimethod = dispatch(
   entry(M, (a) => new LineElement(Log.logMotor(a))),
   entry(R, (a) => new OriginElement(Log.logRotor(a))),
   entry(T, (a) => new IdealElement(Log.logTranslator(a))),
+);
+
+/* === Square root multiple dispatch ===
+ *
+ * Refer to 'math/sqrt.js' for implementation details
+ * Throws an UnsupportedError on invalid operations
+*/
+export const sqrtMultimethod = dispatch(
+  true,
+  () => { throw new UnsupportedError(); },
+
+  entry(I, (a) => new TranslatorElement(Sqrt.sqrtTranslator(a))),
+  entry(O, (a) => new RotorElement(Sqrt.sqrtRotor(a))),
+  entry(L, (a) => new MotorElement(Sqrt.sqrtMotor(a))),
+  entry(M, (a) => new MotorElement(Sqrt.sqrtMotor(a))),
+  entry(R, (a) => new RotorElement(Sqrt.sqrtRotor(a))),
+  entry(T, (a) => new TranslatorElement(Sqrt.sqrtTranslator(a))),
 );

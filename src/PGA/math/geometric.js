@@ -3,7 +3,7 @@
  * The geometric product is an extension of the outer product with the
  * inner product, resulting in a vector composed of multiple grades, called a
  * multivector. This can also be intuited as the outer product with the notion
- * of weight, provided by the inner product of the elements.
+ * of weight, provided by the inner product of the elements
 */
 
 /* === Plane geometric products ===
@@ -84,7 +84,7 @@ export const geometricPlanePlane = (a, b) => {
  * A valid operation that results in a multivector that is the combination
  * of multiple elements, while simply being equivalent to both the inner and
  * outer products individually. Due to this, it should not be called and
- * the particular element should be retreived from either product instead.
+ * the particular element should be retreived from either product instead
 */
 export const geometricPlaneIdeal = (a, b) => {
   const e0 = -(a[0] * b[0] + a[1] * b[1] + a[2] * b[2]);
@@ -102,7 +102,7 @@ export const geometricPlaneIdeal = (a, b) => {
  * A valid operation that results in a multivector that is the combination
  * of multiple elements, while simply being equivalent to both the inner and
  * outer products individually. Due to this, it should not be called and
- * the particular element should be retreived from either product instead.
+ * the particular element should be retreived from either product instead
 */
 export const geometricPlaneOrigin = (a, b) => {
   const e1 = a[0] * b[3] + a[2] * b[1] - a[1] * b[2];
@@ -124,7 +124,7 @@ export const geometricPlaneOrigin = (a, b) => {
  * A valid operation that results in a multivector that is the combination
  * of multiple elements, while simply being equivalent to both the inner and
  * outer products individually. Due to this, it should not be called and
- * the particular element should be retreived from either product instead.
+ * the particular element should be retreived from either product instead
 */
 export const geometricPlaneLine = (a, b) => {
   const e1 = a[0] * b[7] + a[2] * b[5] - a[1] * b[6];
@@ -180,7 +180,7 @@ export const geometricPlanePoint = (a, b) => {
  * A valid operation that results in a multivector that is the combination
  * of multiple elements, while simply being equivalent to both the inner and
  * outer products individually. Due to this, it should not be called and
- * the particular element should be retreived from either product instead.
+ * the particular element should be retreived from either product instead
 */
 export const geometricIdealPlane = (a, b) => {
   const e0 = a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
@@ -263,7 +263,7 @@ export const geometricIdealPoint = (a, b) => {
  * A valid operation that results in a multivector that is the combination
  * of multiple elements, while simply being equivalent to both the inner and
  * outer products individually. Due to this, it should not be called and
- * the particular element should be retreived from either product instead.
+ * the particular element should be retreived from either product instead
 */
 export const geometricOriginPlane = (a, b) => {
   const e1 = a[3] * b[0] - a[1] * b[2] + a[2] * b[1];
@@ -510,7 +510,7 @@ export const geometricLinePoint = (a, b) => {
  * Point * Ideal line  -> Multivector (e0, e032, e013, e021)
  * Point * Origin line -> Multivector (e1, e2, e3, e0, e032, e013, e021, e123)
  * Point * Line        -> Multivector (e1, e2, e3, e0, e032, e013, e021, e123)
- * Point * Point       -> Translator (e01, e02, e03, s)
+ * Point * Point       -> Translator (e01, e02, e03, e0123)
 */
 
 /*
@@ -562,7 +562,7 @@ export const geometricPointIdeal = (a, b) => {
  * A valid operation that results in a multivector that is the combination
  * of multiple elements, while simply being equivalent to both the inner and
  * outer products individually. Due to this, it should not be called and
- * the particular element should be retreived from either product instead.
+ * the particular element should be retreived from either product instead
 */
 export const geometricPointOrigin = (a, b) => {
   const e1 = -(a[3] * b[0]);
@@ -584,7 +584,7 @@ export const geometricPointOrigin = (a, b) => {
  * A valid operation that results in a multivector that is the combination
  * of multiple elements, while simply being equivalent to both the inner and
  * outer products individually. Due to this, it should not be called and
- * the particular element should be retreived from either product instead.
+ * the particular element should be retreived from either product instead
 */
 export const geometricPointLine = (a, b) => {
   const e1 = -(a[3] * b[4]);
@@ -601,21 +601,21 @@ export const geometricPointLine = (a, b) => {
 };
 
 /*
- * Point * Point -> Translator (e01, e02, e03, s)
+ * Point * Point -> Translator (e01, e02, e03, e0123)
  * P * P = P ∙ P + P ∧ P
  * Produces a translator that, when normalized, moves P₂ -> P₁
  * -(a.e123 * b.e032 + a.e032 * b.123) -> e01
  * -(a.e123 * b.e013 + a.e013 * b.123) -> e02
  * -(a.e123 * b.e021 + a.e021 * b.123) -> e03
- * -((a.e123 * b.e123)) -> s
+ * -((a.e123 * b.e123)) -> e0123
 */
 export const geometricPointPoint = (a, b) => {
   const e01 = -(a[3] * b[0] - a[0] * b[3]);
   const e02 = -(a[3] * b[1] - a[1] * b[3]);
   const e03 = -(a[3] * b[2] - a[2] * b[3]);
-  const s = -(a[3] * b[3]);
+  const e0123 = -(a[3] * b[3]);
 
-  return new Float32Array([e01, e02, e03, s]);
+  return new Float32Array([e01, e02, e03, e0123]);
 };
 
 /* === Motor geometric products ===

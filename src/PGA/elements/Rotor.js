@@ -48,7 +48,16 @@ export class RotorElement {
     const { buffer: v } = this;
 
     const cosTheta = Math.cos(0.5 * s);
-    const sinTheta = Math.sin(0.5 * s) * (1.0 / (x * x + y * y + z * z)) ** 0.5;
+
+    const norm = (x * x + y * y + z * z);
+    if (norm === 0) {
+      v[0] = 0;
+      v[1] = 0;
+      v[2] = 0;
+      v[3] = cosTheta;
+    }
+
+    const sinTheta = Math.sin(0.5 * s) * (1.0 / norm) ** 0.5;
 
     v[0] = x * sinTheta;
     v[1] = y * sinTheta;
@@ -75,7 +84,11 @@ export class RotorElement {
 
   normalize() {
     const { buffer: v } = this;
-    const invNorm = (1.0 / (v[0] * v[0] + v[1] * v[1] + v[2] * v[2] + v[3] * v[3])) ** 0.5;
+
+    const norm = (v[0] * v[0] + v[1] * v[1] + v[2] * v[2] + v[3] * v[3]);
+    if (norm === 0) { v.fill(0); return this; }
+
+    const invNorm = (1.0 / norm) ** 0.5;
 
     v[0] *= invNorm;
     v[1] *= invNorm;
@@ -87,7 +100,11 @@ export class RotorElement {
 
   invert() {
     const { buffer: v } = this;
-    const invNorm = (1.0 / (v[0] * v[0] + v[1] * v[1] + v[2] * v[2]));
+
+    const norm = (v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+    if (norm === 0) { v.fill(0); return this; }
+
+    const invNorm = (1.0 / norm);
 
     v[0] *= -invNorm;
     v[1] *= -invNorm;
@@ -110,7 +127,15 @@ createPGAElement(RotorElement, {
 */
 export const Rotor = (x = 0, y = 0, z = 0, s = 0) => {
   const cosTheta = Math.cos(0.5 * s);
-  const sinTheta = Math.sin(0.5 * s) * (1.0 / (x * x + y * y + z * z)) ** 0.5;
 
-  return new RotorElement(new Float32Array([x * sinTheta, y * sinTheta, z * sinTheta, cosTheta]));
+  const norm = (x * x + y * y + z * z);
+  if (norm === 0) return new RotorElement(new Float32Array([0, 0, 0, cosTheta]));
+
+  const sinTheta = Math.sin(0.5 * s) * (1.0 / norm) ** 0.5;
+  return new RotorElement(new Float32Array([
+    x * sinTheta,
+    y * sinTheta,
+    z * sinTheta,
+    cosTheta,
+  ]));
 };

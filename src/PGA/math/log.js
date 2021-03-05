@@ -2,7 +2,7 @@
  *
  * Due to the lack of commutativity and the non-linear nature of translations,
  * rotations, and screws, it is necessary to map between the logarithm and
- * exponential to achieve linear scaling.
+ * exponential to achieve linear scaling
 */
 
 /* === Complex bivector logarithm ===
@@ -64,7 +64,10 @@ export const logMotor = (a) => {
 */
 export const logRotor = (a) => {
   const theta = Math.acos(a[3]);
-  const invTheta = (1.0 / Math.sin(theta)) * theta;
+  const sinTheta = Math.sin(theta);
+  if (sinTheta === 0) return new Float32Array(4);
+
+  const invTheta = (1.0 / sinTheta) * theta;
 
   const e23 = a[0] * invTheta;
   const e31 = a[1] * invTheta;

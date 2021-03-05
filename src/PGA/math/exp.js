@@ -2,16 +2,16 @@
  *
  * Due to the lack of commutativity and the non-linear nature of translations,
  * rotations, and screws, it is necessary to map between the logarithm and
- * exponential to achieve linear scaling.
+ * exponential to achieve linear scaling
 */
 
 /*
- * exp(Ideal) -> Translator (e01, e02, e03, 1)
+ * exp(Ideal) -> Translator (e01, e02, e03, 0)
 */
 export const expIdeal = (a) => {
   const [e01, e02, e03] = a;
 
-  return new Float32Array([e01, e02, e03, 1]);
+  return new Float32Array([e01, e02, e03, 0]);
 };
 
 /*
@@ -19,13 +19,14 @@ export const expIdeal = (a) => {
 */
 export const expOrigin = (a) => {
   const theta = (a[0] * a[0] + a[1] * a[1] + a[2] * a[2]) ** 0.5;
-  const cosTheta = Math.cos(theta);
+  if (theta === 0) return new Float32Array([0, 0, 0, Math.cos(theta)]);
+
   const sinTheta = Math.sin(theta) / theta;
 
   const e23 = a[0] * sinTheta;
   const e31 = a[1] * sinTheta;
   const e12 = a[2] * sinTheta;
-  const s = a[3] * sinTheta + cosTheta;
+  const s = a[3] * sinTheta + Math.cos(theta);
 
   return new Float32Array([e23, e31, e12, s]);
 };

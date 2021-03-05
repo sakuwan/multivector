@@ -4,6 +4,8 @@ import {
 
   Plane,
   Point,
+  Translator,
+  Rotor,
 } from '../../src';
 
 describe('PGA element - Plane', () => {
@@ -31,6 +33,11 @@ describe('PGA element - Plane', () => {
   it('Has the proper type identifier', () => {
     // Make sure the instance has the proper type
     const defaultPlane = Plane();
+
+    {
+      const motorA = PGA.sqrt(PGA.mul(Translator(0, 1, 0), Rotor(1, 0, 0, Math.PI)).normalize());
+      console.log(motorA);
+    }
 
     const planeType = defaultPlane.type();
     expect(planeType).toBe(PGATypes.Plane);

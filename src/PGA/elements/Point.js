@@ -60,6 +60,9 @@ export class PointElement {
 
   normalize() {
     const { buffer: v } = this;
+
+    if (v[3] === 0) { v.fill(0); return this; }
+
     const invNorm = (1.0 / v[3]);
 
     v[0] *= invNorm;
@@ -72,6 +75,9 @@ export class PointElement {
 
   invert() {
     const { buffer: v } = this;
+
+    if (v[3] === 0) { v.fill(0); return this; }
+
     const invNorm = (1.0 / (v[3] * v[3]));
 
     v[0] *= invNorm;

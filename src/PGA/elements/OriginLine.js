@@ -62,7 +62,11 @@ export class OriginElement {
 
   normalize() {
     const { buffer: v } = this;
-    const invNorm = (1.0 / (v[0] * v[0] + v[1] * v[1] + v[2] * v[2] + v[3] * v[3])) ** 0.5;
+
+    const norm = (v[0] * v[0] + v[1] * v[1] + v[2] * v[2] + v[3] * v[3]);
+    if (norm === 0) { v.fill(0); return this; }
+
+    const invNorm = (1.0 / norm) ** 0.5;
 
     v[0] *= invNorm;
     v[1] *= invNorm;
@@ -74,7 +78,11 @@ export class OriginElement {
 
   invert() {
     const { buffer: v } = this;
-    const invNorm = (1.0 / (v[0] * v[0] + v[1] * v[1] + v[2] * v[2] + v[3] * v[3]));
+
+    const norm = (v[0] * v[0] + v[1] * v[1] + v[2] * v[2] + v[3] * v[3]);
+    if (norm === 0) { v.fill(0); return this; }
+
+    const invNorm = (1.0 / norm);
 
     v[0] *= -invNorm;
     v[1] *= -invNorm;

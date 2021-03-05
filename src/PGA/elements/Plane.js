@@ -60,17 +60,23 @@ export class PlaneElement {
 
   normalize() {
     const { buffer: v } = this;
-    const invNorm = (1.0 / (v[0] * v[0] + v[1] * v[1] + v[2] * v[2])) ** 0.5;
+
+    const norm = (v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+    if (norm === 0) { v.fill(0); return this; }
+
+    const invNorm = (1.0 / norm) ** 0.5;
 
     v[0] *= invNorm;
     v[1] *= invNorm;
     v[2] *= invNorm;
 
     /* === TODO: Ask Gunn, Keninck or Ong about this in regards to 3,0,1 PGA
-    * I will admit, I honestly have no idea when it comes to e0 and normalization, as I see a blend
-    * of approaches from multiple authors and papers. Some ignore it entirely, some normalize it
-    * by the same value as the k-vectors, and others add scalars and then normalize. I will stand to
-    * simply treat it the same as the other k-vectors here, similar to what ganja and others do.
+    * I will admit, I honestly have no idea when it comes to e0 and
+    * normalization, as I see a blend of approaches from multiple authors and
+    * papers. Some ignore it entirely, some normalize it by the same value as
+    * the k-vectors, and others add scalars and then normalize. I will stand
+    * to simply treat it the same as the other k-vectors here, similar to what
+    * ganja and others do
     */
 
     v[3] *= invNorm;
@@ -80,7 +86,11 @@ export class PlaneElement {
 
   invert() {
     const { buffer: v } = this;
-    const invNorm = (1.0 / (v[0] * v[0] + v[1] * v[1] + v[2] * v[2]));
+
+    const norm = (v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+    if (norm === 0) { v.fill(0); return this; }
+
+    const invNorm = (1.0 / norm);
 
     v[0] *= invNorm;
     v[1] *= invNorm;
