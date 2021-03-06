@@ -15,16 +15,12 @@ import {
   formatPGAType,
 } from '../../types';
 
-import * as GP from '../../math/geometric';
-import * as IP from '../../math/inner';
-import * as OP from '../../math/outer';
-import * as RP from '../../math/regressive';
-import * as SP from '../../math/sandwich';
-
-import * as Duality from '../../math/dual';
-import * as Exp from '../../math/exp';
-import * as Log from '../../math/log';
-import * as Sqrt from '../../math/sqrt';
+import * as GP from '../../math/operators/geometric';
+import * as IP from '../../math/operators/inner';
+import * as OP from '../../math/operators/outer';
+import * as RP from '../../math/operators/regressive';
+import * as SP from '../../math/operators/sandwich';
+import * as Duality from '../../math/operators/dual';
 
 /* === Helpers === */
 import {
@@ -54,7 +50,7 @@ const {
 
 /* === Element type multiple dispatch ===
  *
- * Dispatch PGA operation calls to their proper implementation based on the
+ * Dispatch PGA operator calls to their proper implementation based on the
  * input types, using the multiple dispatch logic from './helpers/dispatch.js'
 */
 
@@ -272,49 +268,4 @@ export const dualMultimethod = dispatch(
   entry(O, (a) => new IdealElement(Duality.dualOrigin(a))),
   entry(L, (a) => new LineElement(Duality.dualLine(a))),
   entry(P, (a) => new PlaneElement(Duality.dualPoint(a))),
-);
-
-/* === Exponentiation multiple dispatch ===
- *
- * Refer to 'math/exp.js' for implementation details
- * Throws an UnsupportedError on invalid operations
-*/
-export const expMultimethod = dispatch(
-  true,
-  () => { throw new UnsupportedError(); },
-
-  entry(I, (a) => new TranslatorElement(Exp.expIdeal(a))),
-  entry(O, (a) => new RotorElement(Exp.expOrigin(a))),
-  entry(L, (a) => new MotorElement(Exp.expLine(a))),
-);
-
-/* === Logarithm multiple dispatch ===
- *
- * Refer to 'math/log.js' for implementation details
- * Throws an UnsupportedError on invalid operations
-*/
-export const logMultimethod = dispatch(
-  true,
-  () => { throw new UnsupportedError(); },
-
-  entry(M, (a) => new LineElement(Log.logMotor(a))),
-  entry(R, (a) => new OriginElement(Log.logRotor(a))),
-  entry(T, (a) => new IdealElement(Log.logTranslator(a))),
-);
-
-/* === Square root multiple dispatch ===
- *
- * Refer to 'math/sqrt.js' for implementation details
- * Throws an UnsupportedError on invalid operations
-*/
-export const sqrtMultimethod = dispatch(
-  true,
-  () => { throw new UnsupportedError(); },
-
-  entry(I, (a) => new TranslatorElement(Sqrt.sqrtTranslator(a))),
-  entry(O, (a) => new RotorElement(Sqrt.sqrtRotor(a))),
-  entry(L, (a) => new MotorElement(Sqrt.sqrtMotor(a))),
-  entry(M, (a) => new MotorElement(Sqrt.sqrtMotor(a))),
-  entry(R, (a) => new RotorElement(Sqrt.sqrtRotor(a))),
-  entry(T, (a) => new TranslatorElement(Sqrt.sqrtTranslator(a))),
 );
