@@ -35,8 +35,10 @@ describe('PGA element - Plane', () => {
     const defaultPlane = Plane();
 
     {
-      const motorA = PGA.sqrt(PGA.mul(Translator(0, 1, 0), Rotor(1, 0, 0, Math.PI)).normalize());
-      console.log(motorA);
+      const pointA = Point(0, 2, 0);
+      const basePlane = Plane(0, 1, 0);
+
+      console.log(PGA.dist(pointA, basePlane));
     }
 
     const planeType = defaultPlane.type();

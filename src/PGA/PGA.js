@@ -29,6 +29,10 @@ import {
   sqrtMultimethod,
 } from './dispatch/multimethods/functional';
 
+import {
+  distanceMultimethod,
+} from './dispatch/multimethods/geometry';
+
 export default class PGA {
   /* eslint-disable lines-between-class-members */
 
@@ -60,28 +64,9 @@ export default class PGA {
 
   /* === Geometry operations ===
    *
-   * distance: Metric distance - d(a, b)
+   * distance: Metric distance - dist(a, b)
   */
+  static dist(a, b) { return distanceMultimethod(a, b); }
 
   /* eslint-enable lines-between-class-members */
-
-  /*
-  static distance(a, b) {
-    // const lhsType = a.elementType;
-    // const rhsType = b.elementType;
-
-    // TODO: distances
-    // d(p₁, p₂) -> meet(p₁, p₂) -> infinity norm
-    // d(p, l) -> mul(p, l) -> grade(3) norm
-    // d(p, P) -> meet(p, P) -> infinity norm
-
-    // d(l, p) -> mul(l, p1) -> grade(3) norm
-    // d(l₁, l₂) -> mul(l₁, l₂) -> norm
-    // d(l, P) -> join(l, P) -> norm
-
-    // d(P, p) -> meet(P, p) -> infinity norm
-    // d(P, l) -> join(P, l) -> norm
-    // d(P₁, P₂) -> (P₁ - P₂) -> infinity norm
-  }
-  */
 }
