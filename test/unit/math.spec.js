@@ -7,6 +7,7 @@ import {
   Translator,
   Rotor,
 } from '../../src';
+import { anglePlaneLine, anglePlanePlane } from '../../src/PGA/math/geometry/angle';
 
 describe('PGA element - Plane', () => {
   it('Initializes a proper element', () => {
@@ -35,10 +36,20 @@ describe('PGA element - Plane', () => {
     const defaultPlane = Plane();
 
     {
-      const pointA = Point(0, 2, 0);
-      const basePlane = Plane(0, 1, 0);
+      const pointA = Point(1, 1, 0);
+      const pointB = Point(1, 1, 0);
 
-      console.log(PGA.dist(pointA, basePlane));
+      const planeA = Plane(1, 1, 0).normalize();
+      const planeB = Plane(-1, -1, 0).normalize();
+
+      const lineA = PGA.join(pointA, Point()).normalize();
+      const lineB = PGA.join(pointB, Point()).normalize();
+
+      const roundError = (x) => (
+        (Math.abs(x) > 0.999999) ? Math.sign(x) : x
+      );
+
+      console.log(anglePlanePlane(planeA.buffer, planeB.buffer) * (180 / Math.PI));
     }
 
     const planeType = defaultPlane.type();
