@@ -5,6 +5,13 @@
  * of being parallel and normalization
 */
 
+/* === Plane metric distances ===
+ *
+ * Plane <-> Plane -> Unoriented
+ * Plane <-> Line  -> Unoriented
+ * Plane <-> Point -> Oriented
+*/
+
 /*
  * Unoriented
  * dist(p₁, p₂) -> ||p₁ ∧ p₂||∞
@@ -43,6 +50,13 @@ export const distancePlaneLine = (a, b) => {
 export const distancePlanePoint = (a, b) => (
   a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3]
 );
+
+/* === Line metric distances ===
+ *
+ * Line <-> Plane -> Unoriented
+ * Line <-> Line  -> Unoriented
+ * Line <-> Point -> Oriented
+*/
 
 /*
  * Unoriented
@@ -94,6 +108,13 @@ export const distanceLinePoint = (a, b) => {
 
   return (e1 * e1 + e2 * e2 + e3 * e3) ** 0.5;
 };
+
+/* === Point metric distances ===
+ *
+ * Point <-> Plane -> Oriented
+ * Point <-> Line  -> Oriented
+ * Point <-> Point -> Unoriented
+*/
 
 /*
  * Oriented
