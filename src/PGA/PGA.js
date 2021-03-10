@@ -30,6 +30,7 @@ import {
 } from './dispatch/multimethods/functional';
 
 import {
+  angleMultimethod,
   distanceMultimethod,
 } from './dispatch/multimethods/geometry';
 
@@ -64,8 +65,10 @@ export default class PGA {
 
   /* === Geometry operations ===
    *
-   * distance: Metric distance - dist(a, b)
+   * angle: Metric angle - angle(a, b)
+   * dist: Metric distance - dist(a, b)
   */
+  static angle(a, b) { return angleMultimethod(a, b); }
   static dist(a, b) { return distanceMultimethod(a, b); }
 
   /* eslint-enable lines-between-class-members */
