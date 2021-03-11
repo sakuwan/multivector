@@ -4,8 +4,6 @@ import {
 
   Plane,
   Point,
-  Translator,
-  Rotor,
 } from '../../src';
 
 describe('PGA element - Plane', () => {

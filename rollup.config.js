@@ -11,9 +11,9 @@ const babelPlugin = babel({
   babelHelpers: 'runtime',
 });
 
-const terserPlugin = terser(
-  // TODO: Terser opts, see what compression & mangling are viable
-);
+const terserPlugin = terser({
+  ecma: 2020,
+});
 
 const generateConfig = (file) => {
   const outputFile = toOutputFile(file);
@@ -35,7 +35,7 @@ const generateConfig = (file) => {
     }, {
       file: `${outputFile}${isProd ? '.cjs.min.js' : '.cjs.js'}`,
       format: 'cjs',
-      exports: 'auto',
+      exports: 'named',
       ...(isProd ? null : { sourcemap: 'inline' }),
     }],
     external: [/@babel\/runtime/],
