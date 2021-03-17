@@ -1,11 +1,8 @@
 module.exports = {
   name: 'unit',
-  displayName: 'MV Unit Tests',
+  displayName: 'mv unit tests',
 
   roots: [
     '<rootDir>',
   ],
-
-  testEnvironment: 'node',
-  verbose: true,
 };

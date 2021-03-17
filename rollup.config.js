@@ -1,11 +1,12 @@
-import json from '@rollup/plugin-json';
 import babel from '@rollup/plugin-babel';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
+
 import { terser } from 'rollup-plugin-terser';
 
+import * as pkgConfig from './package.json';
+
 const isProd = process.env.NODE_ENV !== 'development';
-const toOutputFile = (file) => `dist/${file.match(/(?<=\/)[^/]*(?=\.\w+$)/i)}`;
 
 const babelPlugin = babel({
   babelHelpers: 'runtime',
@@ -16,11 +17,9 @@ const terserPlugin = terser({
 });
 
 const generateConfig = (file) => {
-  const outputFile = toOutputFile(file);
   const plugins = [
     resolve(),
     commonjs(),
-    json(),
 
     babelPlugin,
     ...(isProd ? [terserPlugin] : []),
@@ -28,21 +27,24 @@ const generateConfig = (file) => {
 
   return {
     input: file,
+
     output: [{
-      file: `${outputFile}${isProd ? '.esm.min.js' : '.esm.js'}`,
+      file: `./dist/${pkgConfig.name}${isProd ? '.esm.min.js' : '.esm.js'}`,
       format: 'esm',
+
       ...(isProd ? null : { sourcemap: 'inline' }),
     }, {
-      file: `${outputFile}${isProd ? '.cjs.min.js' : '.cjs.js'}`,
+      file: `./dist/${pkgConfig.name}${isProd ? '.cjs.min.js' : '.cjs.js'}`,
       format: 'cjs',
-      exports: 'named',
+      exports: 'auto',
+
       ...(isProd ? null : { sourcemap: 'inline' }),
     }],
-    external: [/@babel\/runtime/],
+
     plugins,
   };
 };
 
 export default [
-  generateConfig('src/index.js'),
+  generateConfig(pkgConfig.main),
 ];
