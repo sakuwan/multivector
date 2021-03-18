@@ -5,6 +5,8 @@ module.exports = {
     '!**/node_modules/**',
   ],
 
+  roots: ['<rootDir>'],
+
   testEnvironment: 'node',
   testPathIgnorePatterns: ['/node_modules/'],
 

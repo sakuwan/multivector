@@ -1,10 +1,10 @@
+const baseConfig = require('../../jest.config');
+
 module.exports = {
-  name: 'benchmarks',
-  displayName: 'MV Benchmarks',
+  ...baseConfig,
 
-  roots: [
-    '<rootDir>',
-  ],
+  name: 'benchmark',
+  displayName: 'mv benchmark tests',
 
-  testEnvironment: 'node',
+  testMatch: ['./**/?(*.)+(spec|test).[tj]s?(x)'],
 };

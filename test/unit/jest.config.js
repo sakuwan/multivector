@@ -1,8 +1,10 @@
+const baseConfig = require('../../jest.config');
+
 module.exports = {
+  ...baseConfig,
+
   name: 'unit',
   displayName: 'mv unit tests',
 
-  roots: [
-    '<rootDir>',
-  ],
+  testMatch: ['./**/?(*.)+(spec|test).[tj]s?(x)'],
 };

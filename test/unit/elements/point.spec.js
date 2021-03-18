@@ -1,5 +1,4 @@
 import {
-  PGA,
   PGATypes,
 
   Point,
