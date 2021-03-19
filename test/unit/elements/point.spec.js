@@ -113,20 +113,4 @@ describe('PGA element - Point', () => {
     expect(negativeInvert.e021).toBeCloseTo(-0.03);
     expect(negativeInvert.e123).toBeCloseTo(-0.1);
   });
-
-  it('Performs core element operations: Reversion', () => {
-    // Reversion of grade 3 k-vectors is simply a sign flip
-    const toBeReversed = Point(1, -2, 3, -1);
-
-    toBeReversed.reverse();
-    expect(toBeReversed.buffer).toEqual(new Float32Array([-1, 2, -3, 1]));
-  });
-
-  it('Performs core element operations: Conjugation', () => {
-    // There is no conjugate for this multivector, so expect a no-op
-    const noConjugate = Point(1, 2, 3, 4);
-
-    noConjugate.conjugate();
-    expect(noConjugate.buffer).toEqual(new Float32Array([1, 2, 3, 4]));
-  });
 });
