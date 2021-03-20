@@ -5,6 +5,8 @@
  * general methods
 */
 
+import InvalidError from '../utils/error/InvalidError';
+
 /* === Helper functions & class composition ===
  *
  * createMethodDescriptors: Enumerate all properties of a provided object and
@@ -84,7 +86,9 @@ const applyBasisMixins = (obj, basis) => {
 */
 const createMathMixin = () => ({
   add(v) {
-    if ((v instanceof Object) && (v.elementType === this.elementType)) {
+    if (typeof v === 'object') {
+      if (v.elementType !== this.elementType) throw new InvalidError();
+
       const { buffer } = this;
       const { buffer: other } = v;
       for (let i = 0; i < buffer.length; i += 1) {
@@ -103,7 +107,9 @@ const createMathMixin = () => ({
   },
 
   sub(v) {
-    if ((v instanceof Object) && (v.elementType === this.elementType)) {
+    if (typeof v === 'object') {
+      if (v.elementType !== this.elementType) throw new InvalidError();
+
       const { buffer } = this;
       const { buffer: other } = v;
       for (let i = 0; i < buffer.length; i += 1) {
@@ -122,7 +128,9 @@ const createMathMixin = () => ({
   },
 
   mul(v) {
-    if ((v instanceof Object) && (v.elementType === this.elementType)) {
+    if (typeof v === 'object') {
+      if (v.elementType !== this.elementType) throw new InvalidError();
+
       const { buffer } = this;
       const { buffer: other } = v;
       for (let i = 0; i < buffer.length; i += 1) {
@@ -141,7 +149,9 @@ const createMathMixin = () => ({
   },
 
   div(v) {
-    if ((v instanceof Object) && (v.elementType === this.elementType)) {
+    if (typeof v === 'object') {
+      if (v.elementType !== this.elementType) throw new InvalidError();
+
       const { buffer } = this;
       const { buffer: other } = v;
       for (let i = 0; i < buffer.length; i += 1) {
@@ -162,8 +172,8 @@ const createMathMixin = () => ({
   },
 
   eq(v) {
-    if (!(v instanceof Object) || (v.elementType !== this.elementType)) {
-      throw TypeError('Invalid arguments: eq expects both elements to be of the same type');
+    if (typeof v !== 'object' || v.elementType !== this.elementType) {
+      throw new InvalidError('Invalid element: eq expects both elements to be of the same type');
     }
 
     const { buffer } = this;
@@ -176,8 +186,8 @@ const createMathMixin = () => ({
   },
 
   approxEq(v, epsilon = 1e-6) {
-    if (!(v instanceof Object) || (v.elementType !== this.elementType)) {
-      throw TypeError('Invalid arguments: approxEq expects both elements to be of the same type');
+    if (typeof v !== 'object' || v.elementType !== this.elementType) {
+      throw new InvalidError('Invalid element: approxEq expects both elements to be of the same type');
     }
 
     const { buffer } = this;
