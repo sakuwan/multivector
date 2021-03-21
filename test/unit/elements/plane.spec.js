@@ -17,14 +17,6 @@ describe('PGA element - Plane', () => {
     // Initialize with values
     const initializedPlane = Plane(1, 2, 3, 4);
     expect(initializedPlane.buffer).toEqual(new Float32Array([1, 2, 3, 4]));
-
-    // Cloning, verify unique instances
-    const clonedPlane = defaultPlane.clone();
-    expect(clonedPlane.buffer).toEqual(new Float32Array([0, 0, 0, 0]));
-    expect(clonedPlane.buffer).not.toBe(defaultPlane.buffer);
-
-    clonedPlane.buffer[0] = 1;
-    expect(defaultPlane.buffer[0]).toBe(0);
   });
 
   it('Has the proper type identifier', () => {

@@ -179,4 +179,69 @@ describe('PGA Element - Core', () => {
     const originalTest = toBeNegated.negated();
     expect(originalTest.buffer).toEqual(new Float32Array([1, 1, 1, 1, 1]));
   });
+
+  it('Performs utility operations: Accessors', () => {
+    // mv: Alias for accessing buffer property
+    const defaultElement = Test(1, 1, 1, 1, 1);
+
+    const mv = defaultElement.mv();
+    expect(mv).toBe(defaultElement.buffer);
+
+    // type: Return a specific Symbol instance, used for typechecking
+    const type = defaultElement.type();
+    expect(type).toBe(TestType);
+  });
+
+  it('Performs utility operations: Clone', () => {
+    // clone: Create a new element instance initialized with the same multivector
+    const defaultElement = Test(1, 1, 1, 1, 1);
+
+    const clonedElement = defaultElement.clone();
+    expect(clonedElement.buffer).toEqual(new Float32Array([1, 1, 1, 1, 1]));
+    expect(clonedElement.buffer).not.toBe(defaultElement.buffer);
+
+    clonedElement.buffer[0] = 10;
+    expect(defaultElement.buffer[0]).toBe(1);
+  });
+
+  it('Performs utility operations: Set', () => {
+    // set: Set the internal buffer to an array of values
+    const defaultElement = Test(1, 1, 1, 1, 1);
+
+    defaultElement.set(1, 2, 3, 4, 5);
+    expect(defaultElement.buffer).toEqual(new Float32Array([1, 2, 3, 4, 5]));
+
+    defaultElement.set(3, 2, 1);
+    expect(defaultElement.buffer).toEqual(new Float32Array([3, 2, 1, 4, 5]));
+  });
+
+  it('Performs utility operations: Format', () => {
+    // format: Return a formatted string of the element instance
+    const defaultElement = Test(1, 1, 1, 1, 1);
+
+    const positiveFormat = defaultElement.format();
+    const positiveString = 'TestElement(1s + 1e0 + 1e01 + 1e012 + 1e0123)';
+    expect(positiveFormat).toBe(positiveString);
+
+    defaultElement.set(-1, 1, -1, 1, -1);
+    const negativeFormat = defaultElement.format();
+    const negativeString = 'TestElement(-1s + 1e0 - 1e01 + 1e012 - 1e0123)';
+    expect(negativeFormat).toBe(negativeString);
+  });
+
+  it('Performs utility operations: Symbol.toPrimitive', () => {
+    // toPrimitive: Semi-automatic string coercion for string literals
+    const defaultElement = Test(1, 1, 1, 1, 1);
+
+    const stringCoercion = `${defaultElement}`;
+    const positiveString = 'TestElement(1s + 1e0 + 1e01 + 1e012 + 1e0123)';
+    expect(stringCoercion).toBe(positiveString);
+
+    const numberCoercion = +defaultElement;
+    expect(numberCoercion).toBe(NaN);
+
+    // eslint-disable-next-line prefer-template
+    const defaultCoercion = defaultElement + '';
+    expect(defaultCoercion).toBe('true');
+  });
 });
