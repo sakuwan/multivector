@@ -12,11 +12,11 @@ describe('PGA element - Plane', () => {
 
     // Default plane, Plane(0, 0, 0, 0)
     const defaultPlane = Plane();
-    expect(defaultPlane.buffer).toEqual(new Float32Array([0, 0, 0, 0]));
+    expect(defaultPlane).toEqualElement([0, 0, 0, 0]);
 
     // Initialize with values
     const initializedPlane = Plane(1, 2, 3, 4);
-    expect(initializedPlane.buffer).toEqual(new Float32Array([1, 2, 3, 4]));
+    expect(initializedPlane).toEqualElement([1, 2, 3, 4]);
   });
 
   it('Has the proper type identifier', () => {
@@ -28,17 +28,44 @@ describe('PGA element - Plane', () => {
     expect(planeType).not.toBe(Symbol('Plane'));
   });
 
+  it('Allows for multivector and component access', () => {
+    // (a, b, c, d) -> (1, 2, 3, 4)
+    const planeElement = Plane(1, 2, 3, 4);
+
+    expect(planeElement).toEqualElement([1, 2, 3, 4]);
+
+    expect(planeElement.e1).toBe(1);
+    expect(planeElement.e2).toBe(2);
+    expect(planeElement.e3).toBe(3);
+    expect(planeElement.e0).toBe(4);
+
+    planeElement.e1 = 4;
+    planeElement.e2 = 3;
+    planeElement.e3 = 2;
+    planeElement.e0 = 1;
+
+    expect(planeElement).toEqualElement([4, 3, 2, 1]);
+  });
+
+  it('Performs core element operations: Lengths', () => {
+    // e0 squares to zero and vanishes
+    const farPoint = Plane(10, 10, 10, 5);
+
+    const metricLength = farPoint.length();
+    expect(metricLength).toBeCloseTo(17.3205);
+
+    // ||p||∞ = ||P||
+    const infinityLength = farPoint.infinityLength();
+    expect(infinityLength).toBe(5);
+  });
+
   it('Performs core element operations: Normalization', () => {
     // Satisfy p∙p = 1
     const toBeNormalized = Plane(1, 1, 1, 2);
 
     toBeNormalized.normalize();
     {
-      const [e1, e2, e3, e0] = toBeNormalized.buffer;
-      expect(e1).toBeCloseTo(0.5773);
-      expect(e2).toBeCloseTo(0.5773);
-      expect(e3).toBeCloseTo(0.5773);
-      expect(e0).toBeCloseTo(1.1547);
+      expect(toBeNormalized).toApproxEqualElement([0.5773, 0.5773, 0.5773, 1.1547], 1e-4);
 
       const innerProduct = PGA.dot(toBeNormalized, toBeNormalized);
       expect(innerProduct).toBeCloseTo(1, 5);
@@ -49,11 +76,7 @@ describe('PGA element - Plane', () => {
 
     mixedSigns.normalize();
     {
-      const [e1, e2, e3, e0] = mixedSigns.buffer;
-      expect(e1).toBeCloseTo(-0.2672);
-      expect(e2).toBeCloseTo(0.5345);
-      expect(e3).toBeCloseTo(-0.8017);
-      expect(e0).toBeCloseTo(1.0690);
+      expect(mixedSigns).toApproxEqualElement([-0.2672, 0.5345, -0.8017, 1.0690], 1e-4);
 
       const innerProduct = PGA.dot(mixedSigns, mixedSigns);
       expect(innerProduct).toBeCloseTo(1, 5);
@@ -65,11 +88,7 @@ describe('PGA element - Plane', () => {
     const toBeInverted = Plane(1, 1, 1, 2);
     toBeInverted.invert();
     {
-      const [e1, e2, e3, e0] = toBeInverted.buffer;
-      expect(e1).toBeCloseTo(0.333);
-      expect(e2).toBeCloseTo(0.333);
-      expect(e3).toBeCloseTo(0.333);
-      expect(e0).toBeCloseTo(0.666);
+      expect(toBeInverted).toApproxEqualElement([0.3333, 0.3333, 0.3333, 0.6666], 1e-4);
 
       const initialP = Plane(1, 1, 1, 2);
       const innerProduct = PGA.dot(initialP, toBeInverted);

@@ -11,11 +11,11 @@ describe('PGA element - Point', () => {
 
     // Default point, Point(0, 0, 0, 1)
     const defaultPoint = Point();
-    expect(defaultPoint.buffer).toEqual(new Float32Array([0, 0, 0, 1]));
+    expect(defaultPoint).toEqualElement([0, 0, 0, 1]);
 
     // Initialize with values
     const initializedPoint = Point(1, 2, 3, 4);
-    expect(initializedPoint.buffer).toEqual(new Float32Array([1, 2, 3, 4]));
+    expect(initializedPoint).toEqualElement([1, 2, 3, 4]);
   });
 
   it('Has the proper type identifier', () => {
@@ -31,7 +31,7 @@ describe('PGA element - Point', () => {
     // (x, y, z, w) -> (1, 2, 3, 4)
     const pointElement = Point(1, 2, 3, 4);
 
-    expect(pointElement.mv()).toEqual(new Float32Array([1, 2, 3, 4]));
+    expect(pointElement).toEqualElement([1, 2, 3, 4]);
 
     expect(pointElement.e032).toBe(1);
     expect(pointElement.e013).toBe(2);
@@ -43,16 +43,17 @@ describe('PGA element - Point', () => {
     pointElement.e021 = 2;
     pointElement.e123 = 1;
 
-    expect(pointElement.mv()).toEqual(new Float32Array([4, 3, 2, 1]));
+    expect(pointElement).toEqualElement([4, 3, 2, 1]);
   });
 
   it('Performs core element operations: Lengths', () => {
-    // Metric will simply be e123
+    // e0 squares to zero, e123 remains
     const farPoint = Point(10, 10, 10, 5);
 
     const metricLength = farPoint.length();
     expect(metricLength).toBe(5);
 
+    // ||P||∞ = ||p||
     const infinityLength = farPoint.infinityLength();
     expect(infinityLength).toBeCloseTo(17.3205);
   });
@@ -62,19 +63,19 @@ describe('PGA element - Point', () => {
     const toBeNormalized = Point(1, 1, 1, 2);
 
     toBeNormalized.normalize();
-    expect(toBeNormalized.buffer).toEqual(new Float32Array([0.5, 0.5, 0.5, 1]));
+    expect(toBeNormalized).toEqualElement([0.5, 0.5, 0.5, 1]);
 
     // Already normalized
     const alreadyNormalized = Point(1, 1, 1, 1);
 
     alreadyNormalized.normalize();
-    expect(alreadyNormalized.buffer).toEqual(new Float32Array([1, 1, 1, 1]));
+    expect(alreadyNormalized).toEqualElement([1, 1, 1, 1]);
 
     // Scale values upwards instead of down
     const belowOne = Point(1, 1, 1, 0.5);
 
     belowOne.normalize();
-    expect(belowOne.buffer).toEqual(new Float32Array([2, 2, 2, 1]));
+    expect(belowOne).toEqualElement([2, 2, 2, 1]);
   });
 
   it('Performs core element operations: Inversion', () => {
@@ -82,27 +83,24 @@ describe('PGA element - Point', () => {
     const toBeInverted = Point(1, 1, 1, 2);
 
     toBeInverted.invert();
-    expect(toBeInverted.buffer).toEqual(new Float32Array([0.25, 0.25, 0.25, 0.5]));
+    expect(toBeInverted).toEqualElement([0.25, 0.25, 0.25, 0.5]);
 
     // No inverse
     const noInverse = Point(1, 1, 1, 1);
 
     noInverse.invert();
-    expect(noInverse.buffer).toEqual(new Float32Array([1, 1, 1, 1]));
+    expect(noInverse).toEqualElement([1, 1, 1, 1]);
 
     // Scale values upwards instead of down
     const belowOne = Point(1, 1, 1, 0.5);
 
     belowOne.invert();
-    expect(belowOne.buffer).toEqual(new Float32Array([4, 4, 4, 2]));
+    expect(belowOne).toEqualElement([4, 4, 4, 2]);
 
     // Ensure negatives are fine
     const negativeInvert = Point(-1, -2, -3, -10);
 
     negativeInvert.invert();
-    expect(negativeInvert.e032).toBeCloseTo(-0.01);
-    expect(negativeInvert.e013).toBeCloseTo(-0.02);
-    expect(negativeInvert.e021).toBeCloseTo(-0.03);
-    expect(negativeInvert.e123).toBeCloseTo(-0.1);
+    expect(negativeInvert).toApproxEqualElement([-0.01, -0.02, -0.03, -0.1]);
   });
 });

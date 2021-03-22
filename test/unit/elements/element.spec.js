@@ -25,10 +25,10 @@ describe('PGA Element - Core', () => {
     const toBeAdded = Test(1, 2, 3, 4, 5);
 
     defaultElement.add(toBeAdded);
-    expect(defaultElement.buffer).toEqual(new Float32Array([2, 3, 4, 5, 6]));
+    expect(defaultElement).toEqualElement([2, 3, 4, 5, 6]);
 
     defaultElement.add(1);
-    expect(defaultElement.buffer).toEqual(new Float32Array([3, 4, 5, 6, 7]));
+    expect(defaultElement).toEqualElement([3, 4, 5, 6, 7]);
 
     const invalidElement = {};
     try {
@@ -44,10 +44,10 @@ describe('PGA Element - Core', () => {
     const toBeSubtracted = Test(1, 2, 3, 4, 5);
 
     defaultElement.sub(toBeSubtracted);
-    expect(defaultElement.buffer).toEqual(new Float32Array([0, -1, -2, -3, -4]));
+    expect(defaultElement).toEqualElement([0, -1, -2, -3, -4]);
 
     defaultElement.sub(1);
-    expect(defaultElement.buffer).toEqual(new Float32Array([-1, -2, -3, -4, -5]));
+    expect(defaultElement).toEqualElement([-1, -2, -3, -4, -5]);
 
     const invalidElement = {};
     try {
@@ -63,10 +63,10 @@ describe('PGA Element - Core', () => {
     const toBeScaled = Test(1, 2, 3, 4, 5);
 
     defaultElement.mul(toBeScaled);
-    expect(defaultElement.buffer).toEqual(new Float32Array([0, 2, 6, 12, 20]));
+    expect(defaultElement).toEqualElement([0, 2, 6, 12, 20]);
 
     defaultElement.mul(2);
-    expect(defaultElement.buffer).toEqual(new Float32Array([0, 4, 12, 24, 40]));
+    expect(defaultElement).toEqualElement([0, 4, 12, 24, 40]);
 
     const invalidElement = {};
     try {
@@ -82,10 +82,10 @@ describe('PGA Element - Core', () => {
     const toBeDivided = Test(1, 2, 3, 4, 5);
 
     defaultElement.div(toBeDivided);
-    expect(defaultElement.buffer).toEqual(new Float32Array([2, 2, 2, 2, 2]));
+    expect(defaultElement).toEqualElement([2, 2, 2, 2, 2]);
 
     defaultElement.div(2);
-    expect(defaultElement.buffer).toEqual(new Float32Array([1, 1, 1, 1, 1]));
+    expect(defaultElement).toEqualElement([1, 1, 1, 1, 1]);
 
     const invalidElement = {};
     try {
@@ -141,10 +141,10 @@ describe('PGA Element - Core', () => {
     const toBeInvoluted = Test(1, 1, 1, 1, 1);
 
     toBeInvoluted.involute();
-    expect(toBeInvoluted.buffer).toEqual(new Float32Array([1, -1, 1, -1, 1]));
+    expect(toBeInvoluted).toEqualElement([1, -1, 1, -1, 1]);
 
     const originalTest = toBeInvoluted.involuted();
-    expect(originalTest.buffer).toEqual(new Float32Array([1, 1, 1, 1, 1]));
+    expect(originalTest).toEqualElement([1, 1, 1, 1, 1]);
   });
 
   it('Performs grade operations: Reversion', () => {
@@ -152,10 +152,10 @@ describe('PGA Element - Core', () => {
     const toBeReversed = Test(1, 1, 1, 1, 1);
 
     toBeReversed.reverse();
-    expect(toBeReversed.buffer).toEqual(new Float32Array([1, 1, -1, -1, 1]));
+    expect(toBeReversed).toEqualElement([1, 1, -1, -1, 1]);
 
     const originalTest = toBeReversed.reversed();
-    expect(originalTest.buffer).toEqual(new Float32Array([1, 1, 1, 1, 1]));
+    expect(originalTest).toEqualElement([1, 1, 1, 1, 1]);
   });
 
   it('Performs grade operations: Conjugation', () => {
@@ -163,10 +163,10 @@ describe('PGA Element - Core', () => {
     const toBeConjugated = Test(1, 1, 1, 1, 1);
 
     toBeConjugated.conjugate();
-    expect(toBeConjugated.buffer).toEqual(new Float32Array([1, -1, -1, 1, 1]));
+    expect(toBeConjugated).toEqualElement([1, -1, -1, 1, 1]);
 
     const originalTest = toBeConjugated.conjugated();
-    expect(originalTest.buffer).toEqual(new Float32Array([1, 1, 1, 1, 1]));
+    expect(originalTest).toEqualElement([1, 1, 1, 1, 1]);
   });
 
   it('Performs grade operations: Negation', () => {
@@ -174,10 +174,10 @@ describe('PGA Element - Core', () => {
     const toBeNegated = Test(1, 1, 1, 1, 1);
 
     toBeNegated.negate();
-    expect(toBeNegated.buffer).toEqual(new Float32Array([-1, -1, -1, -1, -1]));
+    expect(toBeNegated).toEqualElement([-1, -1, -1, -1, -1]);
 
     const originalTest = toBeNegated.negated();
-    expect(originalTest.buffer).toEqual(new Float32Array([1, 1, 1, 1, 1]));
+    expect(originalTest).toEqualElement([1, 1, 1, 1, 1]);
   });
 
   it('Performs utility operations: Accessors', () => {
@@ -197,7 +197,7 @@ describe('PGA Element - Core', () => {
     const defaultElement = Test(1, 1, 1, 1, 1);
 
     const clonedElement = defaultElement.clone();
-    expect(clonedElement.buffer).toEqual(new Float32Array([1, 1, 1, 1, 1]));
+    expect(clonedElement).toEqualElement([1, 1, 1, 1, 1]);
     expect(clonedElement.buffer).not.toBe(defaultElement.buffer);
 
     clonedElement.buffer[0] = 10;
@@ -209,10 +209,10 @@ describe('PGA Element - Core', () => {
     const defaultElement = Test(1, 1, 1, 1, 1);
 
     defaultElement.set(1, 2, 3, 4, 5);
-    expect(defaultElement.buffer).toEqual(new Float32Array([1, 2, 3, 4, 5]));
+    expect(defaultElement).toEqualElement([1, 2, 3, 4, 5]);
 
     defaultElement.set(3, 2, 1);
-    expect(defaultElement.buffer).toEqual(new Float32Array([3, 2, 1, 4, 5]));
+    expect(defaultElement).toEqualElement([3, 2, 1, 4, 5]);
   });
 
   it('Performs utility operations: Format', () => {

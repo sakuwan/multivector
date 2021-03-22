@@ -1,5 +1,6 @@
 module.exports = {
-  setupFilesAfterEnv: ['jest-extended'],
+  setupFilesAfterEnv: ['../test.setup.js'],
+
   collectCoverageFrom: [
     './src/**/*.{js,jsx}',
     '!**/node_modules/**',
