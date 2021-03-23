@@ -1,4 +1,5 @@
 import {
+  PGA,
   PGATypes,
 
   Point,
@@ -59,48 +60,98 @@ describe('PGA element - Point', () => {
   });
 
   it('Performs core element operations: Normalization', () => {
-    // Satisfy P∙P = +-1, the homogeneous coordinate should be of weight 1
     const toBeNormalized = Point(1, 1, 1, 2);
 
+    // Satisfy P∙P = +-1, the homogeneous coordinate should be of weight 1
     toBeNormalized.normalize();
-    expect(toBeNormalized).toEqualElement([0.5, 0.5, 0.5, 1]);
+    {
+      expect(toBeNormalized).toEqualElement([0.5, 0.5, 0.5, 1]);
+
+      const innerProduct = PGA.dot(toBeNormalized, toBeNormalized);
+      expect(innerProduct).toBeCloseTo(-1);
+    }
+
+    // Less than one scaling
+    const decimalNormalized = Point(1, 1, 1, 0.5);
+
+    decimalNormalized.normalize();
+    {
+      expect(decimalNormalized).toEqualElement([2, 2, 2, 1]);
+
+      const innerProduct = PGA.dot(decimalNormalized, decimalNormalized);
+      expect(innerProduct).toBeCloseTo(-1);
+    }
+
+    // Mixed signs
+    const mixedNormalized = Point(-1, 2, -3, 4);
+
+    mixedNormalized.normalize();
+    {
+      expect(mixedNormalized).toEqualElement([-0.25, 0.5, -0.75, 1]);
+
+      const innerProduct = PGA.dot(mixedNormalized, mixedNormalized);
+      expect(innerProduct).toBeCloseTo(-1);
+    }
 
     // Already normalized
     const alreadyNormalized = Point(1, 1, 1, 1);
 
     alreadyNormalized.normalize();
-    expect(alreadyNormalized).toEqualElement([1, 1, 1, 1]);
+    {
+      expect(alreadyNormalized).toEqualElement([1, 1, 1, 1]);
 
-    // Scale values upwards instead of down
-    const belowOne = Point(1, 1, 1, 0.5);
-
-    belowOne.normalize();
-    expect(belowOne).toEqualElement([2, 2, 2, 1]);
+      const innerProduct = PGA.dot(alreadyNormalized, alreadyNormalized);
+      expect(innerProduct).toBeCloseTo(-1);
+    }
   });
 
   it('Performs core element operations: Inversion', () => {
-    // Satisfy P∙P⁻¹ = P∙P = +-1
     const toBeInverted = Point(1, 1, 1, 2);
 
+    // Satisfy P∙P⁻¹ = P∙P = +-1
     toBeInverted.invert();
-    expect(toBeInverted).toEqualElement([0.25, 0.25, 0.25, 0.5]);
+    {
+      expect(toBeInverted).toEqualElement([0.25, 0.25, 0.25, 0.5]);
 
-    // No inverse
-    const noInverse = Point(1, 1, 1, 1);
+      const originalPoint = Point(1, 1, 1, 2);
+      const innerProduct = PGA.dot(originalPoint, toBeInverted);
+      expect(innerProduct).toBeCloseTo(-1);
+    }
 
-    noInverse.invert();
-    expect(noInverse).toEqualElement([1, 1, 1, 1]);
+    // Less than one scaling
+    const decimalInverted = Point(1, 1, 1, 0.5);
 
-    // Scale values upwards instead of down
-    const belowOne = Point(1, 1, 1, 0.5);
+    decimalInverted.invert();
+    {
+      expect(decimalInverted).toEqualElement([4, 4, 4, 2]);
 
-    belowOne.invert();
-    expect(belowOne).toEqualElement([4, 4, 4, 2]);
+      const originalPoint = Point(1, 1, 1, 0.5);
+      const innerProduct = PGA.dot(originalPoint, decimalInverted);
+      expect(innerProduct).toBeCloseTo(-1);
+    }
 
-    // Ensure negatives are fine
-    const negativeInvert = Point(-1, -2, -3, -10);
+    // Mixed signs
+    const mixedInverted = Point(-1, 2, -3, 4);
 
-    negativeInvert.invert();
-    expect(negativeInvert).toApproxEqualElement([-0.01, -0.02, -0.03, -0.1]);
+    mixedInverted.invert();
+    {
+      expect(mixedInverted).toApproxEqualElement([-0.0625, 0.125, -0.1875, 0.25]);
+
+      const originalPoint = Point(-1, 2, -3, 4);
+      const innerProduct = PGA.dot(originalPoint, mixedInverted);
+      expect(innerProduct).toBeCloseTo(-1);
+    }
+
+    // Already inverted
+    const alreadyInverted = Point(1, 1, 1, 1);
+
+    alreadyInverted.invert();
+    {
+      expect(alreadyInverted).toEqualElement([1, 1, 1, 1]);
+
+      const originalPoint = Point(1, 1, 1, 1);
+      const innerProduct = PGA.dot(originalPoint, alreadyInverted);
+      expect(innerProduct).toBeCloseTo(-1);
+    }
   });
 });

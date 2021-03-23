@@ -1,5 +1,7 @@
+const setupFile = require('path').resolve(__dirname, './test/test.setup.js');
+
 module.exports = {
-  setupFilesAfterEnv: ['../test.setup.js'],
+  setupFilesAfterEnv: [setupFile],
 
   collectCoverageFrom: [
     './src/**/*.{js,jsx}',

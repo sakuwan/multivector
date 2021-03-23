@@ -7,7 +7,7 @@
 import { Benchmark } from 'benchmark';
 import { cvec4 } from '../../src';
 
-describe('benchmark', () => {
+describe.skip('benchmark', () => {
   let tableCollection = [];
 
   beforeEach(() => {
