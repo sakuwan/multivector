@@ -30,8 +30,8 @@ import createPGAElement from './PGAElement';
  * norm: e0 squares to zero and all components vanish
  * infinity norm: ||T∞||∞ = ||R||
  *
- * normalize: -sqrt(||R||) = d/2
- * invert: -sqrt(||R||) = -d/2
+ * normalize: -sqrt(||T₂||) = d/2
+ * invert: -sqrt(||T₂||) = -d/2
  *
  * === Antiautomorphisms ===
  *
