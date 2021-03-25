@@ -13,7 +13,7 @@ describe('PGA Element - Translator', () => {
     const defaultTranslator = Translator();
     expect(defaultTranslator).toEqualElement([0, 0, 0, 0]);
 
-    // Initialize with values
+    // Initialize with values, auto-normalization
     const initializedTranslator = Translator(1, 2, 3);
     expect(initializedTranslator).toApproxEqualElement([
       -0.1336, -0.2672, -0.4008, 0,
