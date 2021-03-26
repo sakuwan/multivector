@@ -126,7 +126,9 @@ describe('PGA Element - Rotor', () => {
         -0.2672, -0.5345, -0.8017, 0,
       ], 1e-4);
 
-      const innerProduct = PGA.mul(toBeInverted, toBeInverted.reversed());
+      const originalRotor = Rotor(1, 2, 3, Math.PI);
+
+      const innerProduct = PGA.mul(originalRotor, toBeInverted);
       expect(innerProduct.s).toBe(1);
     }
 
@@ -139,7 +141,9 @@ describe('PGA Element - Rotor', () => {
         -0.2672, -0.5345, -0.8017, 0,
       ], 1e-4);
 
-      const innerProduct = PGA.mul(decimalInverted, decimalInverted.reversed());
+      const originalRotor = Rotor(0.3, 0.6, 0.9, Math.PI);
+
+      const innerProduct = PGA.mul(originalRotor, decimalInverted);
       expect(innerProduct.s).toBe(1);
     }
 
@@ -152,7 +156,9 @@ describe('PGA Element - Rotor', () => {
         -0.2672, 0.5345, -0.8017, 0,
       ], 1e-4);
 
-      const innerProduct = PGA.mul(mixedInverted, mixedInverted.reversed());
+      const originalRotor = Rotor(1, -2, 3, Math.PI);
+
+      const innerProduct = PGA.mul(originalRotor, mixedInverted);
       expect(innerProduct.s).toBe(1);
     }
 
@@ -163,7 +169,9 @@ describe('PGA Element - Rotor', () => {
     {
       expect(alreadyInverted).toApproxEqualElement([-1, 0, 0, 0]);
 
-      const innerProduct = PGA.mul(alreadyInverted, alreadyInverted.reversed());
+      const originalRotor = Rotor(1, 0, 0, Math.PI);
+
+      const innerProduct = PGA.mul(originalRotor, alreadyInverted);
       expect(innerProduct.s).toBe(1);
     }
   });
