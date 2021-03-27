@@ -30,7 +30,7 @@ describe('PGA Element - Translator', () => {
   });
 
   it('Allows for multivector and component access', () => {
-    // (a, b, c, d) -> (1, 2, 3, 1)
+    // (x, y, z, s) -> (1, 2, 3, 1)
     const translatorElement = Translator(1, 2, 3);
 
     expect(translatorElement).toApproxEqualElement([
