@@ -29,7 +29,7 @@ const createMethodDescriptors = (obj) => {
 
   const makeDescriptors = (a, c) => ({
     ...a,
-    [c]: Object.assign(Object.getOwnPropertyDescriptor(obj, c), defaultConfiguration),
+    [c]: { ...defaultConfiguration, ...Object.getOwnPropertyDescriptor(obj, c) },
   });
 
   const propertyKeys = [...Object.getOwnPropertyNames(obj), ...Object.getOwnPropertySymbols(obj)];
@@ -38,10 +38,9 @@ const createMethodDescriptors = (obj) => {
 
 const applyMethodMixins = (obj, ...mixins) => {
   const objPrototype = obj.prototype ?? Object.getPrototypeOf(obj);
-  const applyMixin = (mixin) => {
-    const mixinDescriptor = createMethodDescriptors(mixin);
-    Object.defineProperties(objPrototype, mixinDescriptor);
-  };
+  const applyMixin = (mixin) => Object.defineProperties(
+    objPrototype, createMethodDescriptors(mixin),
+  );
 
   mixins.forEach(applyMixin);
 };
