@@ -38,8 +38,8 @@ const createMethodDescriptors = (obj) => {
 
 const applyMethodMixins = (obj, ...mixins) => {
   const objPrototype = obj.prototype ?? Object.getPrototypeOf(obj);
-  const applyMixin = (mixin) => Object.defineProperties(
-    objPrototype, createMethodDescriptors(mixin),
+  const applyMixin = (mixin) => (
+    Object.defineProperties(objPrototype, createMethodDescriptors(mixin))
   );
 
   mixins.forEach(applyMixin);
